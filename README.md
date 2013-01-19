@@ -4,7 +4,6 @@ desi-ada-commercial-edition
 **Ada** implementation in `Python(2.7.x)`. 
 `PLY` library is required. You can download it [here](http://www.dabeaz.com/ply/).
 
-**Please ignore `ada.py` file**
 Specifications
 ---------------
 - types and subtypes
