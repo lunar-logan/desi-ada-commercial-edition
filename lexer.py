@@ -1,5 +1,6 @@
 import ply.lex as lex
-
+import sys
+import os
 reserved = ('ABORT', 'ELSE', 'NEW', 'RETURN', 'ABS', 'ELSIF', 'NOT', 'REVERSE', 'ABSTRACT', 'END', 'NULL',
 'ACCEPT', 'ENTRY', 'SELECT', 'ACCESS', 'EXCEPTION', 'OF', 'SEPARATE', 'ALIASED', 'EXIT', 'OR',
 'SOME', 'ALL', 'OTHERS', 'SUBTYPE', 'AND', 'FOR', 'OUT', 'SYNCHRONIZED', 'ARRAY', 'FUNCTION',
@@ -43,7 +44,7 @@ tokens = reserved + (
 
 #Definition of each operator
 t_PLUS          = r'\+'
-t_MINUS         = r'-'
+t_MINUS         = r'\-'
 t_AMPERSAND     = r'&'
 t_TIMES         = r'\*'
 t_DIVIDE        = r'/'
@@ -104,16 +105,17 @@ def t_IDENTIFIER(t):
     return t
 
 def t_NUMBER(t):
-    r'-?[0-9]*\.?[0-9]+([Ee]?[+\-]?[0-9]+)?'
+    r'[0-9]*\.?[0-9]+([Ee][+\-]?[0-9]+)?'
     v = t.value
-    if '.' in v:
+    if '.' in v or 'e' in v:
         t.value = float(v)
     else:
         t.value = int(t.value)
     return t
-#
+#r'"[^"]*"'
+#r'"([^"\\]|(\\.))*"'
 def t_STRING(t):
-    r'"[^"]*"'
+    r'"(?:[^"\\]|(?:\\.))*"'
     t.value = t.value[1:-1]
     return t
 
@@ -133,21 +135,34 @@ def t_error(t):
     t.lexer.skip(1)
 
 ########### Lexer Ends Here ##########################
-
-lang = """
-with Ada.Text_IO; use Ada.Text_IO;
-procedure Hello is
-A: Float;
-begin -- hjgyugy
-    A:=-.6e+6;
-  Put_Line ("Hello, world!");
-  Put(Float'Image(A));
-end Hello;
- !!"""
-adalexer = lex.lex()
-adalexer.input(lang)
-while True:
-    tok = adalexer.token()
-    if not tok: break
-    print tok
-     
+if len(sys.argv) < 2:
+    print "Abe input file to de?"
+    sys.exit(1)
+try:
+    fd = open(sys.argv[1])
+    out = open(os.getcwd() + "/desi_ada_lexical_analysis.html", "w")
+    out.write('''<!doctype HTML>
+    <html>
+    <head><title>Lexical Analysis</title></head>
+    <body><table cellspacing="0" border="1">
+    <tr>
+    <th>Token Type</th>
+    <th>Value</th>
+    <th>Line No.</th>
+    <th>Lexeme Position</th>
+    </tr>
+    ''')
+    lang = fd.read()
+    adalexer = lex.lex()
+    adalexer.input(lang)
+    while True:
+        tok = adalexer.token()
+        if not tok: break
+        out.write("<tr><td>" + str(tok.type) + "</td><td><b><pre>" + str(tok.value) + "</pre></b></td><td>" + str(tok.lineno) + "</td><td>"+str(tok.lexpos)+"</td></tr>")
+    out.write("</table></body></html>")
+    print "Output so generated is in html form. Please open in a HTML Browser (not IE ;))"
+    out.close()
+    fd.close()
+except IOError as (errno, strerror):
+    print "OOps! lagta hai file me kuch locha hai. Are you sure about the path ?"
+    print "Error details for NeRdS: Error code #", errno, strerror
