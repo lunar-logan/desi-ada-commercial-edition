@@ -1,6 +1,6 @@
 import ply.lex as lex
 import sys
-import os
+import os, re
 reserved = ('ABORT', 'ELSE', 'NEW', 'RETURN', 'ABS', 'ELSIF', 'NOT', 'REVERSE', 'ABSTRACT', 'END', 'NULL',
 'ACCEPT', 'ENTRY', 'SELECT', 'ACCESS', 'EXCEPTION', 'OF', 'SEPARATE', 'ALIASED', 'EXIT', 'OR',
 'SOME', 'ALL', 'OTHERS', 'SUBTYPE', 'AND', 'FOR', 'OUT', 'SYNCHRONIZED', 'ARRAY', 'FUNCTION',
@@ -105,7 +105,20 @@ def t_IDENTIFIER(t):
         t.type = 'IDENTIFIER'
     return t
 
-    
+def __is_valid(x, base):
+    a = "0123456789abcdef"
+    c = a[0:base]
+    p = r"[^" + c + "_.]+"
+    if re.search(p, x, re.I) != None:
+            return False
+    return True
+def __is_valid(x, base):
+    a = "0123456789abcdef"
+    c = a[0:base]
+    p = r"[^" + c + "_.]+"
+    if re.search(p, x, re.I) != None:
+            return False
+    return True
 def t_NUMBER(t):
     r'(?:(?:[0-9](_?[0-9])*\#[0-9a-fA-F](_?[0-9a-fA-F])*(\.?[0-9a-fA-F](_?[0-9a-fA-F])*)?\#([Ee][+\-]?[0-9](_?[0-9])*)?)|[0-9](_?[0-9])*(?:(?:\.[0-9](_?[0-9])*([Ee][+\-]?[0-9](_?[0-9])*)?)|(?:([Ee]\+?[0-9](_?[0-9])*)?)))'
     t.value = t.value.replace('_','')
@@ -120,6 +133,8 @@ def t_NUMBER(t):
             else: exp = 1
             base = int(base)
             if base <= 1 or base > 16: print "WARNING: Invalid base of the number used"
+            if __is_valid(num, base) == False:
+                print "WARNING: Incorrect symbols used in the number with base",base
             if '.' not in num:
                 #its a integer
                 num = int(num, base)
@@ -189,7 +204,7 @@ try:
     out.write("</table></body></html>")
     out.close()
     fd.close()
-    print "Generated in ", time.clock()-st, "seconds"
+    print "A file named 'lexical_analysis.html' has been created\nAnalysis time", time.clock()-st, "seconds"
 except IOError as (errno, strerror):
     print "An I/O Error occured. Make sure the path of the input file is correct"
     print "Error details:\nError code=", errno,"\nError=", strerror
