@@ -35,6 +35,7 @@ tokens = reserved + (
           'RLB', # >> Right Label Bracket
           'BOX', # <>
           # Special characters
+          'QUOTE',
           'NUMBERSIGN', # #
           'LSQB', # [
           'RSQB', # ]
@@ -44,6 +45,7 @@ tokens = reserved + (
 )
 
 #Definition of each operator
+t_QUOTE = r'\"'
 t_PLUS = r'\+'
 t_MINUS = r'\-'
 t_AMPERSAND = r'&'
@@ -112,13 +114,7 @@ def __is_valid(x, base):
     if re.search(p, x, re.I) != None:
             return False
     return True
-def __is_valid(x, base):
-    a = "0123456789abcdef"
-    c = a[0:base]
-    p = r"[^" + c + "_.]+"
-    if re.search(p, x, re.I) != None:
-            return False
-    return True
+
 def t_NUMBER(t):
     r'(?:(?:[0-9](_?[0-9])*\#[0-9a-fA-F](_?[0-9a-fA-F])*(\.?[0-9a-fA-F](_?[0-9a-fA-F])*)?\#([Ee][+\-]?[0-9](_?[0-9])*)?)|[0-9](_?[0-9])*(?:(?:\.[0-9](_?[0-9])*([Ee][+\-]?[0-9](_?[0-9])*)?)|(?:([Ee]\+?[0-9](_?[0-9])*)?)))'
     t.value = t.value.replace('_','')
@@ -129,8 +125,9 @@ def t_NUMBER(t):
             base, num, exp = t.value[0:h1], t.value[h1+1:h2], t.value[h2+1:]
             ##print base, num, exp
             if exp !=None and len(exp) > 0:
-                exp = float("1"+exp)
-            else: exp = 1
+                exp = exp[1:]
+                exp = int(exp)
+            else: exp = 0
             base = int(base)
             if base <= 1 or base > 16: print "WARNING: Invalid base of the number used"
             if __is_valid(num, base) == False:
@@ -138,10 +135,7 @@ def t_NUMBER(t):
             if '.' not in num:
                 #its a integer
                 num = int(num, base)
-            else:
-                ##num is float in base
-                num = float(num)
-            t.value = num*exp
+                t.value = num*pow(base, exp)
         elif '.' in t.value or 'e' in t.value or 'E' in t.value:
             t.value = float(t.value)
         else:
