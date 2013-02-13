@@ -30,7 +30,7 @@ tokens = reserved + (
           'VLINE', # |
           'ARROW', # =>
           'DOUBLEDOT', # ..
-          'ASSIGN', # :=
+          'IS_ASSIGNED', # :=
           'LLB', # << Left Label Bracket
           'RLB', # >> Right Label Bracket
           'BOX', # <>
@@ -48,10 +48,10 @@ tokens = reserved + (
 t_QUOTE = r'\"'
 t_PLUS = r'\+'
 t_MINUS = r'\-'
-t_AMPERSAND = r'&'
-t_TIMES = r'\*'
-t_DIVIDE = r'/'
-t_POW = r'\*\*'
+t_AMPERSAND =   r'&'
+t_TIMES =       r'\*'
+t_DIVIDE =      r'/'
+t_POW =         r'\*\*'
 t_NE = r'/='
 t_EQ = r'='
 t_LT = r'<'
@@ -59,16 +59,16 @@ t_LE = r'<='
 t_GE = r'>='
 t_GT = r'>'
 t_TICK = r"'"
-t_LPAREN = r'\('
-t_RPAREN = r'\)'
-t_COMMA = r'\,'
-t_DOT = r'\.'
-t_COLON = r':'
-t_SEMICOLON = r';'
-t_VLINE = r'\|'
+t_LPAREN =      r'\('
+t_RPAREN =      r'\)'
+t_COMMA =       r'\,'
+t_DOT =         r'\.'
+t_COLON =       r':'
+t_SEMICOLON =   r';'
+t_VLINE =       r'\|'
 t_ARROW = r'=>'
 t_DOUBLEDOT = r'\.\.'
-t_ASSIGN = r':='
+t_IS_ASSIGNED = r':='
 t_LLB = r'<<'
 t_RLB = r'>>'
 t_BOX = r'<>'
@@ -144,7 +144,7 @@ def t_NUMBER(t):
         print "WARNING: ",sys.exc_info()[0] 
     return t
 
-t_ignore = " \t\r\v"
+t_ignore = " \t\r\v\x0c"
 
 #r'"[^"]*"'
 #r'"([^"\\]|(\\.))*"'
@@ -166,7 +166,10 @@ def t_error(t):
     print("Illegal character '%s'" % t.value[0])
     t.lexer.skip(1)
 
+
+lexer = lex.lex();
 ########### Lexer Ends Here ##########################
+"""
 import time
 if len(sys.argv) < 2:
     print '''Error: No ada source file given
@@ -202,3 +205,4 @@ try:
 except IOError as (errno, strerror):
     print "An I/O Error occured. Make sure the path of the input file is correct"
     print "Error details:\nError code=", errno,"\nError=", strerror
+"""
