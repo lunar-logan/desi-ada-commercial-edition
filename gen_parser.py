@@ -435,7 +435,7 @@ def p_term(p):
     | term multiplying factor'''
     pass
 def p_multiplying(p):
-    '''multiplying : '*'
+    '''multiplying : TIMES
     | DIVIDE
     | MOD
     | REM'''
@@ -1010,28 +1010,22 @@ def p_error(p):
     
 
 yacc = yacc.yacc()
-cu = '''with Ada.Text_IO; 
-package body Example is
- 
-  i : Number := Number'First;
- 
-  procedure Print_and_Increment (j: in out Number) is
- 
-    function Next (k: in Number) return Number is
-    begin
-      return k + 1;
-    end Next;
- 
+cu = '''
+function Levenshtein(Left, Right : String) return Natural is
+    D : array(0 .. Left'Last, 0 .. Right'Last) of Natural;
   begin
-    Ada.Text_IO.Put_Line ( "The total is: " & Number'Image(j) );
-    j := Next (j);
-  end Print_and_Increment;
+    for I in D'range(1) loop D(I, 0) := I;end loop;
  
--- package initialization executed when the package is made visible (use clause)
-begin
-  while i < Number'Last loop
-    Print_and_Increment (i);
-  end loop;
-end Example;
+    for J in D'range(2) loop D(0, J) := J;end loop;
+ 
+    for I in Left'range loop
+      for J in Right'range loop
+        D(I, J) := Natural'Min(D(I - 1, J), D(I, J - 1)) + 1;
+        D(I, J) := Natural'Min(D(I, J), D(I - 1, J - 1) + Boolean'Pos(Left(I) /= Right(J)));
+      end loop;
+    end loop;
+ 
+    return D(D'Last(1), D'Last(2));
+  end Levenshtein;
 '''
 print yacc.parse(cu)
