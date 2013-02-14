@@ -160,3 +160,16 @@ begin
     Put( Max_Subsequence_Sum( An_Array ) ); New_Line;
 end Fig2_7;
 ----------------------------------
+
+procedure Subt is
+      subtype Day is Integer range 1 .. 7;
+      Q : Day;
+   
+      M : Natural;  -- built in subtype: Integer range 0 .. max integer
+      N : Positive; -- built in subtype: Integer range 1 .. max integer
+   
+   begin
+      Q := 8;  -- raises runtime exception (error)
+      M := -1;  -- so does this
+   end;
+-------------------------------------------
