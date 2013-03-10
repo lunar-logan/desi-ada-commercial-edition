@@ -17,7 +17,7 @@ precedence = (
 
 def p_goal_symbol(p):
     '''goal_symbol : compilation'''
-    p[0]=p[1]
+    p[0]=Goal_symbol(p[1])
 
 #pragmas
 
@@ -55,11 +55,12 @@ def p_object_qualifier_opt(p):
     | ALIASED
     | CONSTANT
     | ALIASED CONSTANT'''
-    if p[1]=='ALIASED':
-        if len(p)==2:
-            Object_Aliased(None)
-        else:
-            Object_Aliased(p[2])
+    if len(p) > 1:
+        if p[1]=='ALIASED':
+            if len(p)==2:
+                Object_Aliased(None)
+            else:
+                Object_Aliased(p[2])
     elif len(p)==2:
         p[0]=p[1]
     else:
@@ -71,9 +72,9 @@ def p_object_subtype_def(p):
     p[0]=p[1]
     
 def p_init_opt(p):
-    '''init_opt :
+    '''init_opt : empty
     | IS_ASSIGNED expression'''
-    if len(p[1])==3:
+    if len(p)==3:
         p[0]=p[2]
     else:
         p[0]=None
@@ -121,9 +122,9 @@ def p_subtype_ind(p):
     '''subtype_ind : name constraint
     | name'''
     if len(p)==3:
-        p[0]=Subtype_ind(p[1],None)
-    else:
         p[0]=Subtype_ind(p[1],p[2])
+    else:
+        p[0]=Subtype_ind(p[1],None)
     
 def p_constraint(p):
     '''constraint : range_constraint
@@ -145,7 +146,7 @@ def p_range(p):
     '''range : simple_expression DOUBLEDOT simple_expression
     | name TICK RANGE
     | name TICK RANGE LPAREN expression RPAREN'''
-    if p[2]=='..':
+    if p[2]=='\.\.':
         p[0]=Doubledot_range(p[1],p[3],p.lineno(2))
     elif len(p)==4:
         p[0]=Name_tick(p[1],None,lineno=p.lineno(2))
@@ -203,9 +204,9 @@ def p_fixed_type(p):
     '''fixed_type : DELTA expression range_spec
     | DELTA expression DIGITS expression range_spec_opt'''
     if len(p)==4:
-        p[0]=Fixed_type_1(p[2],p[3],lineno=p.lineno(1))
+        p[0]=Fixed_type(p[2],None,p[3],lineno=p.lineno(1))
     else:
-        p[0]=Fixed_type_2(p[2],p[3],p[4],lineno=p.lineno(1))
+        p[0]=Fixed_type(p[2],p[3],p[4],lineno=p.lineno(1))
     
 def p_array_type(p):
     '''array_type : unconstr_array_type
@@ -388,7 +389,7 @@ def p_choice_s(p):
     '''choice_s : choice
     | choice_s '|' choice'''
     if len(p)==2:
-        p[0]=Choice_s(p[1])
+        p[0]=Choice_s([p[1]])
     else:
         p[0]=p[1]
         p[0].append(p[3])
@@ -414,13 +415,13 @@ def p_access_type(p):
     | ACCESS prot_opt PROCEDURE formal_part_opt
     | ACCESS prot_opt FUNCTION formal_part_opt RETURN mark'''
     if len(p)==3:
-        Access_1(p[2],lineno=p.lineno(1))
+        Access_1(None,p[2],lineno=p.lineno(1))
     elif len(p)==4:
-        Access_2(p[2],p[3],lineno=p.lineno(1))
+        Access_1(p[2],p[3],lineno=p.lineno(1))
     elif len(p)==5:
-        Access_3(p[2],p[4],lineno=p.lineno(1))
+        Access_2(p[2],p[4],lineno=p.lineno(1))
     else:
-        Access_4(p[2],p[4],p[6],lineno=p.lineno(1))
+        Access_3(p[2],p[4],p[6],lineno=p.lineno(1))
         
 def p_prot_opt(p):
     '''prot_opt :
@@ -592,7 +593,7 @@ def p_expression(p):
     | expression short_circuit relation'''
     if len(p)==2:
         p[0]=p[1]
-    elif p[2]=='AND' | p[2]=='OR' | p[2]=='XOR' :
+    elif p[2]=='AND' or p[2]=='OR' or p[2]=='XOR' :
         p[0]=Logical_op(p[2],p[1],p[3],lineno=p.lineno(2))
     else :
         p[0]=Short_circuit(p[2],p[1],p[3],lineno=p.lineno(2))
@@ -614,12 +615,13 @@ def p_relation(p):
     | simple_expression relational simple_expression
     | simple_expression membership range
     | simple_expression membership name'''
-    if len(p)==2:
-        p[0]=p[1]
-    elif p[1]=='IN' | p[1]=='NOT IN':
-        Membership(p[2],p[1],p[3],lineno=p.lineno(2))
+    if len(p)==4:
+        if p[2]=='IN' or p[2]=='NOT':
+            Membership(p[2],p[1],p[3],lineno=p.lineno(2))
+        else:
+            Relational(p[2],p[1],p[3],lineno=p.lineno(2))
     else:
-        Relational(p[2],p[1],p[3],lineno=p.lineno(2))
+        p[0]=p[1]
         
 def p_relational(p):
     '''relational : EQ
@@ -813,7 +815,7 @@ def p_alternative(p):
 
 def p_loop_stmt(p):
     '''loop_stmt : label_opt iteration basic_loop id_opt SEMICOLON'''
-    p[0]=Loop_stmt(p[0],p[1],p[2],p[3],lineno=p.lineno(3))
+    p[0]=Loop_stmt(p[1],p[2],p[3],p[4],lineno=p.lineno(3))
     
 def p_label_opt(p):
     '''label_opt :
@@ -851,7 +853,7 @@ def p_basic_loop(p):
     p[0]=p[2]
     
 def p_id_opt(p):
-    '''id_opt :
+    '''id_opt : empty
     | designator'''
     p[0]=p[1]
 
@@ -885,12 +887,12 @@ def p_name_opt(p):
     p[0] = p[1]
     
 def p_when_opt(p):
-    '''when_opt :
+    '''when_opt : empty
     | WHEN condition'''
     if p[1] is None:
         p[0] = None
     else:
-        p[0] = When_cond(p[2],lineno=p.lineno(1))
+        p[0] = p[2]
         
 def p_return_stmt(p):
     '''return_stmt : RETURN SEMICOLON
@@ -962,12 +964,15 @@ def p_mode(p):
     | OUT
     | IN OUT
     | ACCESS'''
-    p[0]=p[1]
+    if len(p)==2:
+        p[0]=p[1]
+    else:
+        p[0]=None
     
 def p_subprog_spec_is_push(p):
     '''subprog_spec_is_push : subprog_spec IS'''
     pass
-    p[0]=Is_push(p[1],lineno=p.lineno(p[2]))
+    p[0]=Is_push(p[1],lineno=p.lineno(2))
     
 def p_subprog_body(p):
     '''subprog_body : subprog_spec_is_push decl_part block_body END id_opt SEMICOLON'''
@@ -1030,7 +1035,7 @@ def p_comp_unit(p):
     if len(p)==4:
         p[0]=Comp_unit(p[1],p[2],p[3],lineno=p.lineno(3))
     else:
-        p[0]=Comp_unit(None,p[1],p[2],lineno=p.lineno(3))
+        p[0]=Comp_unit(None,p[1],p[2],lineno=p.lineno(2))
         
 def p_private_opt(p):
     '''private_opt :
@@ -1056,7 +1061,7 @@ def p_with_clause(p):
     p[0]=With_clause(p[2],lineno=p.lineno(1))
     
 def p_use_clause_opt(p):
-    '''use_clause_opt :
+    '''use_clause_opt : empty
     | use_clause_opt use_clause'''
     if p[1] is None:
         p[0]=None
@@ -1087,7 +1092,7 @@ def p_generic_formal_part(p):
     '''generic_formal_part : GENERIC
     | generic_formal_part generic_formal'''
     if len(p)==2 :
-        p[0] = Generic([p[1].append(p[2])])
+        p[0] = Generic([p[1]])
     else :
         p[0] = p[1]
         p[0].append(p[2])
@@ -1127,8 +1132,8 @@ if __name__ == '__main__':
     lexer = lexer.make_lexer()
     parser = make_parser()
     with subscribe_errors(lambda msg: sys.stdout.write(msg+"\n")):
-        program = parser.parse(open(sys.argv[1]).read())
+        goal_symbol = parser.parse(open(sys.argv[1]).read())
 
     # Output the resulting parse tree structure
-    for depth,node in flatten(program):
+    for depth,node in flatten(goal_symbol):
         print("%s%s" % (" "*(4*depth),node))
