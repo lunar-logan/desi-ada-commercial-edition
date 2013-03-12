@@ -739,7 +739,7 @@ def p_empty(t):
 
 def p_error(p):
     if p:
-        print("Syntax error at '%s'" % p.value)
+        print("Syntax error near '%s' at line %d" % (p.value, p.lineno))
     else:
         print("Syntax error at EOF")
     
@@ -750,7 +750,6 @@ function Levenshtein(Left, Right : String) return Natural is
     D : array(0 .. Left'Last, 0 .. Right'Last) of Natural;
   begin
     for I in D'range(1) loop D(I, 0) := I;end loop;
- 
     for J in D'range(2) loop D(0, J) := J;end loop;
  
     for I in Left'range loop
@@ -758,8 +757,8 @@ function Levenshtein(Left, Right : String) return Natural is
         D(I, J) := Natural'Min(D(I - 1, J), D(I, J - 1)) + 1;
         D(I, J) := Natural'Min(D(I, J), D(I - 1, J - 1) + Boolean'Pos(Left(I) /= Right(J)));
       end loop;
-    end loop;
- 
+    end loop; 
+
     return D(D'Last(1), D'Last(2));
   end Levenshtein;
 '''
