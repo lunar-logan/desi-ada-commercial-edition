@@ -1,3 +1,4 @@
+# exprast.py
 '''
 Abstract Syntax Tree (AST) objects.
 
@@ -49,369 +50,115 @@ class AST(object):
 # way up to building the complete grammar
 # ----------------------------------------------------------------------
 
-class Goal_symbol(AST):
-    _fields = ['compilation'] 
-    
-class Object_decl(AST):
-    _fields = ['def_id_s','object_qualifier_opt','object_subtype_def','init_opt']
-    
-class Def_id_s(AST):
-    _fields = ['def_id_s']
-    
+class Compilation(AST):
+    _fields = ['program']
+
     def append(self,stmt):
-        self.def_id_s.append(stmt)
+        self.program.append(stmt)
 
     def __len__(self):
-        return len(self.def_id_s)
+        return len(self.program)
+
+
+class Literal(AST):
+    _fields = ['value']          
+
+class Typename(AST):
+    _fields = ['name']          
+
+class Location(AST):
+    _fields = ['name']          
+
+class LoadLocation(AST):
+    _fields = ['location']          
+
+class Unaryop(AST):
+    _fields = ['op','expr']           
+
+class Binop(AST):
+    _fields = ['op','left','right']          
     
-class Def_id(AST):
-    _fields = ['identifier']
+class Relop(AST):
+    _fields = ['op','left','right']          
     
-class Object_Aliased(AST):
-    _fields = ['constant']
+class AssignmentStatement(AST):
+    _fields = ['location','expr']          
+
+class PrintStatement(AST):
+    _fields = ['expr']          
     
-class Number_decl(AST):
-    _fields = ['def_id_s','constant','expression']
+class Statements(AST):
+    _fields = ['statements']          
+
+    def append(self,stmt):
+        self.statements.append(stmt)
+
+    def __len__(self):
+        return len(self.statements)
+
+
+class Goal_symbol(AST):
+    _fields = ['compilation']          
+
+class VarDeclaration(AST):
+    _fields = ['name','typename','expr']          
     
-class Type_decl(AST):
-    _fields = ['identifier','discrim_part_opt','type_completion']
+class ConstDeclaration(AST):
+    _fields = ['name','expr']          
     
-class Subtype_decl(AST):
-    _fields = ['identifier','subtype_ind']
-    
-class Subtype_ind(AST):
-    _fields = ['name','constraint']
-    
+class IfStatement(AST):
+    _fields = ['expr', 'truebranch', 'falsebranch']
+
+class WhileStatement(AST):
+    _fields = ['expr', 'truebranch']
+
+class LoopStatement(AST):
+    _fields = ['condition','truebranch']
+
+class For_loop(AST):
+    _fields = ['name','discrete_range']
+
 class Doubledot_range(AST):
-    _fields = ['l_simple_expression','r_simple_expression']
-    
+    _fields = ['left','right']
+
 class Name_tick(AST):
     _fields = ['name','expression']
-    
-class Enum(AST):
-    _fields = ['enum_id']
-    
+
+class FuncStatement(AST):
+    _fields = ['name', 'returntype', 'parameters']
+
+class FuncParameterList(AST):
+    _fields = ['parameters']
+
     def append(self,stmt):
-        self.enum_id.append(stmt)
+        self.parameters = self.parameters + stmt
 
     def __len__(self):
-        return len(self.enum_id)
-    
-class Float_type(AST):
-    _fields = ['expression','range_spec']
-    
-class Fixed_type(AST):
-    _fields = ['l_expression','r_expression','range_spec']
-    
-class Unconstr_array(AST):
-    _fields = ['index_s','component_subtype_def']
-    
-class Constr_array(AST):
-    _fields = ['index_constraint','component_subtype_def']
-    
-class Component_subtype(AST):
-    _fields = ['aliased','subtype_ind']
-    
-class Array_aliased(AST):
-    _fields = ['aliased']
-    
-class Index_s(AST):
-    _fields = ['index_s']
-    
+        return len(self.parameters)
+
+class FuncParameter(VarDeclaration):
+    pass
+
+class FuncCall(AST):
+    _fields = ['name', 'arguments']
+
+class FuncCallArguments(AST):
+    _fields = ['arguments']
+
     def append(self,stmt):
-        self.index_s.append(stmt)
+        self.arguments.append(stmt)
 
     def __len__(self):
-        return len(self.index_s)
-    
-class Iter_discrete_range_s(AST):
-    _fields = ['discrete_range']
-    
-    def append(self,stmt):
-        self.discrete_range.append(stmt)
+        return len(self.arguments)
 
-    def __len__(self):
-        return len(self.discrete_range)
-    
-class Range_constr(AST):
-    _fields = ['name','range_constr']
-    
-class Record_type(AST):
-    _fields = ['tagged','limited','record_def']
-    
-class Record_def(AST):
-    _fields = ['comp_list']
-    
-class Comp_list_1(AST):
-    _fields = ['comp_decl_s','variant_part']
-    
-class Comp_decl_s(AST):
-    _fields = ['comp_decl_s']
-    
-    def append(self,stmt):
-        self.comp_decl_s.append(stmt)
+class FuncCallArgument(AST):
+    _fields = ['expr']
 
-    def __len__(self):
-        return len(self.comp_decl_s)
-    
-class Comp_decl(AST):
-    _fields = ['def_id_s','component_subtype_def','init']
-    
-class Disrim_spec_s(AST):
-    _fields = ['discrim_spec_s']
-    
-    def append(self,stmt):
-        self.discrim_spec_s.append(stmt)
+class ReturnStatement(AST):
+    _fields = ['expr']
 
-    def __len__(self):
-        return len(self.discrim_spec_s)
-    
-class Discrim_spec(AST):
-    _fields = ['def_id_s','access','mark','init']
-    
-class Variant_part(AST):
-    _fields = ['simple_name','variant_s']
-    
-class Variant_s(AST):
-    _fields = ['variant_s']
-    
-    def append(self,stmt):
-        self.variant_s.append(stmt)
-
-    def __len__(self):
-        return len(self.variant_s)
-    
-class Variant(AST):
-    _fields = ['choice_s','comp_list']
-    
-class Choice_s(AST):
-    _fields = ['choice_s']
-    
-    def append(self,stmt):
-        self.choice_s.append(stmt)
-
-    def __len__(self):
-        return len(self.choice_s)
-
-class Access_1(AST):
-    _fields = ['cons','subtype_ind']
-    
-class Access_2(AST):
-    _fields = ['prot_opt','formal_part']
-    
-class Access_3(AST):
-    _fields = ['prot_opt','formal_part','return']
-    
-class Decl_or_body__s1(AST):
-    _fields = ['decl_item_or_body_s1']
-    
-    def append(self,stmt):
-        self.decl_item_or_body_s1.append(stmt)
-
-    def __len__(self):
-        return len(self.decl_item_or_body_s1)
-    
-class Mark(AST):
-    _fields = ['mark','attribute']
-    
-class Compound_name(AST):
-    _fields = ['compound_name','simple_name']
-    
-class C_name_list(AST):
-    _fields = ['c_name_list']
-    
-    def append(self,stmt):
-        self.c_name_list.append(stmt)
-
-    def __len__(self):
-        return len(self.c_name_list)
-    
-class Indexed_comp(AST):
-    _fields = ['name','value_s']
-    
-class Value_s(AST):
-    _fields = ['value_s']
-    
-    def append(self,stmt):
-        self.value_s.append(stmt)
-
-    def __len__(self):
-        return len(self.value_s)
-    
-class Selected_comp(AST):
-    _fields = ['name','simple_name']
-    
-class Attribute(AST):
-    _fields = ['name','attribute_id']
-    
-class Aggregate_1(AST):
-    _fields = ['comp']
-    
-class Aggregate_2(AST):
-    _fields = ['expression','value_s']
-    
-class Aggregate_3(AST):
-    _fields = ['expression']
-    
-class Value_s_2(AST):
-    _fields = ['value_s_2']
-    
-    def append(self,stmt):
-        self.value_s_2.append(stmt)
-
-    def __len__(self):
-        return len(self.value_s_2)
-    
-class Comp_assoc(AST):
-    _fields = ['choice_s','expression']
-    
-class Logical_op(AST):
-    _fields = ['logical','expression','relation']
-    
-class Short_circuit(AST):
-    _fields = ['short_circuit','expression','relation']
-    
-class Membership(AST):
-    _fields = ['membership','simple_expression','range']
-    
-class Relational(AST):
-    _fields = ['membership','simple_expression','name']
-    
-class Unary_op(AST):
-    _fields = ['unary','term']
-    
-class Adding(AST):
-    _fields = ['adding','simple_expression','term']
-    
-class Multiplying(AST):
-    _fields = ['multiplying','term','factor']
-    
-class Not(AST):
-    _fields = ['primary']
-    
-class Abs(AST):
-    _fields = ['primary']
-    
-class Pow(AST):
-    _fields = ['l_primary','r_primary']
-    
-class Qualified(AST):
-    _fields = ['name','parenthesized_primary']
-    
-class New(AST):
-    _fields = ['name']
-    
-class Statement_s(AST):
-    _fields = ['statement_s']
-    
-    def append(self,stmt):
-        self.statement_s.append(stmt)
-
-    def __len__(self):
-        return len(self.statement_s)
-    
-class Assign_Stmt(AST):
-    _fields = ['name','expression']
-    
-class If_stmt(AST):
-    _fields = ['cond_clause_s','else']
-    
-class Cond_clause(AST):
-    _fields = ['cond_part','statement_s']
-    
-class Case_stmt(AST):
-    _fields = ['expression','alternative_s']
-    
-class Alternative(AST):
-    _fields = ['choice_s','statement_s']
-    
-class Loop_stmt(AST):
-    _fields = ['label','iteration','basic_loop','id']
-    
-class For_loop(AST):
-    _fields = ['identifier','reverse','discrete_range']
-    
-class Block(AST):
-    _fields = ['label','block_body','id']
-    
-class Exit_stmt(AST):
-    _fields = ['name','when']
-    
-class Return_stmt(AST):
-    _fields = ['expression']
-    
-class Goto_stmt(AST):
-    _fields = ['name']
-    
-class Procedure(AST):
-    _fields = ['compound_name','formal_part']
-    
-class Function(AST):
-    _fields = ['designator','formal_part','name']
-    
-class Param_s(AST):
-    _fields = ['param_s']
-    
-    def append(self,stmt):
-        self.param_s.append(stmt)
-
-    def __len__(self):
-        return len(self.param_s)
-    
-class Param(AST):
-    _fields = ['def_id_s','mode','mark','init']
-    
-class Is_push(AST):
-    _fields = ['subprog_spec']
-    
 class Subprog_body(AST):
-    _fields = ['subprog_spec','decl_part','block_body','id']
-    
-class Procedure_call(AST):
-    _fields = ['name']
-    
-class Limited(AST):
-    _fields = ['limited']
-    
-class Use(AST):
-    _fields = ['type','name_s']
-    
-class Name_s(AST):
-    _fields = ['name_s']
-    
-    def append(self,stmt):
-        self.name_s.append(stmt)
-
-    def __len__(self):
-        return len(self.name_s)
-    
-class Comp_unit(AST):
-    _fields = ['context_spec','private','unit']
-    
-class Private(AST):
-    _fields = ['private']
-    
-class Context_spec(AST):
-    _fields = ['context_spec']
-    
-    def append(self,stmt):
-        self.context_spec.append(stmt)
-
-    def __len__(self):
-        return len(self.context_spec)
-    
-class With_clause(AST):
-    _fields = ['c_name_list']
-    
-class Generic_decl(AST):
-    _fields = ['generic_formal','subprog_spec']
-    
-class Generic(AST):
-    _fields = ['generic']
-    
-class Gen_subp_inst(AST):
-    _fields = ['subprog_spec','generic_inst']
-
+    _fields = ['subprog_spec','decl_part','statements']
 
 # ----------------------------------------------------------------------
 #                  DO NOT MODIFY ANYTHING BELOW HERE
@@ -469,6 +216,39 @@ class NodeVisitor(object):
                         self.visit(item)
             elif isinstance(value, AST):
                 self.visit(value)
+
+# DO NOT MODIFY
+class NodeTransformer(NodeVisitor):
+    '''
+    Class that allows nodes of the parse tree to be replaced/rewritten.
+    This is determined by the return value of the various visit_() functions.
+    If the return value is None, a node is deleted. If any other value is returned,
+    it replaces the original node.
+
+    The main use of this class is in code that wants to apply transformations
+    to the parse tree.  For example, certain compiler optimizations or
+    rewriting steps prior to code generation.
+    '''
+    def generic_visit(self,node):
+        for field in getattr(node,"_fields"):
+            value = getattr(node,field,None)
+            if isinstance(value,list):
+                newvalues = []
+                for item in value:
+                    if isinstance(item,AST):
+                        newnode = self.visit(item)
+                        if newnode is not None:
+                            newvalues.append(newnode)
+                    else:
+                        newvalues.append(n)
+                value[:] = newvalues
+            elif isinstance(value,AST):
+                newnode = self.visit(value)
+                if newnode is None:
+                    delattr(node,field)
+                else:
+                    setattr(node,field,newnode)
+        return node
 
 # DO NOT MODIFY
 def flatten(top):
