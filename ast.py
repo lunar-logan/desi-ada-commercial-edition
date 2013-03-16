@@ -102,21 +102,61 @@ class Goal_symbol(AST):
 
 class VarDeclaration(AST):
     _fields = ['name','typename','expr']          
+  
+class Unconstr_array(AST):
+    _fields = ['index_s','aliased','subtype_ind']
     
+class Constr_array(AST):
+    _fields = ['index_constraint','aliased','subtype_ind']
+ 
+class Index_s(AST):
+    _fields = ['index_s']
+    
+    def append(self,stmt):
+        self.index_s.append(stmt)
+
+    def __len__(self):
+        return len(self.index_s)
+    
+ 
 class ConstDeclaration(AST):
     _fields = ['name','expr']          
     
 class IfStatement(AST):
     _fields = ['expr', 'truebranch', 'falsebranch']
 
+class CaseStatement(AST):
+    _fields = ['condition','alternatives']
+
+class Alternatives(AST):
+    _fields = ['alternatives']
+
+    def append(self,alternate):
+        self.alternatives.append(alternate)
+
+    def __len__(self):
+        return len(self.alternatives)
+
+class Alternative(AST):
+    _fields = ['choices','statements']
+
+class Choices(AST):
+    _fields = ['choices']
+
+    def append(self,choice):
+        self.choices.append(choice)
+    
+    def __len__(self):
+        return len(self.choices)
+
 class WhileStatement(AST):
-    _fields = ['expr', 'truebranch']
+    _fields = ['label','expr', 'truebranch','id']
 
 class LoopStatement(AST):
     _fields = ['condition','truebranch']
 
 class For_loop(AST):
-    _fields = ['name','discrete_range']
+    _fields = ['name','reverse','discrete_range']
 
 class Doubledot_range(AST):
     _fields = ['left','right']
@@ -124,8 +164,11 @@ class Doubledot_range(AST):
 class Name_tick(AST):
     _fields = ['name','expression']
 
+class Block(AST):
+    _fields = ['label','decl','block','id']
+
 class FuncStatement(AST):
-    _fields = ['name', 'returntype', 'parameters']
+    _fields = ['name', 'returntype', 'parameters','decl_part','statements','id']
 
 class FuncParameterList(AST):
     _fields = ['parameters']
@@ -140,7 +183,7 @@ class FuncParameter(VarDeclaration):
     pass
 
 class FuncCall(AST):
-    _fields = ['name', 'arguments']
+    _fields = ['name']
 
 class FuncCallArguments(AST):
     _fields = ['arguments']
@@ -157,8 +200,8 @@ class FuncCallArgument(AST):
 class ReturnStatement(AST):
     _fields = ['expr']
 
-class Subprog_body(AST):
-    _fields = ['subprog_spec','decl_part','statements']
+class ExitStatement(AST):
+    _fields = ['name','expr']
 
 # ----------------------------------------------------------------------
 #                  DO NOT MODIFY ANYTHING BELOW HERE
