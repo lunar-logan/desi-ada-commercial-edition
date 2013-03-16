@@ -91,6 +91,7 @@ from ast import *
 from loo import IntType, FloatType, StringType, BoolType, ExprType
 from pprint import pprint
 
+counter = 0
 class SymbolTable(dict):
     '''
     Class representing a symbol table.  It should provide functionality
@@ -105,7 +106,8 @@ class SymbolTable(dict):
         return self.get(name, None)
     def return_type(self):
         if self.decl:
-            return self.decl.returntype
+            if self.decl.returntype != None:
+                return self.decl.returntype.check_type
         return None
 
 class Environment(object):
@@ -205,7 +207,7 @@ class CheckProgramVisitor(NodeVisitor):
             return BoolType
 
     def inside_function(self):
-        return self.environment.scope_level() > 0
+        return self.environment.scope_level() > 1
 
     def visit_Program(self,node):
         print 'Program'
@@ -255,6 +257,7 @@ class CheckProgramVisitor(NodeVisitor):
         check_type = self.check_type_rel(node, node.op, node.left, node.right)
         # 3. Assign the result type
         node.check_type = check_type
+        print check_type
 
     def visit_AssignmentStatement(self,node):
         print 'Assignment'
@@ -301,18 +304,59 @@ class CheckProgramVisitor(NodeVisitor):
         if node.falsebranch is not None:
             self.visit(node.falsebranch)
 
+    def visit_CaseStatement(self,node):
+        print 'Case'
+        self.visit(node.condition)
+        for al in self.alternatives.alternatives :
+            self.visit(al)
+            if hasattr(node.condition,'check_type') and hasattr(al,'check_type') :
+                if node.condition.check_type  != al.check_type :
+                    error(node.lineno, "Expression in case statement must evaluate to bool")
+                    return
+            else :
+                    error(node.lineno, "No type assigned to node")
+
+    def  visit_Alternative(self,node) :
+        print 'Alternative'
+        self.visit(node.choices.choices[0])
+        if hasattr(node.choices.choices[0],'check_type') :
+            temp=node.choices.choices[0].check_type
+        else :
+            error(node.lineno, "Type error") 
+        for ch in range(1,(node.choices.choices.len()-1)) :
+            self.visit(node.choices.choices[ch])
+            if hasattr(node.choices.choices[ch],'check_type')==False or node.choices.choices[ch].check_type!=temp :
+                error(node.lineno, "Type error")
+        node.check_type = temp
+        self.visit(node.statements)
+                
+
     def visit_WhileStatement(self,node):
+        global counter
         print 'While'
         print self.environment.scope_level()
         if not self.inside_function():
             error(node.lineno, "Cannot use while statement outside function body")
             return
+        if node.label ==  None :
+            while self.environment.lookup(counter) is not None :
+                counter+=1
+            node.label = counter
+            counter+=1
+        else:
+            if self.environment.lookup(node.name) is not None:
+                error(node.lineno, "Attempted to redefine label, not allowed".format(node.name))
+                return
+            if node.id!=None and node.label != node.id :
+                error(node.lineno, "Label does not match".format(node.name))
         self.visit(node.expr)
-        if node.expr.check_type != BoolType:
-            error(node.lineno, "Expression in while statement must evaluate to bool")
+        if node.expr != None :
+            if node.expr.check_type != BoolType:
+                error(node.lineno, "Expression in while statement must evaluate to bool")
         self.visit(node.truebranch)
 
     def visit_For_loop(self,node):
+        print 'For_loop'
         node.scope_level = self.environment.scope_level()
 #        if node.scope_level > 1:
 #            error(node.lineno, "Nested functions not implemented")
@@ -326,7 +370,7 @@ class CheckProgramVisitor(NodeVisitor):
             if node.name.check_type == node.discrete_range.check_type :
                 node.check_type = BoolType
             else :
-                node.check_type = None
+                error(node.lineno, "Expression in for statement must evaluate to bool")
         self.environment.pop()
 
     def visit_Doubledot_range(self,node):
@@ -338,7 +382,8 @@ class CheckProgramVisitor(NodeVisitor):
                 node.check_type = node.left.check_type
 
     def visit_Name_tick(self,node):
-        self.visit(node.expression)
+        if node.expression != None :
+            self.visit(node.expression)
         node.check_type = self.environment.lookup(node.name)
 
     def visit_ConstDeclaration(self,node):
@@ -353,6 +398,27 @@ class CheckProgramVisitor(NodeVisitor):
         self.visit(node.expr)
         node.check_type = node.expr.check_type
 
+    def visit_Block(self,node):
+        global counter
+        print 'Block'
+        if node.label ==  None :
+            while self.environment.lookup(counter) is not None :
+                counter+=1
+            node.label = counter
+            counter+=1
+        else:
+            if self.environment.lookup(node.name) is not None:
+                error(node.lineno, "Attempted to redefine label, not allowed".format(node.name))
+                return
+            if node.id!=None and node.label != node.id :
+                error(node.lineno, "Label does not match".format(node.name))
+        self.environment.push(node)
+        self.environment.add_local(node.name, node)
+        for declarations in node.decl:
+            self.visit(declarations)
+        self.visit(node.block)
+        self.environment.pop()
+
     def visit_FuncStatement(self, node):
         print 'FuncStatement'
         print self.environment.scope_level()
@@ -361,17 +427,25 @@ class CheckProgramVisitor(NodeVisitor):
 #        if node.scope_level > 1:
 #            error(node.lineno, "Nested functions not implemented")
 #            return
+        self.environment.push(node)
         if self.environment.lookup(node.name) is not None:
             error(node.lineno, "Attempted to redefine func '{}', not allowed".format(node.name))
             return
+        if node.id!=None and node.name != node.id :
+            error(node.lineno, "Label does not match".format(node.name))
         # 2. Add an entry to the symbol table, and also create a nested symbol
         # table for the function statement
         self.environment.add_root(node.name, node)
         # 3. Propagate the returntype as a checktype for the function, for 
         # use in function call checking and return statement checking
+        self.visit(node.returntype)
         if hasattr(node.returntype, "check_type"):
             node.check_type = node.returntype.check_type
         self.visit(node.parameters)
+        for declarations in node.decl_part:
+            self.visit(declarations)
+        self.visit(node.statements)
+        self.environment.pop()
 
     def visit_FuncParameterList(self, node):
         print 'FuncParameterList'
@@ -403,17 +477,6 @@ class CheckProgramVisitor(NodeVisitor):
         if not isinstance(sym, FuncStatement):
             error(node.lineno, "Tried to call non-function '{}'".format(node.name))
             return
-        if len(sym.parameters) != len(node.arguments):
-            error(node.lineno, "Number of arguments for call to function '{}' do not match function parameter declaration on line {}".format(node.name, sym.lineno))
-        self.visit(node.arguments)
-        argerrors = False
-        for arg, parm in zip(node.arguments.arguments, sym.parameters.parameters):
-            if arg.check_type != parm.check_type:
-                error(node.lineno, "Argument type '{}' does not match parameter type '{}' in function call to '{}'".format(arg.check_type.typename, parm.check_type.typename, node.name))
-                argerrors = True
-            if argerrors:
-                return
-            arg.parm = parm
 
     def visit_FuncCallArguments(self, node):
         print 'FuncCallArguments'
@@ -424,10 +487,22 @@ class CheckProgramVisitor(NodeVisitor):
     def visit_ReturnStatement(self, node):
         print 'ReturnStatemnt'
         print self.environment.scope_level()
+#        if node.expr==None :
+#    vim         print 'None abdcjab'
+#        if self.environment.peek().return_type()==None :
+#            print 'bsdhbajbdsb'
+#        if node.expr==None and self.environment.peek().return_type()==None :
+#            return       
         self.visit(node.expr)
         if self.environment.peek().return_type() != node.expr.check_type:
             error(node.lineno, "Type of return statement expression does not match declared return type for function")
             return
+
+    def visit_ExitStatement(self,node):
+        if node.expr != None :
+            self.visit(node.expr)
+        if node.expr.check_type != BoolType:
+            error(node.lineno, "Expression in if statement must evaluate to bool")
 
     def visit_PrintStatement(self, node):
         print 'PrintStatement'
@@ -512,12 +587,7 @@ class CheckProgramVisitor(NodeVisitor):
 
     def visit_Subprog_body(self,node):
         print 'Subprog'
-        self.environment.push(node)
-        self.visit(node.subprog_spec)
-        for declarations in node.decl_part:
-            self.visit(declarations)
-        self.visit(node.statements)
-        self.environment.pop()
+        
 
 # ----------------------------------------------------------------------
 #                       DO NOT MODIFY ANYTHING BELOW       
