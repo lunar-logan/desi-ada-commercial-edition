@@ -112,7 +112,7 @@ def p_type_def(p):
 | access_type
 | derived_type
 | private_type'''
-    pass
+    p[0] = p[1]
 def p_subtype_decl(p):
     '''subtype_decl : SUBTYPE IDENTIFIER IS subtype_ind SEMICOLON'''
     pass
@@ -173,7 +173,7 @@ def p_range_spec_opt(p):
 def p_real_type(p):
     '''real_type : float_type
 | fixed_type'''
-    pass
+    p[0] = p[1]
 def p_float_type(p):
     '''float_type : DIGITS expression range_spec_opt'''
     pass
@@ -184,34 +184,46 @@ def p_fixed_type(p):
 def p_array_type(p):
     '''array_type : unconstr_array_type
 | constr_array_type'''
-    pass
+    p[0] = p[1]
 def p_unconstr_array_type(p):
     '''unconstr_array_type : ARRAY LPAREN index_s RPAREN OF component_subtype_def'''
-    pass
+    p[0] = Unconstrained(p[3],p[6][0],p[6][1])
 def p_constr_array_type(p):
     '''constr_array_type : ARRAY iter_index_constraint OF component_subtype_def'''
-    pass
+    p[0] = Constrained(p[2],p[4][0],p[4][1])
 def p_component_subtype_def(p):
     '''component_subtype_def : aliased_opt subtype_ind'''
-    pass
+    p[0] = (p[1],p[2])
 def p_aliased_opt(p):
     '''aliased_opt :
 | ALIASED'''
-    pass
+    if len(p)==1 :
+        p[0] = None
+    else :
+        p[0] = p[1]
 def p_index_s(p):
     '''index_s : index
 | index_s COMMA index'''
-    pass
+    if len(p)==2:
+        p[0]=Index_s([p[1]])
+    else:
+        p[0]=p[1]
+        p[0].append(p[3])
 def p_index(p):
     '''index : name RANGE BOX'''
-    pass
+    p[0] = p[1]
 def p_iter_index_constraint(p):
     '''iter_index_constraint : LPAREN iter_discrete_range_s RPAREN'''
-    pass
+    p[0] = p[2]
 def p_iter_discrete_range_s(p):
     '''iter_discrete_range_s : discrete_range
 | iter_discrete_range_s COMMA discrete_range'''
-    pass
+    if len(p)==2 :
+        p[0] = [p[1]]
+    else :
+        p[0] = p[1]
+        p[0].append(p[3])
+
 def p_discrete_range(p):
     '''discrete_range : name range_constr_opt
 | range'''
@@ -284,12 +296,16 @@ def p_variant(p):
 def p_choice_s(p):
     '''choice_s : choice
 | choice_s '|' choice'''
-    pass
+    if len(p)==4:
+        p[0]=p[1]
+        p[0].append(p[2])
+    else:
+        p[0]=Choices([p[1]])
 def p_choice(p):
     '''choice : expression
 | discrete_with_range
 | OTHERS'''
-    pass
+    p[0] = p[1]
 def p_discrete_with_range(p):
     '''discrete_with_range : name range_constraint
 | range'''
@@ -382,7 +398,7 @@ def p_used_char(p):
     p[0] = p[1]
 def p_operator_symbol(p):
     '''operator_symbol : STRING'''
-    pass
+    p[0] = p[1]
 def p_indexed_comp(p):
     '''indexed_comp : name LPAREN value_s RPAREN'''
     pass
@@ -395,7 +411,7 @@ def p_value(p):
 | comp_assoc
 | discrete_with_range
 | error'''
-    pass
+    p[0] = p[1]
 def p_selected_comp(p):
     '''selected_comp : name DOT simple_name
 | name DOT used_char
@@ -437,7 +453,7 @@ def p_expression(p):
     if len(p)==2:
         p[0]=p[1]
     else:
-        p[0]=Expression(p[2],p[1],p[3])
+        p[0]=Relop(p[2],p[1],p[3])
 
 def p_logical(p):
     '''logical : AND
@@ -448,16 +464,19 @@ def p_logical(p):
 def p_short_circuit(p):
     '''short_circuit : AND THEN
 | OR ELSE'''
-    pass
+    p[0] = p[1] + p[2]
 def p_relation(p):
     '''relation : simple_expression
 | simple_expression relational simple_expression
-| simple_expression membership range
-| simple_expression membership name'''
+| simple_expression membership range'''
     if len(p)==2 :
         p[0] = p[1]
     else :
         p[0] = Relop(p[2],p[1],p[3])
+
+def p_relation_2(p):
+    '''relation : simple_expression membership name'''
+    p[0] = Relop(p[2],p[1],LoadLocation(Location(p[3])))
 
 def p_relational(p):
     '''relational : EQ
@@ -471,7 +490,10 @@ def p_relational(p):
 def p_membership(p):
     '''membership : IN
 | NOT IN'''
-    pass
+    if len(p)==2 :
+        p[0] = p[1]
+    else :
+        p[0] = p[1] + p[2]
 
 def p_simple_expression(p):
     '''simple_expression : unary term
@@ -598,11 +620,11 @@ def p_compound_stmt(p):
 
 def p_label(p):
     '''label : LLB IDENTIFIER RLB'''
-    pass
+    p[0] = p[2]
 
 def p_NULL_stmt(p):
     '''NULL_stmt : NULL SEMICOLON'''
-    pass
+    p[0] = None
 def p_assign_stmt(p):
     '''assign_stmt : name IS_ASSIGNED expression SEMICOLON'''
     p[0] = AssignmentStatement(Location(p[1]),p[3])
@@ -636,24 +658,32 @@ def p_else_opt(p):
 
 def p_case_stmt(p):
     '''case_stmt : case_hdr pragma_s alternative_s END CASE SEMICOLON'''
-    pass
+    p[0] = CaseStatement(p[0],p[1])
 def p_case_hdr(p):
     '''case_hdr : CASE expression IS'''
-    pass
+    p[0] = p[1]
 def p_alternative_s(p):
     '''alternative_s :
 | alternative_s alternative'''
-    pass
+    if len(p)==3:
+        p[0]=p[1]
+        p[0].append(p[2])
+    else:
+        p[0]=Alternatives([])
 def p_alternative(p):
     '''alternative : WHEN choice_s ARROW statement_s'''
-    pass
+    p[0]=Alternative(p[2],p[3],lineno=p.lineno(1))
 def p_loop_stmt(p):
     '''loop_stmt : label_opt iteration basic_loop id_opt SEMICOLON'''
-    p[0] = WhileStatement(p[2],p[3])
+    p[0] = WhileStatement(p[1],p[2],p[3],p[4])
 def p_label_opt(p):
     '''label_opt :
 | IDENTIFIER COLON'''
-    pass
+    if len(p)==1 :
+        p[0] = None
+    else :
+        p[0] = p[1]
+
 def p_iter_part(p):
     '''iter_part : FOR IDENTIFIER IN'''
     p[0]=p[2]
@@ -665,29 +695,41 @@ def p_iteration(p):
         p[0]=p[2]
     elif len(p)==4:
         if p[3][0] != None:
-            p[0]=For_loop(VarDeclaration(p[1],Typename(p[3][0]),None),p[3][1])
+            p[0]=For_loop(VarDeclaration(p[1],Typename(p[3][0]),None),p[2],p[3][1])
         else :
-            p[0]=For_loop(VarDeclaration(p[1],Typename('integer'),None),p[3][1])
+            p[0]=For_loop(VarDeclaration(p[1],Typename('integer'),None),p[2],p[3][1])
     else:
         p[0]=None
 def p_reverse_opt(p):
     '''reverse_opt :
 | REVERSE'''
-    pass
+    if len(p)==1 :
+        p[0] = None
+    else :
+        p[0] = p[1]
+
 def p_basic_loop(p):
     '''basic_loop : LOOP statement_s END LOOP'''
     p[0] = p[2]
 def p_id_opt(p):
     '''id_opt :
 | designator'''
-    pass
+    if len(p)==1 :
+        p[0] = None
+    else :
+        p[0] = p[1]
+
 def p_block(p):
     '''block : label_opt block_decl block_body END id_opt SEMICOLON'''
-    pass
+    p[0] = Block(p[1],p[2],p[3],p[5])
+
 def p_block_decl(p):
     '''block_decl :
 | DECLARE decl_part'''
-    pass
+    if len(p)==1 :
+        p[0] = None
+    else :
+        p[0] = p[2]
 def p_block_body(p):
     '''block_body : BEGIN handled_stmt_s'''
     p[0]=p[2]
@@ -701,24 +743,33 @@ def p_except_handler_part_opt(p):
     pass
 def p_exit_stmt(p):
     '''exit_stmt : EXIT name_opt when_opt SEMICOLON'''
-    pass
+    p[0] = ExitStatement(p[2],p[3])
 def p_name_opt(p):
     '''name_opt :
 | name'''
-    pass
+    if len(p)==1 :
+        p[0] = None
+    else :
+        p[0] = p[1]
 def p_when_opt(p):
     '''when_opt :
 | WHEN condition'''
-    pass
+    if len(p) == 1 :
+        p[0] = None
+    else :
+        p[0] = p[2]
+
 def p_return_stmt(p):
     '''return_stmt : RETURN SEMICOLON
 | RETURN expression SEMICOLON'''
     if len(p)==4 :
         p[0]=ReturnStatement(p[2])
+    else :
+        p[0] = ReturnStatement(None)
 
 def p_goto_stmt(p):
     '''goto_stmt : GOTO name SEMICOLON'''
-    pass
+    p[0]=Goto_stmt(p[2],lineno=p.lineno(2))
 def p_subprog_decl(p):
     '''subprog_decl : subprog_spec SEMICOLON
 | generic_subp_inst SEMICOLON
@@ -729,11 +780,11 @@ def p_subprog_spec(p):
 | FUNCTION designator formal_part_opt RETURN name
 | FUNCTION designator '''
     if p[1]=='procedure':
-        p[0] = FuncStatement(p[2],None,p[3])
+        p[0] = (p[2],None,p[3])
     elif len(p)==6:
-        p[0] = FuncStatement(p[2],p[5],p[3])
+        p[0] = (p[2],Typename(p[5]),p[3])
     else:
-        p[0] = FuncStatement(p[2],None,None)
+        p[0] = (p[2],None,None)
 def p_designator(p):
     '''designator : compound_name
 | STRING'''
@@ -760,7 +811,6 @@ def p_param(p):
     '''param : def_id_s COLON mode mark init_opt
 | error'''
     if len(p)>2 :
-        print 'Laudu'
         p[0]=[]
         for d in p[1] :
             p[0] = p[0]+[FuncParameter(d,p[4],p[5])]
@@ -779,10 +829,10 @@ def p_subprog_spec_is_push(p):
     p[0] = p[1]
 def p_subprog_body(p):
     '''subprog_body : subprog_spec_is_push decl_part block_body END id_opt SEMICOLON'''
-    p[0]=Subprog_body(p[1],p[2],p[3])
+    p[0]=FuncStatement(p[1][0],p[1][1],p[1][2],p[2],p[3],p[5])
 def p_procedure_call(p):
     '''procedure_call : name SEMICOLON'''
-    p[0] = LoadLocation(Location(p[1]))
+    p[0] = FuncCall(p[1])
 def p_pkg_decl(p):
     '''pkg_decl : pkg_spec SEMICOLON
 | generic_pkg_inst SEMICOLON'''
