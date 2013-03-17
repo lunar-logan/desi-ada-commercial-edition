@@ -150,15 +150,20 @@ def p_range(p):
 
 
 def p_enumeration_type(p):
-    '''enumeration_type : LPAREN enum_id_s RPAREN
-
-enum_id_s : enum_id
+    '''enumeration_type : LPAREN enum_id_s RPAREN'''
+    p[0] = p[1]
+def p_enum_id_s(p):
+    '''enum_id_s : enum_id
 | enum_id_s COMMA enum_id'''
-    pass
+    if len(p)==2 :
+        p[0] = Enum([p[1]])
+    else :
+        p[0]=p[1]
+        p[0].append(p[3])
 def p_enum_id(p):
     '''enum_id : IDENTIFIER
 | CHARACTER'''
-    pass
+    p[0] = p[1]
 def p_integer_type(p):
     '''integer_type : range_spec
 | MOD expression'''
@@ -187,10 +192,10 @@ def p_array_type(p):
     p[0] = p[1]
 def p_unconstr_array_type(p):
     '''unconstr_array_type : ARRAY LPAREN index_s RPAREN OF component_subtype_def'''
-    p[0] = Unconstrained(p[3],p[6][0],p[6][1])
+    p[0] = Unconstr_array(p[3],p[6][0],p[6][1])
 def p_constr_array_type(p):
     '''constr_array_type : ARRAY iter_index_constraint OF component_subtype_def'''
-    p[0] = Constrained(p[2],p[4][0],p[4][1])
+    p[0] = Constr_array(p[2],p[4][0],p[4][1])
 def p_component_subtype_def(p):
     '''component_subtype_def : aliased_opt subtype_ind'''
     p[0] = (p[1],p[2])
@@ -211,7 +216,7 @@ def p_index_s(p):
         p[0].append(p[3])
 def p_index(p):
     '''index : name RANGE BOX'''
-    p[0] = p[1]
+    p[0] = LoadLocation(Location(p[1]))
 def p_iter_index_constraint(p):
     '''iter_index_constraint : LPAREN iter_discrete_range_s RPAREN'''
     p[0] = p[2]
@@ -219,10 +224,16 @@ def p_iter_discrete_range_s(p):
     '''iter_discrete_range_s : discrete_range
 | iter_discrete_range_s COMMA discrete_range'''
     if len(p)==2 :
-        p[0] = [p[1]]
+        if p[1][0] != None :
+            p[0] = [(Typename(p[1][0]),p[1][1])]
+        else :
+            p[0]=[p[1]]
     else :
         p[0] = p[1]
-        p[0].append(p[3])
+        if p[3][0] != None :
+            p[0].append((Typename(p[3][0]),p[3][1]))
+        else :
+            p[0].append(p[3])
 
 def p_discrete_range(p):
     '''discrete_range : name range_constr_opt
@@ -241,33 +252,58 @@ def p_range_constr_opt(p):
         p[0]=p[1]
 def p_record_type(p):
     '''record_type : tagged_opt limited_opt record_def'''
-    pass
+    p[0] = Record(p[1],p[2],p[3])
 def p_record_def(p):
-    '''record_def : RECORD pragma_s comp_list END RECORD
+    '''record_def : RECORD comp_list END RECORD
 | NULL RECORD'''
-    pass
+    if len(p)==3 :
+        p[0] = p[1]
+    else :
+        p[0] = p[2]
 def p_tagged_opt(p):
     '''tagged_opt :
 | TAGGED
 | ABSTRACT TAGGED'''
-    pass
+    if len(p)==1 :
+        p[0] = None
+    else :
+        p[0] = p[1]
 def p_comp_list(p):
     '''comp_list : comp_decl_s variant_part_opt
-| variant_part pragma_s
-| NULL SEMICOLON pragma_s'''
-    pass
+| variant_part 
+| NULL SEMICOLON '''
+    if p[1]=='NULL' :
+        p[0] = p[1]
+    else :
+        if len(p)==3:
+            p[0] = (p[1],p[2])
+        else :
+            p[0] = (None,p[1])
 def p_comp_decl_s(p):
     '''comp_decl_s : comp_decl
-| comp_decl_s pragma_s comp_decl'''
-    pass
+| comp_decl_s comp_decl'''
+    if len(p)==2 :
+        p[0] = ComponentDeclaration(p[1])
+    else :
+        p[0] = p[1]
+        p[0].append(p[2])
 def p_variant_part_opt(p):
-    '''variant_part_opt : pragma_s
-| pragma_s variant_part pragma_s'''
-    pass
+    '''variant_part_opt : 
+| variant_part '''
+    if len(p)==1 :
+        p[0] = None
+    else :
+        p[0] = p[1]
 def p_comp_decl(p):
     '''comp_decl : def_id_s COLON component_subtype_def init_opt SEMICOLON
 | error SEMICOLON'''
-    pass
+    if len(p)==3 :
+        p[0] = p[1]
+    else :
+        k=[]
+        for i in p[1] :
+            k=k+[VarDeclaration(i,p[3][1],p[4])]
+        p[0]=k
 def p_discrim_part(p):
     '''discrim_part : LPAREN discrim_spec_s RPAREN'''
     pass
@@ -284,15 +320,19 @@ def p_access_opt(p):
 | ACCESS'''
     pass
 def p_variant_part(p):
-    '''variant_part : CASE simple_name IS pragma_s variant_s END CASE SEMICOLON'''
-    pass
+    '''variant_part : CASE simple_name IS  variant_s END CASE SEMICOLON'''
+    p[0] = CaseStatement(p[2],p[4])
 def p_variant_s(p):
     '''variant_s : variant
 | variant_s variant'''
-    pass
+    if len(p)==3:
+        p[0]=p[1]
+        p[0].append(p[2])
+    else:
+        p[0]=Alternatives([p[1]])
 def p_variant(p):
-    '''variant : WHEN choice_s ARROW pragma_s comp_list'''
-    pass
+    '''variant : WHEN choice_s ARROW comp_list'''
+    p[0]=Alternative(p[2],p[4],lineno=p.lineno(1))
 def p_choice_s(p):
     '''choice_s : choice
 | choice_s '|' choice'''
@@ -657,11 +697,11 @@ def p_else_opt(p):
         p[0] = IfStatement(p[2][0],p[2][1],p[3])
 
 def p_case_stmt(p):
-    '''case_stmt : case_hdr pragma_s alternative_s END CASE SEMICOLON'''
-    p[0] = CaseStatement(p[0],p[1])
+    '''case_stmt : case_hdr alternative_s END CASE SEMICOLON'''
+    p[0] = CaseStatement(p[1],p[2])
 def p_case_hdr(p):
     '''case_hdr : CASE expression IS'''
-    p[0] = p[1]
+    p[0] = p[2]
 def p_alternative_s(p):
     '''alternative_s :
 | alternative_s alternative'''
@@ -672,7 +712,7 @@ def p_alternative_s(p):
         p[0]=Alternatives([])
 def p_alternative(p):
     '''alternative : WHEN choice_s ARROW statement_s'''
-    p[0]=Alternative(p[2],p[3],lineno=p.lineno(1))
+    p[0]=Alternative(p[2],p[4],lineno=p.lineno(1))
 def p_loop_stmt(p):
     '''loop_stmt : label_opt iteration basic_loop id_opt SEMICOLON'''
     p[0] = WhileStatement(p[1],p[2],p[3],p[4])
@@ -861,7 +901,10 @@ def p_private_type(p):
 def p_limited_opt(p):
     '''limited_opt :
 | LIMITED'''
-    pass
+    if len(p)==1 :
+        p[0] = None
+    else :
+        p[0] = p[1]
 def p_use_clause(p):
     '''use_clause : USE name_s SEMICOLON
 | USE TYPE name_s SEMICOLON'''
