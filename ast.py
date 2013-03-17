@@ -1,23 +1,4 @@
-# exprast.py
-'''
-Abstract Syntax Tree (AST) objects.
-
-This file defines classes for different kinds of nodes of an Abstract
-Syntax Tree.  During parsing, you will create these nodes and connect
-them together.  In general, you will have a different AST node for
-each kind of grammar rule.  A few sample AST nodes can be found at the
-top of this file.  You will need to add more on your own.
-'''
-
-# DO NOT MODIFY
 class AST(object):
-    '''
-    Base class for all of the AST nodes.  Each node is expected to
-    define the _fields attribute which lists the names of stored
-    attributes.   The __init__() method below takes positional
-    arguments and assigns them to the appropriate fields.  Any
-    additional arguments specified as keywords are also assigned. 
-    '''
     _fields = []
     def __init__(self,*args,**kwargs):
         assert len(args) == len(self._fields)
@@ -34,21 +15,6 @@ class AST(object):
                                for key, value in vars(self).items() 
                                if not key.startswith("_") and not key in excluded})
 
-# ----------------------------------------------------------------------
-# Specific AST nodes.
-#
-# For each of these nodes, you need to add the appropriate _fields = []
-# specification that indicates what fields are to be stored.  Just as
-# an example, for a binary operator, you might store the operator, the
-# left expression, and the right expression like this:
-#
-#    class Binop(AST):
-#        _fields = ['op','leftexpr','rightexpr']
-#
-# Suggestion:  The nodes are listed here in a suggested order of work
-# on your parse.  You should start simple and incrementally work your
-# way up to building the complete grammar
-# ----------------------------------------------------------------------
 
 class Compilation(AST):
     _fields = ['program']
@@ -103,6 +69,24 @@ class Goal_symbol(AST):
 class VarDeclaration(AST):
     _fields = ['name','typename','expr','length']          
   
+class TypeDeclaration(AST):
+     _fields = ['name', 'expr', 'type_completion']   
+
+class Integer_type(AST):
+    _fields = ['range_spec', 'expression']
+
+class Float_type(AST):
+    _fields = ['expression', 'range_spec_opt']
+
+class Fixed_type(AST):
+    _fields = ['expression_1', 'range_spec_opt', 'expression_2']
+
+class Access_type_subtype(AST):
+    _fields = ['modifier', 'subtype_ind']
+
+class Access_type_subprog(AST):
+    _fields = ['prot_opt', 'formal_part_opt', 'mark']
+     
 class Unconstr_array(AST):
     _fields = ['index_s','aliased','subtype_ind']
     
@@ -228,41 +212,9 @@ class ExitStatement(AST):
 class GotoStatement(AST):
     _fields = ['name']
 
-# ----------------------------------------------------------------------
-#                  DO NOT MODIFY ANYTHING BELOW HERE
-# ----------------------------------------------------------------------
 
-# The following classes for visiting and rewriting the AST are taken
-# from Python's ast module.   
-
-# DO NOT MODIFY
 class NodeVisitor(object):
-    '''
-    Class for visiting nodes of the parse tree.  This is modeled after
-    a similar class in the standard library ast.NodeVisitor.  For each
-    node, the visit(node) method calls a method visit_NodeName(node)
-    which should be implemented in subclasses.  The generic_visit() method
-    is called for all nodes where there is no matching visit_NodeName() method.
-
-    Here is a example of a visitor that examines binary operators:
-
-        class VisitOps(NodeVisitor):
-            visit_Binop(self,node):
-                print("Binary operator", node.op)
-                self.visit(node.left)
-                self.visit(node.right)
-            visit_Unaryop(self,node):
-                print("Unary operator", node.op)
-                self.visit(node.expr)
-
-        tree = parse(txt)
-        VisitOps().visit(tree)
-    '''
     def visit(self,node):
-        '''
-        Execute a method of the form visit_NodeName(node) where
-        NodeName is the name of the class of a particular node.
-        '''
         if node:
             method = 'visit_' + node.__class__.__name__
             visitor = getattr(self, method, self.generic_visit)
@@ -271,11 +223,6 @@ class NodeVisitor(object):
             return None
     
     def generic_visit(self,node):
-        '''
-        Method executed if no applicable visit_ method can be found.
-        This examines the node to see if it has _fields, is a list,
-        or can be further traversed.
-        '''
         for field in getattr(node,"_fields"):
             value = getattr(node,field,None)
             if isinstance(value, list):
@@ -284,19 +231,8 @@ class NodeVisitor(object):
                         self.visit(item)
             elif isinstance(value, AST):
                 self.visit(value)
-
-# DO NOT MODIFY
+'''
 class NodeTransformer(NodeVisitor):
-    '''
-    Class that allows nodes of the parse tree to be replaced/rewritten.
-    This is determined by the return value of the various visit_() functions.
-    If the return value is None, a node is deleted. If any other value is returned,
-    it replaces the original node.
-
-    The main use of this class is in code that wants to apply transformations
-    to the parse tree.  For example, certain compiler optimizations or
-    rewriting steps prior to code generation.
-    '''
     def generic_visit(self,node):
         for field in getattr(node,"_fields"):
             value = getattr(node,field,None)
@@ -317,15 +253,8 @@ class NodeTransformer(NodeVisitor):
                 else:
                     setattr(node,field,newnode)
         return node
-
-# DO NOT MODIFY
+'''
 def flatten(top):
-    '''
-    Flatten the entire parse tree into a list for the purposes of
-    debugging and testing.  This returns a list of tuples of the
-    form (depth, node) where depth is an integer representing the
-    parse tree depth and node is the associated AST node.
-    '''
     class Flattener(NodeVisitor):
         def __init__(self):
             self.depth = 0
