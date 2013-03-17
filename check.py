@@ -88,7 +88,7 @@ A shell of the code is provided below.
 
 from errors import error
 from ast import *
-from loo import IntType, FloatType, StringType, BoolType, ExprType
+from loo import IntType, FloatType, StringType, BoolType, CharType, ExprType
 from pprint import pprint
 
 counter = 0
@@ -118,7 +118,9 @@ class Environment(object):
         self.root.update({
             "integer": IntType,
             "float": FloatType,
-            "string": StringType
+            "string": StringType,
+            "boolean": BoolType,
+            "character": CharType
         })
 
     def push(self, enclosure):
@@ -595,6 +597,7 @@ class CheckProgramVisitor(NodeVisitor):
             node.check_type = node.typename.check_type
         # 4. If there is no expression, set an initial value for the value
         self.visit(node.expr)
+        self.visit(node.length)
         if node.expr is None:
             default = node.check_type.default
             node.expr = Literal(default)
@@ -650,11 +653,10 @@ class CheckProgramVisitor(NodeVisitor):
         check_type = self.typemap.get(valtype, None)
         if check_type is None:
             error(node.lineno, "Using unrecognized type {}".format(valtype))
+        if check_type==StringType and len(node.value)==1 :
+            check_type = CharType
         node.check_type = check_type
 
-    def visit_Subprog_body(self,node):
-        print 'Subprog'
-        
 
 # ----------------------------------------------------------------------
 #                       DO NOT MODIFY ANYTHING BELOW       
