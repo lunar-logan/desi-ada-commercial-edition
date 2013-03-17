@@ -128,11 +128,13 @@ def p_range(p):
     | name TICK RANGE LPAREN expression RPAREN'''
     pass
 def p_enumeration_type(p):
-    '''enumeration_type : LPAREN enum_id_s RPAREN
-
-enum_id_s : enum_id
+    '''enumeration_type : LPAREN enum_id_s RPAREN'''
+    pass
+def enum_id_s(p):
+    '''enum_id_s : enum_id
     | enum_id_s COMMA enum_id'''
     pass
+
 def p_enum_id(p):
     '''enum_id : IDENTIFIER
     | CHARACTER'''
@@ -728,12 +730,13 @@ def p_prot_def(p):
     pass
 def p_prot_private_opt(p):
     '''prot_private_opt :
-    | PRIVATE prot_elem_decl_s 
-
-
-prot_op_decl_s : 
+    | PRIVATE prot_elem_decl_s '''
+    pass
+def prot_op_decl_s(p):
+    '''prot_op_decl_s : 
     | prot_op_decl_s prot_op_decl'''
     pass
+
 def p_prot_op_decl(p):
     '''prot_op_decl : entry_decl
     | subprog_spec SEMICOLON
