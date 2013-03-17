@@ -53,7 +53,7 @@ def p_decl(p):
     p[0]=p[1]
 def p_object_decl(p):
     '''object_decl : def_id_s COLON object_qualifier_opt object_subtype_def init_opt SEMICOLON'''
-    k=[]
+    k=[]    
     for i in p[1] :
         k=k+[VarDeclaration(i,p[4],p[5])]
     p[0]=k
@@ -75,8 +75,10 @@ def p_object_qualifier_opt(p):
 | ALIASED CONSTANT'''
     if len(p)==1 :
         p[0] = None
-    else :
+    elif len(p)==2 :
         p[0] = p[1]
+    else :
+        p[0] = p[1] + p[2]
 def p_object_subtype_def(p):
     '''object_subtype_def : subtype_ind
 | array_type'''
@@ -216,7 +218,7 @@ def p_index_s(p):
         p[0].append(p[3])
 def p_index(p):
     '''index : name RANGE BOX'''
-    p[0] = LoadLocation(Location(p[1]))
+    p[0] = p[1]
 def p_iter_index_constraint(p):
     '''iter_index_constraint : LPAREN iter_discrete_range_s RPAREN'''
     p[0] = p[2]
@@ -236,7 +238,7 @@ def p_iter_discrete_range_s(p):
             p[0].append(p[3])
 
 def p_discrete_range(p):
-    '''discrete_range : name range_constr_opt
+    '''discrete_range : IDENTIFIER range_constr_opt
 | range'''
     if len(p)==3 :
         print p[1]
@@ -407,19 +409,19 @@ def p_name(p):
 | operator_symbol'''
     p[0]=p[1]
 def p_mark(p):
-    '''mark : simple_name
+    '''mark : IDENTIFIER
 | mark TICK attribute_id
-| mark DOT simple_name'''
+| mark DOT IDENTIFIER'''
     if len(p)==2 :
         p[0] = Typename(p[1])
     else :
         p[0] = str(p[1]) + p[2] + str(p[3])
 def p_simple_name(p):
     '''simple_name : IDENTIFIER'''
-    p[0]=p[1]
+    p[0]=LoadLocation(Location(p[1]))
 def p_compound_name(p):
-    '''compound_name : simple_name
-| compound_name DOT simple_name'''
+    '''compound_name : IDENTIFIER
+| compound_name DOT IDENTIFIER'''
     if len(p)==2 :
         p[0] = p[1]
     else :
@@ -440,12 +442,16 @@ def p_operator_symbol(p):
     '''operator_symbol : STRING'''
     p[0] = p[1]
 def p_indexed_comp(p):
-    '''indexed_comp : name LPAREN value_s RPAREN'''
-    pass
+    '''indexed_comp : IDENTIFIER LPAREN value_s RPAREN'''
+    p[0] = FuncCall(p[1],p[3])
 def p_value_s(p):
     '''value_s : value
 | value_s COMMA value'''
-    pass
+    if len(p)==2:
+        p[0]=Value_s([p[1]])
+    else:
+        p[0]=p[1]
+        p[0].append(p[3])
 def p_value(p):
     '''value : expression
 | comp_assoc
@@ -516,7 +522,7 @@ def p_relation(p):
 
 def p_relation_2(p):
     '''relation : simple_expression membership name'''
-    p[0] = Relop(p[2],p[1],LoadLocation(Location(p[3])))
+    p[0] = Relop(p[2],p[1],p[3])
 
 def p_relational(p):
     '''relational : EQ
@@ -593,7 +599,7 @@ def p_primary(p):
 
 def p_primary_var(p):
     '''primary : name'''
-    p[0] = LoadLocation(Location(p[1]))
+    p[0] = p[1]
 
 def p_parenthesized_primary(p):
     '''parenthesized_primary : aggregate
@@ -609,7 +615,7 @@ def p_qualified(p):
 def p_allocator(p):
     '''allocator : NEW name
 | NEW qualified'''
-    
+    pass
 def p_statement_s(p):
     '''statement_s : statement
 | statement_s statement'''
@@ -666,7 +672,7 @@ def p_NULL_stmt(p):
     '''NULL_stmt : NULL SEMICOLON'''
     p[0] = None
 def p_assign_stmt(p):
-    '''assign_stmt : name IS_ASSIGNED expression SEMICOLON'''
+    '''assign_stmt : IDENTIFIER IS_ASSIGNED expression SEMICOLON'''
     p[0] = AssignmentStatement(Location(p[1]),p[3])
 
 def p_if_stmt(p):
@@ -809,7 +815,8 @@ def p_return_stmt(p):
 
 def p_goto_stmt(p):
     '''goto_stmt : GOTO name SEMICOLON'''
-    p[0]=Goto_stmt(p[2],lineno=p.lineno(2))
+    p[0]=GotoStatement(p[2],lineno=p.lineno(2))
+
 def p_subprog_decl(p):
     '''subprog_decl : subprog_spec SEMICOLON
 | generic_subp_inst SEMICOLON
@@ -817,7 +824,7 @@ def p_subprog_decl(p):
     p[0] = p[1]
 def p_subprog_spec(p):
     '''subprog_spec : PROCEDURE compound_name formal_part_opt
-| FUNCTION designator formal_part_opt RETURN name
+| FUNCTION designator formal_part_opt RETURN IDENTIFIER
 | FUNCTION designator '''
     if p[1]=='procedure':
         p[0] = (p[2],None,p[3])
@@ -872,7 +879,7 @@ def p_subprog_body(p):
     p[0]=FuncStatement(p[1][0],p[1][1],p[1][2],p[2],p[3],p[5])
 def p_procedure_call(p):
     '''procedure_call : name SEMICOLON'''
-    p[0] = FuncCall(p[1])
+    p[0] = ProcCall(p[1])
 def p_pkg_decl(p):
     '''pkg_decl : pkg_spec SEMICOLON
 | generic_pkg_inst SEMICOLON'''
@@ -1084,9 +1091,12 @@ def p_compilation(p):
         p[0].append(p[2])
 
 def p_comp_unit(p):
-    '''comp_unit : context_spec private_opt unit pragma_s
-| private_opt unit pragma_s'''
-    p[0]=p[3]
+    '''comp_unit : context_spec private_opt unit
+| private_opt unit'''
+    if len(p)==4 :
+        p[0]=p[3]
+    else :
+        p[0] = p[2]
 
 def p_private_opt(p):
     '''private_opt :
