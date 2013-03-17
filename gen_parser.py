@@ -14,10 +14,12 @@ precedence = (
 ('left', 'TIMES', 'DIVIDE'),
 )
 # Grammar description
+start = 'goal_symbol'
 
 def p_goal_symbol(p):
     '''goal_symbol : compilation'''
-    pass
+    pass #p[0] = ('goal-symbol', p[1])
+
 def p_pragma(p):
     '''pragma  : PRAGMA IDENTIFIER SEMICOLON
     | PRAGMA simple_name LPAREN pragma_arg_s RPAREN SEMICOLON'''
@@ -127,10 +129,12 @@ def p_range(p):
     | name TICK RANGE
     | name TICK RANGE LPAREN expression RPAREN'''
     pass
+
 def p_enumeration_type(p):
     '''enumeration_type : LPAREN enum_id_s RPAREN'''
     pass
-def enum_id_s(p):
+
+def p_enum_id_s(p):
     '''enum_id_s : enum_id
     | enum_id_s COMMA enum_id'''
     pass
@@ -732,7 +736,7 @@ def p_prot_private_opt(p):
     '''prot_private_opt :
     | PRIVATE prot_elem_decl_s '''
     pass
-def prot_op_decl_s(p):
+def p_prot_op_decl_s(p):
     '''prot_op_decl_s : 
     | prot_op_decl_s prot_op_decl'''
     pass
@@ -852,6 +856,7 @@ def p_compilation(p):
     | compilation comp_unit
     | pragma pragma_s'''
     pass
+
 def p_comp_unit(p):
     '''comp_unit : context_spec private_opt unit pragma_s
     | private_opt unit pragma_s'''
