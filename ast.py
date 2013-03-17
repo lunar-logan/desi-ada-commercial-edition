@@ -101,7 +101,7 @@ class Goal_symbol(AST):
     _fields = ['compilation']          
 
 class VarDeclaration(AST):
-    _fields = ['name','typename','expr']          
+    _fields = ['name','typename','expr','length']          
   
 class Unconstr_array(AST):
     _fields = ['index_s','aliased','subtype_ind']
@@ -205,9 +205,12 @@ class FuncParameter(VarDeclaration):
     pass
 
 class FuncCall(AST):
+    _fields = ['name','arguments']
+
+class ProcCall(AST):
     _fields = ['name']
 
-class FuncCallArguments(AST):
+class Value_s(AST):
     _fields = ['arguments']
 
     def append(self,stmt):
@@ -216,14 +219,14 @@ class FuncCallArguments(AST):
     def __len__(self):
         return len(self.arguments)
 
-class FuncCallArgument(AST):
-    _fields = ['expr']
-
 class ReturnStatement(AST):
     _fields = ['expr']
 
 class ExitStatement(AST):
     _fields = ['name','expr']
+
+class GotoStatement(AST):
+    _fields = ['name']
 
 # ----------------------------------------------------------------------
 #                  DO NOT MODIFY ANYTHING BELOW HERE
