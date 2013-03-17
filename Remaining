@@ -20,19 +20,6 @@ def p_type_completion(p):
         p[0]=p[2]
     else:
         p[0]=None
-    
-#modified
-def p_type_def(p):
-    '''type_def : enumeration_type 
-    | integer_type
-    | real_type
-    | array_type
-    | record_type
-    | access_type'''
-    pass
-    p[0]=p[1]
-#end
-    
 def p_subtype_decl(p):
     '''subtype_decl : SUBTYPE IDENTIFIER IS subtype_ind SEMICOLON'''
     p[0]=Subtype_decl(p[2],p[4])
@@ -70,23 +57,6 @@ def p_range_spec_opt(p):
         p[0]=p[1]
     else:
         return
-    
-def p_real_type(p):
-    '''real_type : float_type
-    | fixed_type'''
-    p[0]=p[1]
-    
-def p_float_type(p):
-    '''float_type : DIGITS expression range_spec_opt'''
-    p[0]=Float_type(p[2],p[3],lineno=p.lineno(1))
-    
-def p_fixed_type(p):
-    '''fixed_type : DELTA expression range_spec
-    | DELTA expression DIGITS expression range_spec_opt'''
-    if len(p)==4:
-        p[0]=Fixed_type(p[2],None,p[3],lineno=p.lineno(1))
-    else:
-        p[0]=Fixed_type(p[2],p[3],p[4],lineno=p.lineno(1))
     
 def p_iter_discrete_range_s(p):
     '''iter_discrete_range_s : discrete_range
@@ -140,30 +110,6 @@ def p_discrete_with_range(p):
         p[0]=Range_constr(p[1],p[2],lineno=p.lineno(1))
     else:
         p[0]=p[1]
-        
-def p_access_type(p):
-    '''access_type : ACCESS subtype_ind
-    | ACCESS CONSTANT subtype_ind
-    | ACCESS ALL subtype_ind
-    | ACCESS prot_opt PROCEDURE formal_part_opt
-    | ACCESS prot_opt FUNCTION formal_part_opt RETURN mark'''
-    if len(p)==3:
-        Access_1(None,p[2],lineno=p.lineno(1))
-    elif len(p)==4:
-        Access_1(p[2],p[3],lineno=p.lineno(1))
-    elif len(p)==5:
-        Access_2(p[2],p[4],lineno=p.lineno(1))
-    else:
-        Access_3(p[2],p[4],p[6],lineno=p.lineno(1))
-        
-def p_prot_opt(p):
-    '''prot_opt :
-    | PROTECTED'''
-    if len(p)==2:
-        p[0]=p[1]
-        p[0]=None
-    else:
-        
 def p_c_name_list(p):
     '''c_name_list : compound_name
      | c_name_list COMMA compound_name'''
@@ -173,19 +119,6 @@ def p_c_name_list(p):
         p[0]=p[1]
         p[0].append(p[3])
         
-def p_indexed_comp(p):
-    '''indexed_comp : name LPAREN value_s RPAREN'''
-    p[0]=Indexed_comp(p[1],p[3],lineno=p.lineno(2))
-    
-def p_value_s(p):
-    '''value_s : value
-    | value_s COMMA value'''
-    if len(p)==2:
-        p[0]=Value_s([p[1]])
-    else:
-        p[0]=p[1]
-        p[0].append(p[3])
-    
 def p_selected_comp(p):
     '''selected_comp : name DOT simple_name
     | name DOT used_char
