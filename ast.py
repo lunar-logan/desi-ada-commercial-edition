@@ -108,6 +108,28 @@ class Unconstr_array(AST):
     
 class Constr_array(AST):
     _fields = ['index_constraint','aliased','subtype_ind']
+
+class Record(AST):
+    _fields = ['tagged',' limited','record_def']
+
+class Enum(AST):
+    _fields = ['enum_id']
+    
+    def append(self,stmt):
+        self.enum_id.append(stmt)
+
+    def __len__(self):
+        return len(self.enum_id) 
+
+class ComponentDeclaration(AST):
+    _fields = ['comp_decls']
+
+    def append(self,comp_decl):
+        self.comp_decls = self.comp_decls + comp_decl
+
+    def __len__(self):
+        return len(self.comp_decls)
+
  
 class Index_s(AST):
     _fields = ['index_s']
