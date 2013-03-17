@@ -118,8 +118,7 @@ class Environment(object):
         self.root.update({
             "integer": IntType,
             "float": FloatType,
-            "string": StringType,
-            "bool": BoolType
+            "string": StringType
         })
 
     def push(self, enclosure):
@@ -418,9 +417,11 @@ class CheckProgramVisitor(NodeVisitor):
                 node.check_type = node.left.check_type
 
     def visit_Name_tick(self,node):
+        self.visit(node.name)
         if node.expression != None :
             self.visit(node.expression)
-        node.check_type = self.environment.lookup(node.name)
+        if hasattr(node.name,'check_type'):
+            node.check_type = node.name.check_type
 
     def visit_ConstDeclaration(self,node):
         print 'Constant'
@@ -474,9 +475,13 @@ class CheckProgramVisitor(NodeVisitor):
         self.environment.add_root(node.name, node)
         # 3. Propagate the returntype as a checktype for the function, for 
         # use in function call checking and return statement checking
+        if node.returntype==None :
+            print '----------------------------------None-----------------------------------------'
         self.visit(node.returntype)
         if hasattr(node.returntype, "check_type"):
             node.check_type = node.returntype.check_type
+        print 'return type of function iis'
+        print node.check_type
         self.visit(node.parameters)
         for declarations in node.decl_part:
             self.visit(declarations)
@@ -499,6 +504,14 @@ class CheckProgramVisitor(NodeVisitor):
         self.visit(node.typename)
         node.check_type = node.typename.check_type
 
+    def visit_ProcCall(self, node):
+        print 'ProcCall'
+        print self.environment.scope_level()
+        if not self.inside_function():
+            error(node.lineno, "Cannot call function from outside function body; see main() for entry point")
+            return
+        self.visit(node.name)
+
     def visit_FuncCall(self, node):
         print 'FuncCall'
         print self.environment.scope_level()
@@ -510,11 +523,25 @@ class CheckProgramVisitor(NodeVisitor):
             self.environment.prnt()
             error(node.lineno, "Function name '{}' not found".format(node.name))
             return
+        else :
+            node.check_type = sym.check_type
         if not isinstance(sym, FuncStatement):
             error(node.lineno, "Tried to call non-function '{}'".format(node.name))
             return
+        if len(sym.parameters) != len(node.arguments):
+            error(node.lineno, "Number of arguments for call to function '{}' do not match function parameter declaration on line {}".format(node.name, sym.lineno))
+        self.visit(node.arguments)
+        argerrors = False
+        for arg, parm in zip(node.arguments.arguments, sym.parameters.parameters):
+            if arg.check_type != parm.check_type:
+                error(node.lineno, "Argument type '{}' does not match parameter type '{}' in function call to '{}'".format(arg.check_type.typename, parm.check_type.typename, node.name))
+                argerrors = True
+            if argerrors:
+                return
+            arg.parm = parm
 
-    def visit_FuncCallArguments(self, node):
+
+    def visit_Value_s(self, node):
         print 'FuncCallArguments'
         print self.environment.scope_level()
         for argument in node.arguments:
@@ -535,10 +562,14 @@ class CheckProgramVisitor(NodeVisitor):
             return
 
     def visit_ExitStatement(self,node):
+        self.visit(node.name)
         if node.expr != None :
             self.visit(node.expr)
         if node.expr.check_type != BoolType:
             error(node.lineno, "Expression in if statement must evaluate to bool")
+
+    def GotoStatement(self,node):
+        self.visit(node.name)
 
     def visit_PrintStatement(self, node):
         print 'PrintStatement'
