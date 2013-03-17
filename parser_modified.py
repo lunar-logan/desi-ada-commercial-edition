@@ -18,7 +18,7 @@ precedence = (
 
 def p_goal_symbol(p):
     '''goal_symbol : compilation'''
-    p[0]=Goal_symbol(p[1])
+    p[0]=Goal_symbol(p[1],lineno=p.lineno(1))
 
 def p_pragma(p):
     '''pragma : PRAGMA IDENTIFIER SEMICOLON
@@ -56,9 +56,9 @@ def p_object_decl(p):
     k=[]
     for i in p[1] :
         if isinstance(p[4],tuple) :
-            k=k+[VarDeclaration(i,p[4][0],p[5],p[4][1])]
+            k=k+[VarDeclaration(i,p[4][0],p[5],p[4][1],lineno=p.lineno(2))]
         else :
-            k=k+[VarDeclaration(i,p[4],p[5],None)]
+            k=k+[VarDeclaration(i,p[4],p[5],None,lineno=p.lineno(2))]
     p[0]=k
 def p_def_id_s(p):
     '''def_id_s : def_id
@@ -98,29 +98,52 @@ def p_number_decl(p):
     pass
 def p_type_decl(p):
     '''type_decl : TYPE IDENTIFIER discrim_part_opt type_completion SEMICOLON'''
-    pass
+    p[0] = VarDeclaration(p[2], p[4][0], p[4][1],None)
+
 def p_discrim_part_opt(p):
     '''discrim_part_opt :
 | discrim_part
 | LPAREN BOX RPAREN'''
-    pass
+    if len(p)==2:
+        p[0]=p[1]
+    else:
+        p[0]=None
 def p_type_completion(p):
     '''type_completion :
 | IS type_def'''
-    pass
-def p_type_def(p):
-    '''type_def : enumeration_type
-| integer_type
-| real_type
-| array_type
-| record_type
-| access_type
-| derived_type
-| private_type'''
-    p[0] = p[1]
+    if len(p)==1:
+         p[0] = None
+    else:
+        p[0] = p[2]
+
+def p_type_def_enum(p):
+    '''type_def : enumeration_type'''
+    p[0] = (Typename('enumeration'),p[1])
+
+def p_type_def_integer(p):
+    '''type_def : integer_type'''
+    p[0] = (Typename('integer'),p[1])
+
+def p_type_def_real(p):
+    '''type_def : real_type'''
+    p[0] = (Typename('float'),p[1])
+
+def p_type_def_array(p):
+    '''type_def : array_type'''
+    p[0] = (Typename('array'),p[1])
+
+def p_type_def_record(p):
+    '''type_def : record_type'''
+    p[0] = (Typename('record'),p[1])
+
+def p_type_def_access(p):
+    '''type_def : access_type'''
+    p[0] = (Typename('access'),p[1])
+
 def p_subtype_decl(p):
     '''subtype_decl : SUBTYPE IDENTIFIER IS subtype_ind SEMICOLON'''
-    pass
+    p[0] = VarDeclaration(p[2],p[4],None,None)
+
 def p_subtype_ind(p):
     '''subtype_ind : name constraint
 | name'''
@@ -175,7 +198,11 @@ def p_enum_id(p):
 def p_integer_type(p):
     '''integer_type : range_spec
 | MOD expression'''
-    pass
+    if len(p) == 3:
+        p[0] = Integer_type(None, p[2])
+    else:
+        p[0] = Integer_type(p[1], None)
+
 def p_range_spec(p):
     '''range_spec : range_constraint'''
     pass
@@ -187,13 +214,18 @@ def p_real_type(p):
     '''real_type : float_type
 | fixed_type'''
     p[0] = p[1]
+
 def p_float_type(p):
     '''float_type : DIGITS expression range_spec_opt'''
-    pass
+    p[0] = Float_type(p[2], p[3])
 def p_fixed_type(p):
     '''fixed_type : DELTA expression range_spec
 | DELTA expression DIGITS expression range_spec_opt'''
-    pass
+    n = len(p)
+    if n == 4:
+        p[0] = Fixed_type(p[2], p[3], None)
+    else: p[0] = Fixed_type(p[2], p[5], p[4])
+
 def p_array_type(p):
     '''array_type : unconstr_array_type
 | constr_array_type'''
@@ -203,6 +235,7 @@ def p_unconstr_array_type(p):
     p[0] = Unconstr_array(p[3],p[6][0],p[6][1])
 def p_constr_array_type(p):
     '''constr_array_type : ARRAY iter_index_constraint OF component_subtype_def'''
+    #print "***************\n",p[2], "\n$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$\n"
     p[0] = Constr_array(p[2],p[4][0],p[4][1])
 def p_component_subtype_def(p):
     '''component_subtype_def : aliased_opt subtype_ind'''
@@ -364,7 +397,15 @@ def p_access_type(p):
 | ACCESS ALL subtype_ind
 | ACCESS prot_opt PROCEDURE formal_part_opt
 | ACCESS prot_opt FUNCTION formal_part_opt RETURN mark'''
-    pass
+    n = len(p)
+    if n == 3:
+        p[0] = Access_type_subtype(None, p[2])
+    elif n == 4:
+        p[0] = Access_type_subtype(p[2], p[2])
+    elif n == 5:
+        p[0] = Access_type_subprog(p[1], p[3], None)
+    else: p[0] = Access_type_subprog(p[1], p[3], p[5])
+
 def p_prot_opt(p):
     '''prot_opt :
 | PROTECTED'''
@@ -394,9 +435,9 @@ def p_decl_item_or_body_s1(p):
     '''decl_item_or_body_s1 : decl_item_or_body
 | decl_item_or_body_s1 decl_item_or_body'''
     if len(p)==2 :
-        p[0]=p[1]
+        p[0]=[p[1]]
     else :
-        p[0]=p[1]+p[2]
+        p[0]=p[1]+[p[2]]
 def p_decl_item_or_body(p):
     '''decl_item_or_body : body
 | decl_item'''
