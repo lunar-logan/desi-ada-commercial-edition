@@ -88,7 +88,7 @@ A shell of the code is provided below.
 
 from errors import error
 from ast import *
-from loo import IntType, FloatType, StringType, BoolType, CharType, ExprType
+from loo import IntType, FloatType, StringType, BoolType, CharType, ArrayType, AccessType, EnumType, RecordType, ExprType
 from pprint import pprint
 
 counter = 0
@@ -120,7 +120,11 @@ class Environment(object):
             "float": FloatType,
             "string": StringType,
             "boolean": BoolType,
-            "character": CharType
+            "character": CharType,
+            "array": ArrayType,
+            "enumeration": EnumType,
+            "record": RecordType,
+            "access": AccessType
         })
 
     def push(self, enclosure):
@@ -266,6 +270,43 @@ class CheckProgramVisitor(NodeVisitor):
         node.check_type = check_type
         print check_type
 
+    def visit_Integer_type(self, node):
+        print 'Integer_type'
+        print node.environment.scope_level()
+        if not self.inside_function():
+            error(node.lineno, "Cannot define an integer '{}' outside function body".format(node.location.name))
+            return
+        if node.range_spec is not None:
+            self.visit(node.range_spec)
+        else:
+            self.visit(node.expression)
+
+    def visit_Float_type(self, node):
+        node.scope_level = self.environment.scope_level()
+        #if hasattr(node.expression.check_type):
+         #   print node
+        if node.range_spec_opt is not None:
+            self.visit(node.range_spec_opt)
+        self.visit(node.expression)
+
+    def visit_Access_type_subtype(self, node):
+        self.visit(node.subtype_ind)
+
+    def visit_Access_type_subprog(self, node):
+        if node.formal_part_opt is not None:
+            for parameter in node.formal_part_opt.parameters:
+                self.visit(parameter)
+        self.visit(node.mark)
+
+    def visit_Fixed_type(self, node):
+        node.scope_level = self.environment.scope_level()
+        #if hasattr(node.expression.check_type):
+         #   print node
+        if node.range_spec_opt is not None:
+            self.visit(node.range_spec_opt)
+        self.visit(node.expression_1)
+        self.visit(node.expression_2)
+
     def visit_Unconstr_array(self,node):
         print 'Unconstrained Array'
         for index in node.index_s.index_s :
@@ -275,8 +316,14 @@ class CheckProgramVisitor(NodeVisitor):
 
     def visit_Constr_array(self,node):
         print 'Constrained Array'
+        print "^^^^^^^^^^^^^^^^^^^^^^^^^^"
+        print node
+        print "33333333333333333333333333333333"
+        print node.index_constraint
         for drange in node.index_constraint :
-            if drange[0] != None :
+            print '--------------------Drange--------------'
+            print drange
+            if drange[0] is not None :
                 self.visit(drange[0])
             self.visit(drange[1])
             if drange[0]!=None :
@@ -597,7 +644,8 @@ class CheckProgramVisitor(NodeVisitor):
             node.check_type = node.typename.check_type
         # 4. If there is no expression, set an initial value for the value
         self.visit(node.expr)
-        self.visit(node.length)
+        if node.length is not None :
+            self.visit(node.length)
         if node.expr is None:
             default = node.check_type.default
             node.expr = Literal(default)
