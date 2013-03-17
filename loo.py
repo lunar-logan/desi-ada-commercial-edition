@@ -83,12 +83,12 @@ FloatType = ExprType("float", float(),
                "<": operator.lt, "<=": operator.le}
 )
 StringType = ExprType("string", str(), 
-    binary_ops={"+","&"},
-    binary_opcodes={"+": "add","&":"ampersand"},
-    binary_folds={"+": operator.add},
-    rel_ops={"=", "/="},
-    rel_opcodes={"=": "eq", "/=": "ne"},
-    rel_folds={"=": operator.eq, "/=": operator.ne}
+    binary_ops={"&"},
+    binary_opcodes={"&":"ampersand"},
+    binary_folds={"&": operator.add},
+    rel_ops={},
+    rel_opcodes={},
+    rel_folds={}
 )
 BoolType = ExprType("bool", bool(),
     unary_ops={"!"},
@@ -97,4 +97,13 @@ BoolType = ExprType("bool", bool(),
     rel_folds={"=": operator.eq, "/=": operator.ne, "&&": operator.and_, "||": operator.or_},
     unary_opcodes={"!": "not"},
     unary_folds={"!": operator.not_}
+)
+
+CharType = ExprType("character",str(),
+    unary_ops={},
+    rel_ops={},
+    rel_opcodes={},
+    rel_folds={},
+    unary_opcodes={},
+    unary_folds={}
 )
