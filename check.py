@@ -147,6 +147,12 @@ class Environment(object):
                 return hit
         return None
 
+    def look(self,name):
+        hit = self.peek().lookup(name)
+        if hit is not None :
+            return hit
+        return None
+
     def prnt(self):
         for indent, scope in enumerate(reversed(self.stack)):
             print("Scope for {}".format("ROOT" if scope.decl is None else scope.decl))
@@ -259,6 +265,33 @@ class CheckProgramVisitor(NodeVisitor):
         node.check_type = check_type
         print check_type
 
+    def visit_Unconstr_array(self,node):
+        print 'Unconstrained Array'
+        for index in node.index_s.index_s :
+            self.visit(index)
+        self.visit(node.subtype_ind)
+        node.check_type = node.subtype_ind.check_type
+
+    def visit_Constr_array(self,node):
+        print 'Constrained Array'
+        for drange in node.index_constraint :
+            if drange[0] != None :
+                self.visit(drange[0])
+            self.visit(drange[1])
+            if drange[0]!=None :
+                if hasattr(drange[0],'check_type') and hasattr(drange[1],'check_type'):
+                    if drange[0].check_type != drange[1].check_type :
+                        error(node.lineno, "Type Mismatch".format(node.location.name))
+        self.visit(node.subtype_ind)
+        node.check_type = node.subtype_ind.check_type
+
+    def visit_Record(self,node):
+        if node.record_def[1] != None :
+            for comp in node.record_def[1].comp_decls:
+                self.visit(comp)
+        if node.record_def[0] != None :
+            self.visit(node.record_def[0])
+
     def visit_AssignmentStatement(self,node):
         print 'Assignment'
         print node.location.name
@@ -344,16 +377,19 @@ class CheckProgramVisitor(NodeVisitor):
             node.label = counter
             counter+=1
         else:
-            if self.environment.lookup(node.name) is not None:
-                error(node.lineno, "Attempted to redefine label, not allowed".format(node.name))
+            if self.environment.lookup(node.label) is not None:
+                error(node.lineno, "Attempted to redefine label, not allowed".format(node.label))
                 return
             if node.id!=None and node.label != node.id :
-                error(node.lineno, "Label does not match".format(node.name))
+                error(node.lineno, "Label does not match".format(node.label))
+        self.environment.push(node)
+        self.environment.add_local(node.label, node)
         self.visit(node.expr)
         if node.expr != None :
             if node.expr.check_type != BoolType:
                 error(node.lineno, "Expression in while statement must evaluate to bool")
         self.visit(node.truebranch)
+        self.environment.pop()
 
     def visit_For_loop(self,node):
         print 'For_loop'
@@ -407,13 +443,13 @@ class CheckProgramVisitor(NodeVisitor):
             node.label = counter
             counter+=1
         else:
-            if self.environment.lookup(node.name) is not None:
-                error(node.lineno, "Attempted to redefine label, not allowed".format(node.name))
+            if self.environment.lookup(node.label) is not None:
+                error(node.lineno, "Attempted to redefine label, not allowed".format(node.label))
                 return
             if node.id!=None and node.label != node.id :
-                error(node.lineno, "Label does not match".format(node.name))
+                error(node.lineno, "Label does not match".format(node.label))
         self.environment.push(node)
-        self.environment.add_local(node.name, node)
+        self.environment.add_local(node.label, node)
         for declarations in node.decl:
             self.visit(declarations)
         self.visit(node.block)
@@ -516,7 +552,7 @@ class CheckProgramVisitor(NodeVisitor):
         print 'Var'
         print self.environment.scope_level()
         # 1. Check that the variable name is not already defined
-        if self.environment.lookup(node.name) is not None:
+        if self.environment.look(node.name) is not None:
             error(node.lineno, "Attempted to redefine var '{}', not allowed".format(node.name))
             return
         # 2. Add an entry to the symbol table
@@ -541,9 +577,9 @@ class CheckProgramVisitor(NodeVisitor):
         print node.name
         sym = self.environment.lookup(node.name)
         print sym
-        if not isinstance(sym, ExprType):
-            error(node.lineno, "{} is not a valid type".format(node.name))
-            return
+#        if not isinstance(sym, ExprType):
+ #           error(node.lineno, "{} is not a valid type".format(node.name))
+ #           return
         node.check_type = sym
 
     def visit_Location(self,node):
