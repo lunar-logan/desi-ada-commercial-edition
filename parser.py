@@ -840,9 +840,12 @@ def p_except_handler_part_opt(p):
     pass
 def p_exit_stmt(p):
     '''exit_stmt : EXIT name_opt when_opt SEMICOLON'''
-    p[0] = ExitStatement(LoadLocation(Location(p[2])),p[3])
+    if p[2] is not None:
+        p[0] = ExitStatement(LoadLocation(Location(p[2])),p[3])
+    else:
+        p[0] = ExitStatement(None,p[3])
 def p_name_opt(p):
-    '''name_opt :
+    '''name_opt : empty
 | name'''
     if len(p)==1 :
         p[0] = None
