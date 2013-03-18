@@ -190,7 +190,7 @@ class CheckProgramVisitor(NodeVisitor):
     def check_type_binary(self, node, op, left, right):
         if hasattr(left, "check_type") and hasattr(right, "check_type"):
             if left.check_type != right.check_type:
-                error(node.lineno, "Binary operator {} does not have matching LHS/RHS types".format(op))
+                error(node.lineno,"Binary operator {} does not have matching LHS/RHS types".format(op))
                 return left.check_type
             errside = None
             if op not in left.check_type.binary_ops:
@@ -388,11 +388,11 @@ class CheckProgramVisitor(NodeVisitor):
     def visit_CaseStatement(self,node):
         print 'Case'
         self.visit(node.condition)
-        for al in self.alternatives.alternatives :
+        for al in node.alternatives.alternatives :
             self.visit(al)
             if hasattr(node.condition,'check_type') and hasattr(al,'check_type') :
                 if node.condition.check_type  != al.check_type :
-                    error(node.lineno, "Expression in case statement must evaluate to bool")
+                    error(node.lineno, "Type of condition must match with the type of choice.")
                     return
             else :
                     error(node.lineno, "No type assigned to node")
@@ -404,7 +404,7 @@ class CheckProgramVisitor(NodeVisitor):
             temp=node.choices.choices[0].check_type
         else :
             error(node.lineno, "Type error") 
-        for ch in range(1,(node.choices.choices.len()-1)) :
+        for ch in range(1,(len(node.choices.choices)-1)) :
             self.visit(node.choices.choices[ch])
             if hasattr(node.choices.choices[ch],'check_type')==False or node.choices.choices[ch].check_type!=temp :
                 error(node.lineno, "Type error")
@@ -432,7 +432,8 @@ class CheckProgramVisitor(NodeVisitor):
                 error(node.lineno, "Label does not match".format(node.label))
         self.environment.push(node)
         self.environment.add_local(node.label, node)
-        self.visit(node.expr)
+        if node.expr is not None:
+            self.visit(node.expr)
         if node.expr != None :
             if node.expr.check_type != BoolType:
                 error(node.lineno, "Expression in while statement must evaluate to bool")
@@ -529,8 +530,8 @@ class CheckProgramVisitor(NodeVisitor):
         self.visit(node.returntype)
         if hasattr(node.returntype, "check_type"):
             node.check_type = node.returntype.check_type
-        print 'return type of function iis'
-        print node.check_type
+            print 'return type of function iis'
+            print node.check_type
         self.visit(node.parameters)
         for declarations in node.decl_part:
             self.visit(declarations)
@@ -611,7 +612,8 @@ class CheckProgramVisitor(NodeVisitor):
             return
 
     def visit_ExitStatement(self,node):
-        self.visit(node.name)
+        if node.name is not None:
+            self.visit(node.name)
         if node.expr != None :
             self.visit(node.expr)
         if node.expr.check_type != BoolType:
