@@ -14,7 +14,7 @@ precedence = (
 ('left', 'PLUS', 'MINUS'),
 ('left', 'TIMES', 'DIVIDE'),
 )
-# Grammar description
+# Grammar descriptions
 
 def p_goal_symbol(p):
     '''goal_symbol : compilation'''
