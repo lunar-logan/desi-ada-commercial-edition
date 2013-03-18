@@ -58,8 +58,8 @@ StringType = ExprType("string", str(),
 )
 BoolType = ExprType("bool", bool(),
     unary_ops={"!"},
-    rel_ops={"=", "/=", "&&", "||","andthen","orelse"},
-    rel_opcodes={"=": "eq", "/=": "ne", "&&": "land", "||": "lor","andthen":"andthen","orelse":"orelse"},
+    rel_ops={"=", "/=", "and", "or","xor","andthen","orelse"},
+    rel_opcodes={"=": "eq", "/=": "ne", "and": "land", "or": "lor", "xor": "lxor","andthen":"andthen","orelse":"orelse"},
     rel_folds={"=": operator.eq, "/=": operator.ne, "&&": operator.and_, "||": operator.or_},
     unary_opcodes={"!": "not"},
     unary_folds={"!": operator.not_}
