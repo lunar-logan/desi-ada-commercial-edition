@@ -57,6 +57,8 @@ def p_object_decl(p):
     for i in p[1] :
         if isinstance(p[4],tuple) :
             k=k+[VarDeclaration(i,p[4][0],p[5],p[4][1],lineno=p.lineno(2))]
+        elif isinstance(p[4],Unconstr_array) or isinstance(p[4],Constr_array) :
+            k=k+[VarDeclaration(i,Typename('array'),p[5],p[4],lineno=p.lineno(2))]
         else :
             k=k+[VarDeclaration(i,p[4],p[5],None,lineno=p.lineno(2))]
     p[0]=k
@@ -98,7 +100,7 @@ def p_number_decl(p):
     pass
 def p_type_decl(p):
     '''type_decl : TYPE IDENTIFIER discrim_part_opt type_completion SEMICOLON'''
-    p[0] = [VarDeclaration(p[2], p[4][0], p[4][1],None)]
+    p[0] = [VarDeclaration(p[2], p[4][0], None, p[4][1])]
 
 def p_discrim_part_opt(p):
     '''discrim_part_opt :
@@ -390,7 +392,10 @@ def p_choice(p):
 def p_discrete_with_range(p):
     '''discrete_with_range : name range_constraint
 | range'''
-    pass
+    if len(p)==3 :
+        p[0] = (Typename(p[1]),p[2])
+    else :
+        p[0] = (None,p[1])
 def p_access_type(p):
     '''access_type : ACCESS subtype_ind
 | ACCESS CONSTANT subtype_ind
@@ -724,7 +729,10 @@ def p_NULL_stmt(p):
     p[0] = None
 def p_assign_stmt(p):
     '''assign_stmt : name IS_ASSIGNED expression SEMICOLON'''
-    p[0] = AssignmentStatement(Location(p[1]),p[3])
+    if isinstance(p[1],tuple) :
+        p[0] = ArrayAssignmentStatement(Location(p[1][0]),p[1][1],p[3])
+    else :
+        p[0] = AssignmentStatement(Location(p[1]),p[3])
 
 def p_if_stmt(p):
     '''if_stmt : IF cond_clause else_opt END IF SEMICOLON'''
@@ -840,12 +848,10 @@ def p_except_handler_part_opt(p):
     pass
 def p_exit_stmt(p):
     '''exit_stmt : EXIT name_opt when_opt SEMICOLON'''
-    if p[2] is not None:
-        p[0] = ExitStatement(LoadLocation(Location(p[2])),p[3])
-    else:
-        p[0] = ExitStatement(None,p[3])
+    p[0] = ExitStatement(LoadLocation(Location(p[2])),p[3])
 def p_name_opt(p):
-    '''name_opt : empty
+    print p[1]
+    '''name_opt :
 | name'''
     if len(p)==1 :
         p[0] = None
