@@ -229,7 +229,7 @@ class CheckProgramVisitor(NodeVisitor):
             if isinstance(node.expr,list):
                 for e in node.expr :
                     self.visit(e)
-                if len(node.expr) != lean((sym.length.record_def)[0].comp_decls) :
+                if len(node.expr) != len((sym.length.record_def)[0].comp_decls) :
                     error(node.lineno, "Length does not match")
                 else :
                     for i in range(0,len(node.expr)):
