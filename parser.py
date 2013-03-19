@@ -58,7 +58,7 @@ def p_object_decl(p):
         if isinstance(p[4],tuple) :
             k=k+[VarDeclaration(i,p[4][0],p[5],p[4][1],lineno=p.lineno(2))]
         elif isinstance(p[4],Unconstr_array) or isinstance(p[4],Constr_array) :
-            k=k+[VarDeclaration(i,Typename('array'),p[5],p[4],lineno=p.lineno(2))]
+            k=k+[VarDeclaration(i,Typename('array'),p[5],p[4],lineno=p.lineno(2))] 
         else :
             k=k+[VarDeclaration(i,p[4],p[5],None,lineno=p.lineno(2))]
     p[0]=k
@@ -100,7 +100,7 @@ def p_number_decl(p):
     pass
 def p_type_decl(p):
     '''type_decl : TYPE IDENTIFIER discrim_part_opt type_completion SEMICOLON'''
-    p[0] = [VarDeclaration(p[2], p[4][0], None, p[4][1])]
+    p[0] = [VarDeclaration(p[2], p[4][0],None, p[4][1], lineno=p.lineno(1))]
 
 def p_discrim_part_opt(p):
     '''discrim_part_opt :
@@ -144,15 +144,15 @@ def p_type_def_access(p):
 
 def p_subtype_decl(p):
     '''subtype_decl : SUBTYPE IDENTIFIER IS subtype_ind SEMICOLON'''
-    p[0] = VarDeclaration(p[2],p[4],None,None)
+    p[0] = VarDeclaration(p[2],p[4],None,None, lineno=p.lineno(3))
 
 def p_subtype_ind(p):
     '''subtype_ind : name constraint
 | name'''
     if isinstance(p[1],tuple) :
-        p[0] = (Typename(p[1][0]),p[1][1])
+        p[0] = (Typename(p[1][0], lineno=p.lineno(1)),p[1][1])
     else :
-        p[0]=Typename(p[1])
+        p[0]=Typename(p[1], lineno=p.lineno(1))
 def p_constraint(p):
     '''constraint : range_constraint
 | decimal_digits_constraint'''
@@ -175,7 +175,7 @@ def p_range(p):
 | name TICK RANGE
 | name TICK RANGE LPAREN expression RPAREN'''
     if p[2]=='..':
-        p[0]=Doubledot_range(p[1],p[3])
+        p[0]=Doubledot_range(p[1],p[3], lineno=p.lineno(2))
     elif len(p)==4:
         p[0]=Name_tick(LoadLocation(Location(p[1])),None,lineno=p.lineno(2))
     else:
@@ -184,12 +184,12 @@ def p_range(p):
 
 def p_enumeration_type(p):
     '''enumeration_type : LPAREN enum_id_s RPAREN'''
-    p[0] = p[1]
+    p[0] = p[2]
 def p_enum_id_s(p):
     '''enum_id_s : enum_id
 | enum_id_s COMMA enum_id'''
     if len(p)==2 :
-        p[0] = Enum([p[1]])
+        p[0] = Enum([p[1]], lineno=p.lineno(1))
     else :
         p[0]=p[1]
         p[0].append(p[3])
@@ -201,9 +201,9 @@ def p_integer_type(p):
     '''integer_type : range_spec
 | MOD expression'''
     if len(p) == 3:
-        p[0] = Integer_type(None, p[2])
+        p[0] = Integer_type(None, p[2], lineno=p.lineno(1))
     else:
-        p[0] = Integer_type(p[1], None)
+        p[0] = Integer_type(p[1], None, lineno=p.lineno(1))
 
 def p_range_spec(p):
     '''range_spec : range_constraint'''
@@ -219,14 +219,14 @@ def p_real_type(p):
 
 def p_float_type(p):
     '''float_type : DIGITS expression range_spec_opt'''
-    p[0] = Float_type(p[2], p[3])
+    p[0] = Float_type(p[2], p[3], lineno=p.lineno(1))
 def p_fixed_type(p):
     '''fixed_type : DELTA expression range_spec
 | DELTA expression DIGITS expression range_spec_opt'''
     n = len(p)
     if n == 4:
-        p[0] = Fixed_type(p[2], p[3], None)
-    else: p[0] = Fixed_type(p[2], p[5], p[4])
+        p[0] = Fixed_type(p[2], p[3], None, lineno=p.lineno(1))
+    else: p[0] = Fixed_type(p[2], p[5], p[4], lineno=p.lineno(1))
 
 def p_array_type(p):
     '''array_type : unconstr_array_type
@@ -234,11 +234,11 @@ def p_array_type(p):
     p[0] = p[1]
 def p_unconstr_array_type(p):
     '''unconstr_array_type : ARRAY LPAREN index_s RPAREN OF component_subtype_def'''
-    p[0] = Unconstr_array(p[3],p[6][0],p[6][1])
+    p[0] = Unconstr_array(p[3],p[6][0],p[6][1], lineno=p.lineno(1))
 def p_constr_array_type(p):
     '''constr_array_type : ARRAY iter_index_constraint OF component_subtype_def'''
     #print "***************\n",p[2], "\n$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$\n"
-    p[0] = Constr_array(p[2],p[4][0],p[4][1])
+    p[0] = Constr_array(p[2],p[4][0],p[4][1], lineno=p.lineno(1))
 def p_component_subtype_def(p):
     '''component_subtype_def : aliased_opt subtype_ind'''
     p[0] = (p[1],p[2])
@@ -253,13 +253,13 @@ def p_index_s(p):
     '''index_s : index
 | index_s COMMA index'''
     if len(p)==2:
-        p[0]=Index_s([p[1]])
+        p[0]=Index_s([p[1]], lineno=p.lineno(1))
     else:
         p[0]=p[1]
         p[0].append(p[3])
 def p_index(p):
     '''index : name RANGE BOX'''
-    p[0] = LoadLocation(Location(p[1]))
+    p[0] = LoadLocation(Location(p[1], lineno=p.lineno(2)), lineno=p.lineno(2))
 def p_iter_index_constraint(p):
     '''iter_index_constraint : LPAREN iter_discrete_range_s RPAREN'''
     p[0] = p[2]
@@ -268,13 +268,13 @@ def p_iter_discrete_range_s(p):
 | iter_discrete_range_s COMMA discrete_range'''
     if len(p)==2 :
         if p[1][0] != None :
-            p[0] = [(Typename(p[1][0]),p[1][1])]
+            p[0] = [(Typename(p[1][0], lineno=p.lineno(1)),p[1][1])]
         else :
             p[0]=[p[1]]
     else :
         p[0] = p[1]
         if p[3][0] != None :
-            p[0].append((Typename(p[3][0]),p[3][1]))
+            p[0].append((Typename(p[3][0], lineno=p.lineno(2)),p[3][1]))
         else :
             p[0].append(p[3])
 
@@ -295,7 +295,7 @@ def p_range_constr_opt(p):
         p[0]=p[1]
 def p_record_type(p):
     '''record_type : tagged_opt limited_opt record_def'''
-    p[0] = Record(p[1],p[2],p[3])
+    p[0] = Record(p[1],p[2],p[3], lineno=p.lineno(1))
 def p_record_def(p):
     '''record_def : RECORD comp_list END RECORD
 | NULL RECORD'''
@@ -326,7 +326,7 @@ def p_comp_decl_s(p):
     '''comp_decl_s : comp_decl
 | comp_decl_s comp_decl'''
     if len(p)==2 :
-        p[0] = ComponentDeclaration(p[1])
+        p[0] = ComponentDeclaration(p[1], lineno=p.lineno(1))
     else :
         p[0] = p[1]
         p[0].append(p[2])
@@ -345,7 +345,7 @@ def p_comp_decl(p):
     else :
         k=[]
         for i in p[1] :
-            k=k+[VarDeclaration(i,p[3][1],p[4],None)]
+            k=k+[VarDeclaration(i,p[3][1],p[4],None, lineno=p.lineno(2))]
         p[0]=k
 def p_discrim_part(p):
     '''discrim_part : LPAREN discrim_spec_s RPAREN'''
@@ -364,7 +364,7 @@ def p_access_opt(p):
     pass
 def p_variant_part(p):
     '''variant_part : CASE simple_name IS  variant_s END CASE SEMICOLON'''
-    p[0] = CaseStatement(p[2],p[4])
+    p[0] = CaseStatement(p[2],p[4], lineno=p.lineno(1))
 def p_variant_s(p):
     '''variant_s : variant
 | variant_s variant'''
@@ -372,7 +372,7 @@ def p_variant_s(p):
         p[0]=p[1]
         p[0].append(p[2])
     else:
-        p[0]=Alternatives([p[1]])
+        p[0]=Alternatives([p[1]], lineno=p.lineno(1))
 def p_variant(p):
     '''variant : WHEN choice_s ARROW comp_list'''
     p[0]=Alternative(p[2],p[4],lineno=p.lineno(1))
@@ -383,7 +383,7 @@ def p_choice_s(p):
         p[0]=p[1]
         p[0].append(p[2])
     else:
-        p[0]=Choices([p[1]])
+        p[0]=Choices([p[1]], lineno=p.lineno(1))
 def p_choice(p):
     '''choice : expression
 | discrete_with_range
@@ -393,9 +393,9 @@ def p_discrete_with_range(p):
     '''discrete_with_range : name range_constraint
 | range'''
     if len(p)==3 :
-        p[0] = (Typename(p[1]),p[2])
+        p[0] = (Typename(p[1], lineno=p.lineno(1)),p[2])
     else :
-        p[0] = (None,p[1])
+        p[0] = (None,p[1]) 
 def p_access_type(p):
     '''access_type : ACCESS subtype_ind
 | ACCESS CONSTANT subtype_ind
@@ -404,12 +404,12 @@ def p_access_type(p):
 | ACCESS prot_opt FUNCTION formal_part_opt RETURN mark'''
     n = len(p)
     if n == 3:
-        p[0] = Access_type_subtype(None, p[2])
+        p[0] = Access_type_subtype(None, p[2], lineno=p.lineno(1))
     elif n == 4:
-        p[0] = Access_type_subtype(p[2], p[2])
+        p[0] = Access_type_subtype(p[2], p[2], lineno=p.lineno(1))
     elif n == 5:
-        p[0] = Access_type_subprog(p[1], p[3], None)
-    else: p[0] = Access_type_subprog(p[1], p[3], p[5])
+        p[0] = Access_type_subprog(p[1], p[3], None, lineno=p.lineno(1))
+    else: p[0] = Access_type_subprog(p[1], p[3], p[5], lineno=p.lineno(1))
 
 def p_prot_opt(p):
     '''prot_opt :
@@ -465,7 +465,7 @@ def p_mark(p):
 | mark TICK attribute_id
 | mark DOT simple_name'''
     if len(p)==2 :
-        p[0] = Typename(p[1])
+        p[0] = Typename(p[1], lineno=p.lineno(1))
     else :
         p[0] = str(p[1]) + p[2] + str(p[3])
 def p_simple_name(p):
@@ -500,7 +500,7 @@ def p_value_s(p):
     '''value_s : value
 | value_s COMMA value'''
     if len(p)==2:
-        p[0]=Value_s([p[1]])
+        p[0]=Value_s([p[1]], lineno=p.lineno(1))
     else:
         p[0]=p[1]
         p[0].append(p[3]) 
@@ -529,18 +529,21 @@ def p_literal(p):
     '''literal : NUMBER
 | used_char
 | NULL'''
-    p[0]=Literal(p[1])
+    p[0]=Literal(p[1], lineno=p.lineno(1))
 def p_aggregate(p):
     '''aggregate : LPAREN comp_assoc RPAREN
 | LPAREN value_s_2 RPAREN
 | LPAREN expression WITH value_s RPAREN
 | LPAREN expression WITH NULL RECORD RPAREN
 | LPAREN NULL RECORD RPAREN'''
-    pass
+    p[0] = p[2]
 def p_value_s_2(p):
     '''value_s_2 : value COMMA value
 | value_s_2 COMMA value'''
-    pass
+    if isinstance(p[1],list) :
+        p[0] = p[1]+[p[3]]
+    else :
+        p[0] = [p[1],p[3]]
 def p_comp_assoc(p):
     '''comp_assoc : choice_s ARROW expression'''
     pass
@@ -551,7 +554,7 @@ def p_expression(p):
     if len(p)==2:
         p[0]=p[1]
     else:
-        p[0]=Relop(p[2],p[1],p[3])
+        p[0]=Relop(p[2],p[1],p[3], lineno=p.lineno(2))
 
 def p_logical(p):
     '''logical : AND
@@ -570,11 +573,11 @@ def p_relation(p):
     if len(p)==2 :
         p[0] = p[1]
     else :
-        p[0] = Relop(p[2],p[1],p[3])
+        p[0] = Relop(p[2],p[1],p[3], lineno=p.lineno(2))
 
 def p_relation_2(p):
     '''relation : simple_expression membership name'''
-    p[0] = Relop(p[2],p[1],LoadLocation(Location(p[3])))
+    p[0] = Relop(p[2],p[1],LoadLocation(Location(p[3], lineno=p.lineno(2)), lineno=p.lineno(2)), lineno=p.lineno(2))
 
 def p_relational(p):
     '''relational : EQ
@@ -598,9 +601,9 @@ def p_simple_expression(p):
 | term
 | simple_expression adding term'''
     if len(p)==3 :
-        p[0] = Unaryop(p[1],p[2])
+        p[0] = Unaryop(p[1],p[2], lineno=p.lineno(2))
     elif len(p)==4 :
-        p[0] = Binop(p[2],p[1],p[3])
+        p[0] = Binop(p[2],p[1],p[3], lineno=p.lineno(2))
     else :
         p[0]=p[1]
 
@@ -621,7 +624,7 @@ def p_term(p):
     if len(p)==2 :
         p[0] = p[1]
     else :
-        p[0] = Binop(p[2],p[1],p[3])
+        p[0] = Binop(p[2],p[1],p[3], lineno=p.lineno(2))
 
 def p_multiplying(p):
     '''multiplying : TIMES
@@ -638,9 +641,9 @@ def p_factor(p):
     if len(p)==2:
          p[0] = p[1]
     elif len(p)==3 :
-         p[0] = UnaryOp(p[1],p[2])
+         p[0] = UnaryOp(p[1],p[2], lineno=p.lineno(1))
     else :
-         p[0] = Binop(p[2],p[1],p[3])
+         p[0] = Binop(p[2],p[1],p[3], lineno=p.lineno(2))
 
 def p_primary(p):
     '''primary : literal
@@ -652,9 +655,9 @@ def p_primary(p):
 def p_primary_var(p):
     '''primary : name'''
     if isinstance(p[1],tuple):
-        p[0] = FuncCall(p[1][0],p[1][1])
+        p[0] = FuncCall(p[1][0],p[1][1], lineno=p.lineno(1))
     else :
-        p[0] = LoadLocation(Location(p[1]))
+        p[0] = LoadLocation(Location(p[1], lineno=p.lineno(1)), lineno=p.lineno(1))
 
 def p_parenthesized_primary(p):
     '''parenthesized_primary : aggregate
@@ -676,7 +679,7 @@ def p_statement_s(p):
     '''statement_s : statement
 | statement_s statement'''
     if len(p)==2:
-        p[0] = Statements([p[1]])
+        p[0] = Statements([p[1]], lineno=p.lineno(1))
     else :
         p[0]=p[1]
         p[0].append(p[2])
@@ -730,13 +733,12 @@ def p_NULL_stmt(p):
 def p_assign_stmt(p):
     '''assign_stmt : name IS_ASSIGNED expression SEMICOLON'''
     if isinstance(p[1],tuple) :
-        p[0] = ArrayAssignmentStatement(Location(p[1][0]),p[1][1],p[3])
+        p[0] = ArrayAssignmentStatement(Location(p[1][0], lineno=p.lineno(2)),p[1][1],p[3], lineno=p.lineno(2))
     else :
-        p[0] = AssignmentStatement(Location(p[1]),p[3])
-
+        p[0] = AssignmentStatement(Location(p[1], lineno=p.lineno(2)),p[3], lineno=p.lineno(2)) 
 def p_if_stmt(p):
     '''if_stmt : IF cond_clause else_opt END IF SEMICOLON'''
-    p[0] = IfStatement(p[2][0],p[2][1],p[3])
+    p[0] = IfStatement(p[2][0],p[2][1],p[3], lineno=p.lineno(1))
 
 def p_cond_clause(p):
     '''cond_clause : cond_part statement_s'''
@@ -759,11 +761,11 @@ def p_else_opt(p):
     elif len(p)==3 :
         p[0] = p[2]
     else :
-        p[0] = IfStatement(p[2][0],p[2][1],p[3])
+        p[0] = IfStatement(p[2][0],p[2][1],p[3], lineno=p.lineno(1))
 
 def p_case_stmt(p):
     '''case_stmt : case_hdr alternative_s END CASE SEMICOLON'''
-    p[0] = CaseStatement(p[1],p[2])
+    p[0] = CaseStatement(p[1],p[2], lineno=p.lineno(3))
 def p_case_hdr(p):
     '''case_hdr : CASE expression IS'''
     p[0] = p[2]
@@ -780,7 +782,7 @@ def p_alternative(p):
     p[0]=Alternative(p[2],p[4],lineno=p.lineno(1))
 def p_loop_stmt(p):
     '''loop_stmt : label_opt iteration basic_loop id_opt SEMICOLON'''
-    p[0] = WhileStatement(p[1],p[2],p[3],p[4])
+    p[0] = WhileStatement(p[1],p[2],p[3],p[4], lineno=p.lineno(5))
 def p_label_opt(p):
     '''label_opt :
 | IDENTIFIER COLON'''
@@ -800,9 +802,9 @@ def p_iteration(p):
         p[0]=p[2]
     elif len(p)==4:
         if p[3][0] != None:
-            p[0]=For_loop(VarDeclaration(p[1],Typename(p[3][0]),None,None),p[2],p[3][1])
+            p[0]=For_loop(VarDeclaration(p[1],Typename(p[3][0], lineno=p.lineno(1)),None,None, lineno=p.lineno(1)),p[2],p[3][1], lineno=p.lineno(1))
         else :
-            p[0]=For_loop(VarDeclaration(p[1],Typename('integer'),None,None),p[2],p[3][1])
+            p[0]=For_loop(VarDeclaration(p[1],Typename('integer'),None,None, lineno=p.lineno(1)),p[2],p[3][1], lineno=p.lineno(1))
     else:
         p[0]=None
 def p_reverse_opt(p):
@@ -848,10 +850,12 @@ def p_except_handler_part_opt(p):
     pass
 def p_exit_stmt(p):
     '''exit_stmt : EXIT name_opt when_opt SEMICOLON'''
-    p[0] = ExitStatement(LoadLocation(Location(p[2])),p[3])
+    if p[2] is not None:
+        p[0] = ExitStatement(LoadLocation(Location(p[2], lineno=p.lineno(1)), lineno=p.lineno(1)),p[3], lineno=p.lineno(1))
+    else:
+        p[0] = ExitStatement(None,p[3], lineno=p.lineno(1))
 def p_name_opt(p):
-    print p[1]
-    '''name_opt :
+    '''name_opt : empty
 | name'''
     if len(p)==1 :
         p[0] = None
@@ -869,13 +873,13 @@ def p_return_stmt(p):
     '''return_stmt : RETURN SEMICOLON
 | RETURN expression SEMICOLON'''
     if len(p)==4 :
-        p[0]=ReturnStatement(p[2])
+        p[0]=ReturnStatement(p[2], lineno=p.lineno(1))
     else :
         p[0] = ReturnStatement(None)
 
 def p_goto_stmt(p):
     '''goto_stmt : GOTO name SEMICOLON'''
-    p[0]=GotoStatement(LoadLocation(Location(p[2])),lineno=p.lineno(2))
+    p[0]=GotoStatement(LoadLocation(Location(p[2], lineno=p.lineno(1))),lineno=p.lineno(1))
 def p_subprog_decl(p):
     '''subprog_decl : subprog_spec SEMICOLON
 | generic_subp_inst SEMICOLON
@@ -888,7 +892,7 @@ def p_subprog_spec(p):
     if p[1]=='procedure':
         p[0] = (p[2],None,p[3])
     elif len(p)==6:
-        p[0] = (p[2],Typename(p[5]),p[3])
+        p[0] = (p[2],Typename(p[5], lineno=p.lineno(1)),p[3])
     else:
         p[0] = (p[2],None,None)
 def p_designator(p):
@@ -909,7 +913,7 @@ def p_param_s(p):
     '''param_s : param
 | param_s SEMICOLON param'''
     if len(p)==2 :
-        p[0] = FuncParameterList(p[1])
+        p[0] = FuncParameterList(p[1], lineno=p.lineno(1))
     else :
         p[0] = p[1]
         p[0].append(p[3])
@@ -919,7 +923,7 @@ def p_param(p):
     if len(p)>2 :
         p[0]=[]
         for d in p[1] :
-            p[0] = p[0]+[FuncParameter(d,p[4],p[5],None)]
+            p[0] = p[0]+[FuncParameter(d,p[4],p[5],None, lineno=p.lineno(2))]
 def p_mode(p):
     '''mode :
 | IN
@@ -935,10 +939,10 @@ def p_subprog_spec_is_push(p):
     p[0] = p[1]
 def p_subprog_body(p):
     '''subprog_body : subprog_spec_is_push decl_part block_body END id_opt SEMICOLON'''
-    p[0]=FuncStatement(p[1][0],p[1][1],p[1][2],p[2],p[3],p[5])
+    p[0]=FuncStatement(p[1][0],p[1][1],p[1][2],p[2],p[3],p[5], lineno=p.lineno(4))
 def p_procedure_call(p):
     '''procedure_call : name SEMICOLON'''
-    p[0] = ProcCall(LoadLocation(Location(p[1])))
+    p[0] = ProcCall(LoadLocation(Location(p[1], lineno=p.lineno(2)), lineno=p.lineno(2)), lineno=p.lineno(2))
 def p_pkg_decl(p):
     '''pkg_decl : pkg_spec SEMICOLON
 | generic_pkg_inst SEMICOLON'''
