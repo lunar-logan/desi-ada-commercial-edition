@@ -440,9 +440,16 @@ def p_decl_item_or_body_s1(p):
     '''decl_item_or_body_s1 : decl_item_or_body
 | decl_item_or_body_s1 decl_item_or_body'''
     if len(p)==2 :
-        p[0]=p[1]
+        if isinstance(p[1],list):
+            p[0]=p[1]
+        else :
+            p[0]=[p[1]]
     else :
-        p[0]=p[1]+p[2]
+        if isinstance(p[2],list):
+            p[0]=p[1]+p[2]
+        else :
+            p[0] = p[1]+[p[2]]
+
 def p_decl_item_or_body(p):
     '''decl_item_or_body : body
 | decl_item'''
@@ -468,7 +475,7 @@ def p_mark(p):
         p[0] = Typename(p[1], lineno=p.lineno(1))
     else :
         pass
-#        p[0] = str(p[1]) + p[2] + str(p[3])
+        p[0] = Typename(p[1], lineno=p.lineno(1))
 def p_simple_name(p):
     '''simple_name : IDENTIFIER'''
     p[0]=p[1]
@@ -519,7 +526,7 @@ def p_selected_comp(p):
     pass
 def p_attribute(p):
     '''attribute : name TICK attribute_id'''
-    pass
+    p[0] = p[1]
 #    p[0] = str(p[1])+p[2]+str(p[3])
 def p_attribute_id(p):
     '''attribute_id : IDENTIFIER
@@ -1317,7 +1324,7 @@ def p_empty(t):
 
 def p_error(p):
     if p:
-        print("Syntax error at '%s'" % p.value)
+        print "Syntax error at lineno :", p.lineno
     else:
         print("Syntax error at EOF")
 
