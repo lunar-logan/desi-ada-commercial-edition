@@ -527,37 +527,81 @@ class CheckProgramVisitor(NodeVisitor):
             return
         self.visit(node.expr)
 
+    def visit_SubTypeDeclaration(self,node):
+        print 'SubType'
+        print node.name
+        print self.environment.scope_level()
+        if self.environment.look(node.name) is not None:
+            error(node.lineno, "Attempted to redefine var '{}', not allowed".format(node.name))
+        else :
+            p=self.environment.lookup(node.typename.name)
+            if isinstance(p,TypeDeclaration) :
+                node.expr = p.expr
+                node.length = p.length
+                node.typename = p.typename
+                self.visit(node.typename)
+                self.environment.add_local(node.name, node)
+                if hasattr(node.typename, "check_type"):
+                    node.check_type = node.typename.check_type
+            else :
+                error(node.lineno, "Type is not valid")
+            '''if node.expr is None:
+                default = node.check_type.default
+                node.expr = Literal(default)
+                node.expr.check_type = node.check_type'''
+        node.scope_level = self.environment.scope_level()
+
+    def visit_TypeDeclaration(self,node):
+        print 'Type'
+        print node.name
+        print self.environment.scope_level()
+        if self.environment.look(node.name) is not None:
+            error(node.lineno, "Attempted to redefine var '{}', not allowed".format(node.name))
+        else :
+            self.visit(node.typename)
+            if node.length is not None :
+                self.visit(node.length)
+            if node.expr is not None :
+                self.visit(node.expr)
+            self.environment.add_local(node.name, node)
+            if hasattr(node.typename, "check_type"):
+                node.check_type = node.typename.check_type
+            '''if node.expr is None:
+                default = node.check_type.default
+                node.expr = Literal(default)
+                node.expr.check_type = node.check_type'''
+        node.scope_level = self.environment.scope_level()
+
     def visit_VarDeclaration(self,node):
         print 'Var'
         print node.name
         print self.environment.scope_level()
         if self.environment.look(node.name) is not None:
-            print node.name,' is defined already'
             error(node.lineno, "Attempted to redefine var '{}', not allowed".format(node.name))
-            return
-        self.visit(node.typename)
-        if isinstance(node.typename.check_type,VarDeclaration) :
-            node.expr = node.typename.check_type.expr
-            node.length = node.typename.check_type.length
-            node.typename = node.typename.check_type.typename
         else :
-            if node.length is not None :
-                self.visit(node.length)
-            if node.expr is not None :
-                self.visit(node.expr)
-        self.environment.add_local(node.name, node)
-        if hasattr(node.typename, "check_type"):
-            node.check_type = node.typename.check_type
-        '''if node.expr is None:
-            default = node.check_type.default
-            node.expr = Literal(default)
-            node.expr.check_type = node.check_type'''
+            p=self.environment.lookup(node.typename.name)
+            if isinstance(p,TypeDeclaration) :
+                node.expr = p.expr
+                node.length = p.length
+                node.typename = p.typename
+            else :
+                if node.length is not None :
+                    self.visit(node.length)
+                if node.expr is not None :
+                    self.visit(node.expr)
+            self.visit(node.typename)
+            self.environment.add_local(node.name, node)
+            if hasattr(node.typename, "check_type"):
+                node.check_type = node.typename.check_type
+            '''if node.expr is None:
+                default = node.check_type.default
+                node.expr = Literal(default)
+                node.expr.check_type = node.check_type'''
         node.scope_level = self.environment.scope_level()
 
     def visit_Typename(self,node):
         print 'Typename'
         print self.environment.scope_level()
-        print node.name
         sym = self.environment.lookup(node.name)
         node.check_type = sym
         if not isinstance(sym, ExprType):
