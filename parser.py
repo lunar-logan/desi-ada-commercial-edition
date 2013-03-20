@@ -100,7 +100,7 @@ def p_number_decl(p):
     pass
 def p_type_decl(p):
     '''type_decl : TYPE IDENTIFIER discrim_part_opt type_completion SEMICOLON'''
-    p[0] = [VarDeclaration(p[2], p[4][0],None, p[4][1], lineno=p.lineno(1))]
+    p[0] = [TypeDeclaration(p[2], p[4][0],None, p[4][1], lineno=p.lineno(1))]
 
 def p_discrim_part_opt(p):
     '''discrim_part_opt :
@@ -144,7 +144,7 @@ def p_type_def_access(p):
 
 def p_subtype_decl(p):
     '''subtype_decl : SUBTYPE IDENTIFIER IS subtype_ind SEMICOLON'''
-    p[0] = VarDeclaration(p[2],p[4],None,None, lineno=p.lineno(3))
+    p[0] = [SubTypeDeclaration(p[2],p[4],None,None, lineno=p.lineno(3))]
 
 def p_subtype_ind(p):
     '''subtype_ind : name constraint
@@ -467,7 +467,8 @@ def p_mark(p):
     if len(p)==2 :
         p[0] = Typename(p[1], lineno=p.lineno(1))
     else :
-        p[0] = str(p[1]) + p[2] + str(p[3])
+        pass
+#        p[0] = str(p[1]) + p[2] + str(p[3])
 def p_simple_name(p):
     '''simple_name : IDENTIFIER'''
     p[0]=p[1]
@@ -518,7 +519,8 @@ def p_selected_comp(p):
     pass
 def p_attribute(p):
     '''attribute : name TICK attribute_id'''
-    p[0] = str(p[1])+p[2]+str(p[3])
+    pass
+#    p[0] = str(p[1])+p[2]+str(p[3])
 def p_attribute_id(p):
     '''attribute_id : IDENTIFIER
 | DIGITS
@@ -641,7 +643,7 @@ def p_factor(p):
     if len(p)==2:
          p[0] = p[1]
     elif len(p)==3 :
-         p[0] = UnaryOp(p[1],p[2], lineno=p.lineno(1))
+         p[0] = Unaryop(p[1],p[2], lineno=p.lineno(1))
     else :
          p[0] = Binop(p[2],p[1],p[3], lineno=p.lineno(2))
 
