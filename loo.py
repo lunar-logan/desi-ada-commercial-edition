@@ -6,9 +6,6 @@ class ExprType(object):
                  binary_ops=None, unary_ops=None,
                  binary_folds=None, unary_folds=None, rel_folds=None,
                  rel_ops=None, rel_opcodes=None):
-        '''
-        You must implement yourself and figure out what to store.
-        '''
         self.typename = typename
         self.binary_ops = binary_ops or set()
         self.unary_ops = unary_ops or set()
@@ -59,8 +56,7 @@ StringType = ExprType("string", str(),
 BoolType = ExprType("bool", bool(),
     unary_ops={"!"},
     rel_ops={"=", "/=", "and", "or","xor","andthen","orelse"},
-    rel_opcodes={"=": "eq", "/=": "ne", "and": "land", "or": "lor", "xor": "lxor","andthen":"andthen","orelse":"orelse"},
-    rel_folds={"=": operator.eq, "/=": operator.ne, "&&": operator.and_, "||": operator.or_},
+    rel_opcodes={"=": "eq", "/=": "ne", "and": "land", "or": "lor", "xor": "lxor","andthen":"andthen","orelse":"orelse"},     rel_folds={"=": operator.eq, "/=": operator.ne, "&&": operator.and_, "||": operator.or_},
     unary_opcodes={"!": "not"},
     unary_folds={"!": operator.not_}
 )
@@ -83,7 +79,7 @@ EnumType = ExprType("enumeration",None,
     unary_folds={}
 )
 
-ArrayType = ExprType("array",None,
+ArrayType = ExprType("array",list(),
     unary_ops={},
     rel_ops={},
     rel_opcodes={},
