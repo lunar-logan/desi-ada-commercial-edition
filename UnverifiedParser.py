@@ -214,14 +214,11 @@ def p_integer_type(p):
 
 def p_range_spec(p):
     '''range_spec : range_constraint'''
-    p[0]=p[1]
+    pass
 def p_range_spec_opt(p):
     '''range_spec_opt :
 | range_spec'''
-    if len(p)==1:
-        p[0]=None
-    else:
-        p[0]=p[1]
+    pass
 def p_real_type(p):
     '''real_type : float_type
 | fixed_type'''
@@ -236,8 +233,7 @@ def p_fixed_type(p):
     n = len(p)
     if n == 4:
         p[0] = Fixed_type(p[2], p[3], None, lineno=p.lineno(1))
-    else: 
-        p[0] = Fixed_type(p[2], p[5], p[4], lineno=p.lineno(1))
+    else: p[0] = Fixed_type(p[2], p[5], p[4], lineno=p.lineno(1))
 
 def p_array_type(p):
     '''array_type : unconstr_array_type
