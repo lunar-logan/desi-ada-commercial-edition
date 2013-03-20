@@ -1,7 +1,7 @@
 --with Ada.Text_IO;   
 function Levenshtein(prabhat,pandey : Integer) return Integer is
 manav : Integer;
-type day is (Mon,Tue,Wed)
+type day is (Mon,Tue,Wed);
 type Car is record
      Identity       : Integer;
      Number_Wheels  : Integer range 1 .. 10;
@@ -9,7 +9,7 @@ type Car is record
      Consumption    : Float range 0.0 .. 100.0;
   end record;
       type S is array(1..prabhat'Last,1..10) of integer;
-      subtype U is S;
+      subtype U is S range 5..6;
       B: S;
       Q : Integer;
       A : array(1..5) of integer;
@@ -26,5 +26,10 @@ type Car is record
       while Q <= 5 loop
          Q := Q + 1;
       end loop;
+      declare
+         Q : Float;
+      begin
+         Q := 3;
+      end;
       return Q;
    end Levenshtein;
