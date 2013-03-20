@@ -248,7 +248,6 @@ def p_unconstr_array_type(p):
     p[0] = Unconstr_array(p[3],p[6][0],p[6][1][0], lineno=p.lineno(1))
 def p_constr_array_type(p):
     '''constr_array_type : ARRAY iter_index_constraint OF component_subtype_def'''
-    #print "***************\n",p[2], "\n$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$\n"
     p[0] = Constr_array(p[2],p[4][0],p[4][1][0], lineno=p.lineno(1))
 def p_component_subtype_def(p):
     '''component_subtype_def : aliased_opt subtype_ind'''
@@ -293,7 +292,6 @@ def p_discrete_range(p):
     '''discrete_range : name range_constr_opt
 | range'''
     if len(p)==3 :
-        print p[1]
         p[0] = (p[1],p[2])
     else :
         p[0] = (None,p[1])
@@ -415,9 +413,9 @@ def p_access_type(p):
 | ACCESS prot_opt FUNCTION formal_part_opt RETURN mark'''
     n = len(p)
     if n == 3:
-        p[0] = Access_type_subtype(None, p[2], lineno=p.lineno(1))
+        p[0] = Access_type_subtype(None, p[2][0], lineno=p.lineno(1))
     elif n == 4:
-        p[0] = Access_type_subtype(p[2], p[2], lineno=p.lineno(1))
+        p[0] = Access_type_subtype(p[2][0], p[2][0], lineno=p.lineno(1))
     elif n == 5:
         p[0] = Access_type_subprog(p[1], p[3], None, lineno=p.lineno(1))
     else: p[0] = Access_type_subprog(p[1], p[3], p[5], lineno=p.lineno(1))
@@ -1335,7 +1333,7 @@ def p_empty(t):
 
 def p_error(p):
     if p:
-        print "Syntax error at lineno :", p.lineno
+        print "Syntax error at: ",p.value
     else:
         print("Syntax error at EOF")
 
@@ -1344,10 +1342,11 @@ def make_parser():
     return parser
 
 from errors import subscribe_errors
-with subscribe_errors(lambda msg: sys.stdout.write(msg+"\n")):
-    parser = make_parser()
-    program = parser.parse(open(sys.argv[1]).read())
+if __name__ == '__main__':
+    with subscribe_errors(lambda msg: sys.stdout.write(msg+"\n")):
+        parser = make_parser()
+        program = parser.parse(open(sys.argv[1]).read())
 
     # Output the resulting parse tree structure
-    for depth,node in flatten(program):
-        print("%s%s" % (" "*(4*depth),node))    
+        for depth,node in flatten(program):
+            print("%s%s" % (" "*(4*depth),node))    
