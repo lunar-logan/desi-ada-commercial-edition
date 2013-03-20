@@ -144,22 +144,29 @@ def p_type_def_access(p):
 
 def p_subtype_decl(p):
     '''subtype_decl : SUBTYPE IDENTIFIER IS subtype_ind SEMICOLON'''
-    p[0] = [SubTypeDeclaration(p[2],p[4],None,None, lineno=p.lineno(3))]
+    p[0] = [SubTypeDeclaration(p[2],p[4][0],None,p[4][1], lineno=p.lineno(3))]
 
 def p_subtype_ind(p):
     '''subtype_ind : name constraint
 | name'''
     if isinstance(p[1],tuple) :
-        p[0] = (Typename(p[1][0], lineno=p.lineno(1)),p[1][1])
+        if len(p)==2 :
+            p[0] = (Typename(p[1][0], lineno=p.lineno(1)),p[1][1],None)
+        else :
+            p[0] = (Typename(p[1][0], lineno=p.lineno(1)),p[1][1],p[2])
     else :
-        p[0]=Typename(p[1], lineno=p.lineno(1))
+        if len(p)==2 :
+            p[0] = (Typename(p[1],lineno = p.lineno(1)),None)
+        else :
+            p[0]=(Typename(p[1], lineno=p.lineno(1)),p[2])
+
 def p_constraint(p):
     '''constraint : range_constraint
 | decimal_digits_constraint'''
-    pass
+    p[0] = p[1]
 def p_decimal_digits_constraint(p):
     '''decimal_digits_constraint : DIGITS expression range_constr_opt'''
-    pass
+    p[0] = p[2]
 def p_derived_type(p):
     '''derived_type : NEW subtype_ind
 | NEW subtype_ind WITH PRIVATE
@@ -207,11 +214,14 @@ def p_integer_type(p):
 
 def p_range_spec(p):
     '''range_spec : range_constraint'''
-    pass
+    p[0] = p[1]
 def p_range_spec_opt(p):
     '''range_spec_opt :
 | range_spec'''
-    pass
+    if len(p)==1:
+        p[0]=None
+    else:
+        p[0]=p[1] 
 def p_real_type(p):
     '''real_type : float_type
 | fixed_type'''
@@ -226,7 +236,8 @@ def p_fixed_type(p):
     n = len(p)
     if n == 4:
         p[0] = Fixed_type(p[2], p[3], None, lineno=p.lineno(1))
-    else: p[0] = Fixed_type(p[2], p[5], p[4], lineno=p.lineno(1))
+    else: 
+        p[0] = Fixed_type(p[2], p[5], p[4], lineno=p.lineno(1))
 
 def p_array_type(p):
     '''array_type : unconstr_array_type
@@ -234,11 +245,11 @@ def p_array_type(p):
     p[0] = p[1]
 def p_unconstr_array_type(p):
     '''unconstr_array_type : ARRAY LPAREN index_s RPAREN OF component_subtype_def'''
-    p[0] = Unconstr_array(p[3],p[6][0],p[6][1], lineno=p.lineno(1))
+    p[0] = Unconstr_array(p[3],p[6][0],p[6][1][0], lineno=p.lineno(1))
 def p_constr_array_type(p):
     '''constr_array_type : ARRAY iter_index_constraint OF component_subtype_def'''
     #print "***************\n",p[2], "\n$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$\n"
-    p[0] = Constr_array(p[2],p[4][0],p[4][1], lineno=p.lineno(1))
+    p[0] = Constr_array(p[2],p[4][0],p[4][1][0], lineno=p.lineno(1))
 def p_component_subtype_def(p):
     '''component_subtype_def : aliased_opt subtype_ind'''
     p[0] = (p[1],p[2])
@@ -345,7 +356,7 @@ def p_comp_decl(p):
     else :
         k=[]
         for i in p[1] :
-            k=k+[VarDeclaration(i,p[3][1],p[4],None, lineno=p.lineno(2))]
+            k=k+[VarDeclaration(i,p[3][1][0],p[4],p[3][1][1], lineno=p.lineno(2))]
         p[0]=k
 def p_discrim_part(p):
     '''discrim_part : LPAREN discrim_spec_s RPAREN'''
