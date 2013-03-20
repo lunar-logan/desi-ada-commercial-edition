@@ -50,6 +50,9 @@ class Relop(AST):
 class AssignmentStatement(AST):
     _fields = ['location','expr']          
 
+class ArrayAssignmentStatement(AST):
+    _fields = ['location','args','expr']          
+
 class PrintStatement(AST):
     _fields = ['expr']          
     
@@ -123,11 +126,7 @@ class Index_s(AST):
 
     def __len__(self):
         return len(self.index_s)
-    
- 
-class ConstDeclaration(AST):
-    _fields = ['name','expr']          
-    
+
 class IfStatement(AST):
     _fields = ['expr', 'truebranch', 'falsebranch']
 
@@ -188,6 +187,12 @@ class FuncParameterList(AST):
 class FuncParameter(VarDeclaration):
     pass
 
+class TypeDeclaration(VarDeclaration):
+    pass
+
+class SubTypeDeclaration(VarDeclaration):
+    pass
+
 class FuncCall(AST):
     _fields = ['name','arguments']
 
@@ -231,29 +236,6 @@ class NodeVisitor(object):
                         self.visit(item)
             elif isinstance(value, AST):
                 self.visit(value)
-'''
-class NodeTransformer(NodeVisitor):
-    def generic_visit(self,node):
-        for field in getattr(node,"_fields"):
-            value = getattr(node,field,None)
-            if isinstance(value,list):
-                newvalues = []
-                for item in value:
-                    if isinstance(item,AST):
-                        newnode = self.visit(item)
-                        if newnode is not None:
-                            newvalues.append(newnode)
-                    else:
-                        newvalues.append(n)
-                value[:] = newvalues
-            elif isinstance(value,AST):
-                newnode = self.visit(value)
-                if newnode is None:
-                    delattr(node,field)
-                else:
-                    setattr(node,field,newnode)
-        return node
-'''
 def flatten(top):
     class Flattener(NodeVisitor):
         def __init__(self):
