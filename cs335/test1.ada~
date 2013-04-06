@@ -1,0 +1,12 @@
+procedure Ops is
+      A,B,C : Integer;  -- same as 3 separate declarations
+      D : float;
+   begin
+      A := 5;
+      B := A * 3 + 4;   -- result is 19 (multiplication done first)
+      B := A * (3 + 4); -- using parens to override the order
+      C := A / 3;       -- result is 1  (division truncates)
+      C := A rem 3;     -- result is 2
+      C := A - 1;
+      C := A ** 2;      -- exponentiation
+   end;

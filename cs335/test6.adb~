@@ -1,0 +1,17 @@
+-- Case Statement
+procedure Exercise is
+   Choice : Character;
+   A : Integer;
+begin
+   A := 4;
+   case Choice is
+      when 'a' =>
+         A := A+1;
+      when 'b' =>
+         A := A+2;
+      when "asb" =>
+         A := A+3; 
+      when others =>
+         A := A+3;     
+   end case;
+end Exercise;
