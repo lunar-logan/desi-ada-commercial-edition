@@ -1,4 +1,4 @@
-import loo
+from loo import IntType, FloatType, StringType, BoolType, CharType, ArrayType, AccessType, EnumType, RecordType, ExprType
 import ast
 import exprblock
 
@@ -36,11 +36,37 @@ class GenerateCode(ast.NodeVisitor):
             node.code+=progra.code
 
     def visit_FuncStatement(self,node):
+        node.code='.data\n'
+        for args in node.parameters.parameters:
+            self.visit(args)
+            node.code+=args.code
+        for vardecl in node.decl_part:
+            self.visit(vardecl)
+            node.code+=vardecl.code
+        node.code+='.text\n'
         self.visit(node.statements)
-        node.code=node.statements.code
+        node.code+=node.statements.code
+
+    def visit_VarDeclaration(self,node):
+        node.code = node.name+': '
+        if node.typename.check_type.typename=='integer':
+            node.code+=' .word 1\n'
+        elif node.typename.check_type.typename=='character':
+            node.code+=' .byte 1\n'
+        elif node.typename.check_type.typename=='string':
+            node.code+=' .asciiz\n'
+
+    def visit_FuncParameter(self,node):
+        node.code = node.name+': '
+        if node.typename.check_type.typename=='integer':
+            node.code+=' .word 1\n'
+        elif node.typename.check_type.typename=='character':
+            node.code+=' .byte 1\n'
+        elif node.typename.check_type.typename=='string':
+            node.code+=' .asciiz\n'
 
     def visit_Literal(self,node):
-        inst = 'li $a0 '+node.value+'\n'
+        inst = 'li $a0 '+str(node.value)+'\n'
         node.code=inst
 
     def visit_Unaryop(self,node):
@@ -76,14 +102,6 @@ class GenerateCode(ast.NodeVisitor):
         inst = instruction+' $a0 $t1 $a0\naddiu $sp $sp 4\n'
         node.code+=inst
 
-    def visit_VarDeclaration(self, node):
-        self.visit(node.expr)
-        if node.scope_level == 0:
-            opcode = "newvar_global"
-        else:
-            opcode = "newvar_local"
-        inst = (opcode, node.expr.gen_location, node.name)
-        node.code=inst
 
     def visit_ConstDeclaration(self, node):
         self.visit(node.expr)
