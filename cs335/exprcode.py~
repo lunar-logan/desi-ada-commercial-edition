@@ -31,6 +31,7 @@ class GenerateCode(ast.NodeVisitor):
         #print node.program
         node.code=''
         for progra in node.program :
+            print progra
             #if isinstance(progra,FuncStatement):
             self.visit(progra)
             node.code+=progra.code

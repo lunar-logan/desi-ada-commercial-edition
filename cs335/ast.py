@@ -228,14 +228,17 @@ class NodeVisitor(object):
             return None
     
     def generic_visit(self,node):
+        #print node , '------------------laudu----------------'
         for field in getattr(node,"_fields"):
             value = getattr(node,field,None)
             if isinstance(value, list):
                 for item in value:
                     if isinstance(item,AST):
                         self.visit(item)
+                        #print item , '----------------------haha---------------------------'
             elif isinstance(value, AST):
                 self.visit(value)
+                #print value , '-----------------------hehe---------------'
 def flatten(top):
     class Flattener(NodeVisitor):
         def __init__(self):

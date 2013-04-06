@@ -118,8 +118,14 @@ class CheckProgramVisitor(NodeVisitor):
     def inside_function(self):
         return self.environment.scope_level() > 1
 
+    def visit_Goal_symbol(self,node):
+        self.visit(node.compilation)
+
+    def visit_Compilation(self,node):
+        for program in node.program:
+            self.visit(program)
+
     def visit_Program(self,node):
-        print self.environment.scope_level()
         node.environment = self.environment
         node.symtab = self.environment.peek()
         for statement in node.statements.statements:
@@ -159,9 +165,14 @@ class CheckProgramVisitor(NodeVisitor):
         node.scope_level = self.environment.scope_level()
         if node.range_spec_opt is not None:
             self.visit(node.range_spec_opt)
+            if hasattr(node.range_spec_opt,'check_type'):
+                node.check_type = node.range_spec_opt.check_type
         self.visit(node.expression)
 
     def visit_Access_type_subtype(self, node):
+        sym = self.environment.lookup(node.subtype_ind.name)
+        if isinstance(sym,TypeDeclaration) :
+            node.subtype_ind = sym.typename
         self.visit(node.subtype_ind)
 
     def visit_Access_type_subprog(self, node):
@@ -219,8 +230,6 @@ class CheckProgramVisitor(NodeVisitor):
         if not sym:
             error(node.lineno, "name '{}' not defined".format(node.location.name))
         if sym.typename.check_type == EnumType :
-            print node.expr.location.name
-            print sym.length.enum_id
             if node.expr.location.name not in sym.length.enum_id :
                 error(node.lineno,"Not an enum values")
         else :
@@ -303,7 +312,6 @@ class CheckProgramVisitor(NodeVisitor):
         self.visit(node.choices.choices[0])
         if hasattr(node.choices.choices[0],'check_type') :
             temp=node.choices.choices[0].check_type
-            print '====================================='
         else :
             error(node.lineno, "Type error") 
         for ch in range(1,(len(node.choices.choices))) :
@@ -320,7 +328,6 @@ class CheckProgramVisitor(NodeVisitor):
         if not self.inside_function():
             error(node.lineno, "Cannot define a while outside function body")
             return
-        print self.environment.scope_level()
         if not self.inside_function():
             error(node.lineno, "Cannot use while statement outside function body")
         flag = 1
@@ -403,6 +410,7 @@ class CheckProgramVisitor(NodeVisitor):
         self.environment.pop()
 
     def visit_FuncStatement(self, node):
+        print 'In FuncStatement'
         node.scope_level = self.environment.scope_level()
         if node.scope_level > 1:
             error(node.lineno, "Nested functions not implemented")
@@ -499,8 +507,8 @@ class CheckProgramVisitor(NodeVisitor):
         self.visit(node.name)
         if node.expr != None :
             self.visit(node.expr)
-        if node.expr.check_type != BoolType:
-            error(node.lineno, "Expression in if statement must evaluate to bool")
+            if node.expr.check_type != BoolType:
+                error(node.lineno, "Condition must evaluate to bool")
 
     def GotoStatement(self,node):
         if not self.inside_function():
@@ -547,6 +555,9 @@ class CheckProgramVisitor(NodeVisitor):
                 self.visit(node.length)
             if node.expr is not None :
                 self.visit(node.expr)
+            if isinstance(node.length,Float_type) and hasattr(node.length,'check_type') and hasattr(node.typename,'check_type'):
+                if node.length.check_type != node.typename.check_type :
+                    error(node.lineno,'Range has wrong type')
             self.environment.add_local(node.name, node)
             if hasattr(node.typename, "check_type"):
                 node.check_type = node.typename.check_type

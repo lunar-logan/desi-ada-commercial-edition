@@ -118,6 +118,13 @@ class CheckProgramVisitor(NodeVisitor):
     def inside_function(self):
         return self.environment.scope_level() > 1
 
+    def visit_Goal_symbol(self,node):
+        self.visit(node.compilation)
+
+    def visit_Compilation(self,node):
+        for program in node.program:
+            self.visit(program)
+
     def visit_Program(self,node):
         node.environment = self.environment
         node.symtab = self.environment.peek()
