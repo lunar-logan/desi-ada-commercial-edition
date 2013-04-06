@@ -1,0 +1,3326 @@
+Created by PLY version 3.4 (http://www.dabeaz.com/ply)
+
+Grammar
+
+Rule 0     S' -> program
+Rule 1     program -> empty
+Rule 2     program -> basicblock
+Rule 3     basicblock -> statements
+Rule 4     basicblock -> empty
+Rule 5     statements -> statements statement
+Rule 6     statements -> statement
+Rule 7     statement -> const_declaration
+Rule 8     statement -> var_declaration
+Rule 9     statement -> assign_statement
+Rule 10    statement -> print_statement
+Rule 11    statement -> if_statement
+Rule 12    statement -> if_else_statement
+Rule 13    statement -> while_statement
+Rule 14    statement -> return_statement
+Rule 15    statement -> func_call
+Rule 16    statement -> func_statement
+Rule 17    if_statement -> IF expression LCURL basicblock RCURL
+Rule 18    if_else_statement -> IF expression LCURL basicblock RCURL ELSE LCURL basicblock RCURL
+Rule 19    while_statement -> WHILE expression LCURL basicblock RCURL
+Rule 20    func_call -> ID LPAREN arguments RPAREN SEMI
+Rule 21    arguments -> argument
+Rule 22    argument -> expression
+Rule 23    arguments -> arguments COMMA argument
+Rule 24    arguments -> empty
+Rule 25    parameter -> ID typename
+Rule 26    parameters -> parameter
+Rule 27    parameters -> parameters COMMA parameter
+Rule 28    parameters -> empty
+Rule 29    func_statement -> FUNC ID typename LPAREN parameters RPAREN LCURL basicblock RCURL
+Rule 30    return_statement -> RETURN expression SEMI
+Rule 31    const_declaration -> CONST ID ASSIGN expression SEMI
+Rule 32    var_declaration -> VAR ID typename SEMI
+Rule 33    var_declaration -> VAR ID typename ASSIGN expression SEMI
+Rule 34    assign_statement -> location ASSIGN expression SEMI
+Rule 35    print_statement -> PRINT expression SEMI
+Rule 36    expression -> PLUS expression
+Rule 37    expression -> MINUS expression
+Rule 38    expression -> NOT expression
+Rule 39    expression -> expression PLUS expression
+Rule 40    expression -> expression MINUS expression
+Rule 41    expression -> expression TIMES expression
+Rule 42    expression -> expression DIVIDE expression
+Rule 43    expression -> expression GT expression
+Rule 44    expression -> expression GTE expression
+Rule 45    expression -> expression LT expression
+Rule 46    expression -> expression LTE expression
+Rule 47    expression -> expression EQ expression
+Rule 48    expression -> expression NEQ expression
+Rule 49    expression -> expression LAND expression
+Rule 50    expression -> expression LOR expression
+Rule 51    expression -> LPAREN expression RPAREN
+Rule 52    expression -> location
+Rule 53    expression -> literal
+Rule 54    literal -> INTEGER
+Rule 55    literal -> FLOAT
+Rule 56    literal -> STRING
+Rule 57    literal -> BOOL
+Rule 58    location -> ID
+Rule 59    typename -> ID
+Rule 60    empty -> <empty>
+
+Terminals, with rules where they appear
+
+ASSIGN               : 31 33 34
+BOOL                 : 57
+COMMA                : 23 27
+CONST                : 31
+DIVIDE               : 42
+ELSE                 : 18
+EQ                   : 47
+FLOAT                : 55
+FUNC                 : 29
+GT                   : 43
+GTE                  : 44
+ID                   : 20 25 29 31 32 33 58 59
+IF                   : 17 18
+INTEGER              : 54
+LAND                 : 49
+LCURL                : 17 18 18 19 29
+LOR                  : 50
+LPAREN               : 20 29 51
+LT                   : 45
+LTE                  : 46
+MINUS                : 37 40
+NEQ                  : 48
+NOT                  : 38
+PLUS                 : 36 39
+PRINT                : 35
+RCURL                : 17 18 18 19 29
+RETURN               : 30
+RPAREN               : 20 29 51
+SEMI                 : 20 30 31 32 33 34 35
+STRING               : 56
+TIMES                : 41
+VAR                  : 32 33
+WHILE                : 19
+error                : 
+
+Nonterminals, with rules where they appear
+
+argument             : 21 23
+arguments            : 20 23
+assign_statement     : 9
+basicblock           : 2 17 18 18 19 29
+const_declaration    : 7
+empty                : 1 4 24 28
+expression           : 17 18 19 22 30 31 33 34 35 36 37 38 39 39 40 40 41 41 42 42 43 43 44 44 45 45 46 46 47 47 48 48 49 49 50 50 51
+func_call            : 15
+func_statement       : 16
+if_else_statement    : 12
+if_statement         : 11
+literal              : 53
+location             : 34 52
+parameter            : 26 27
+parameters           : 27 29
+print_statement      : 10
+program              : 0
+return_statement     : 14
+statement            : 5 6
+statements           : 3 5
+typename             : 25 29 32 33
+var_declaration      : 8
+while_statement      : 13
+
+Parsing method: LALR
+
+state 0
+
+    (0) S' -> . program
+    (1) program -> . empty
+    (2) program -> . basicblock
+    (60) empty -> .
+    (3) basicblock -> . statements
+    (4) basicblock -> . empty
+    (5) statements -> . statements statement
+    (6) statements -> . statement
+    (7) statement -> . const_declaration
+    (8) statement -> . var_declaration
+    (9) statement -> . assign_statement
+    (10) statement -> . print_statement
+    (11) statement -> . if_statement
+    (12) statement -> . if_else_statement
+    (13) statement -> . while_statement
+    (14) statement -> . return_statement
+    (15) statement -> . func_call
+    (16) statement -> . func_statement
+    (31) const_declaration -> . CONST ID ASSIGN expression SEMI
+    (32) var_declaration -> . VAR ID typename SEMI
+    (33) var_declaration -> . VAR ID typename ASSIGN expression SEMI
+    (34) assign_statement -> . location ASSIGN expression SEMI
+    (35) print_statement -> . PRINT expression SEMI
+    (17) if_statement -> . IF expression LCURL basicblock RCURL
+    (18) if_else_statement -> . IF expression LCURL basicblock RCURL ELSE LCURL basicblock RCURL
+    (19) while_statement -> . WHILE expression LCURL basicblock RCURL
+    (30) return_statement -> . RETURN expression SEMI
+    (20) func_call -> . ID LPAREN arguments RPAREN SEMI
+    (29) func_statement -> . FUNC ID typename LPAREN parameters RPAREN LCURL basicblock RCURL
+    (58) location -> . ID
+
+    $end            reduce using rule 60 (empty -> .)
+    CONST           shift and go to state 6
+    VAR             shift and go to state 19
+    PRINT           shift and go to state 3
+    IF              shift and go to state 21
+    WHILE           shift and go to state 4
+    RETURN          shift and go to state 23
+    ID              shift and go to state 20
+    FUNC            shift and go to state 2
+
+    func_call                      shift and go to state 22
+    if_statement                   shift and go to state 16
+    statements                     shift and go to state 1
+    var_declaration                shift and go to state 11
+    if_else_statement              shift and go to state 9
+    return_statement               shift and go to state 10
+    const_declaration              shift and go to state 18
+    while_statement                shift and go to state 12
+    program                        shift and go to state 13
+    func_statement                 shift and go to state 7
+    statement                      shift and go to state 15
+    print_statement                shift and go to state 5
+    basicblock                     shift and go to state 24
+    assign_statement               shift and go to state 8
+    empty                          shift and go to state 17
+    location                       shift and go to state 14
+
+state 1
+
+    (3) basicblock -> statements .
+    (5) statements -> statements . statement
+    (7) statement -> . const_declaration
+    (8) statement -> . var_declaration
+    (9) statement -> . assign_statement
+    (10) statement -> . print_statement
+    (11) statement -> . if_statement
+    (12) statement -> . if_else_statement
+    (13) statement -> . while_statement
+    (14) statement -> . return_statement
+    (15) statement -> . func_call
+    (16) statement -> . func_statement
+    (31) const_declaration -> . CONST ID ASSIGN expression SEMI
+    (32) var_declaration -> . VAR ID typename SEMI
+    (33) var_declaration -> . VAR ID typename ASSIGN expression SEMI
+    (34) assign_statement -> . location ASSIGN expression SEMI
+    (35) print_statement -> . PRINT expression SEMI
+    (17) if_statement -> . IF expression LCURL basicblock RCURL
+    (18) if_else_statement -> . IF expression LCURL basicblock RCURL ELSE LCURL basicblock RCURL
+    (19) while_statement -> . WHILE expression LCURL basicblock RCURL
+    (30) return_statement -> . RETURN expression SEMI
+    (20) func_call -> . ID LPAREN arguments RPAREN SEMI
+    (29) func_statement -> . FUNC ID typename LPAREN parameters RPAREN LCURL basicblock RCURL
+    (58) location -> . ID
+
+    RCURL           reduce using rule 3 (basicblock -> statements .)
+    $end            reduce using rule 3 (basicblock -> statements .)
+    CONST           shift and go to state 6
+    VAR             shift and go to state 19
+    PRINT           shift and go to state 3
+    IF              shift and go to state 21
+    WHILE           shift and go to state 4
+    RETURN          shift and go to state 23
+    ID              shift and go to state 20
+    FUNC            shift and go to state 2
+
+    func_call                      shift and go to state 22
+    assign_statement               shift and go to state 8
+    if_else_statement              shift and go to state 9
+    return_statement               shift and go to state 10
+    const_declaration              shift and go to state 18
+    while_statement                shift and go to state 12
+    location                       shift and go to state 14
+    statement                      shift and go to state 25
+    print_statement                shift and go to state 5
+    var_declaration                shift and go to state 11
+    if_statement                   shift and go to state 16
+    func_statement                 shift and go to state 7
+
+state 2
+
+    (29) func_statement -> FUNC . ID typename LPAREN parameters RPAREN LCURL basicblock RCURL
+
+    ID              shift and go to state 26
+
+
+state 3
+
+    (35) print_statement -> PRINT . expression SEMI
+    (36) expression -> . PLUS expression
+    (37) expression -> . MINUS expression
+    (38) expression -> . NOT expression
+    (39) expression -> . expression PLUS expression
+    (40) expression -> . expression MINUS expression
+    (41) expression -> . expression TIMES expression
+    (42) expression -> . expression DIVIDE expression
+    (43) expression -> . expression GT expression
+    (44) expression -> . expression GTE expression
+    (45) expression -> . expression LT expression
+    (46) expression -> . expression LTE expression
+    (47) expression -> . expression EQ expression
+    (48) expression -> . expression NEQ expression
+    (49) expression -> . expression LAND expression
+    (50) expression -> . expression LOR expression
+    (51) expression -> . LPAREN expression RPAREN
+    (52) expression -> . location
+    (53) expression -> . literal
+    (58) location -> . ID
+    (54) literal -> . INTEGER
+    (55) literal -> . FLOAT
+    (56) literal -> . STRING
+    (57) literal -> . BOOL
+
+    PLUS            shift and go to state 29
+    MINUS           shift and go to state 27
+    NOT             shift and go to state 37
+    LPAREN          shift and go to state 33
+    ID              shift and go to state 34
+    INTEGER         shift and go to state 31
+    FLOAT           shift and go to state 35
+    STRING          shift and go to state 32
+    BOOL            shift and go to state 36
+
+    literal                        shift and go to state 28
+    expression                     shift and go to state 38
+    location                       shift and go to state 30
+
+state 4
+
+    (19) while_statement -> WHILE . expression LCURL basicblock RCURL
+    (36) expression -> . PLUS expression
+    (37) expression -> . MINUS expression
+    (38) expression -> . NOT expression
+    (39) expression -> . expression PLUS expression
+    (40) expression -> . expression MINUS expression
+    (41) expression -> . expression TIMES expression
+    (42) expression -> . expression DIVIDE expression
+    (43) expression -> . expression GT expression
+    (44) expression -> . expression GTE expression
+    (45) expression -> . expression LT expression
+    (46) expression -> . expression LTE expression
+    (47) expression -> . expression EQ expression
+    (48) expression -> . expression NEQ expression
+    (49) expression -> . expression LAND expression
+    (50) expression -> . expression LOR expression
+    (51) expression -> . LPAREN expression RPAREN
+    (52) expression -> . location
+    (53) expression -> . literal
+    (58) location -> . ID
+    (54) literal -> . INTEGER
+    (55) literal -> . FLOAT
+    (56) literal -> . STRING
+    (57) literal -> . BOOL
+
+    PLUS            shift and go to state 29
+    MINUS           shift and go to state 27
+    NOT             shift and go to state 37
+    LPAREN          shift and go to state 33
+    ID              shift and go to state 34
+    INTEGER         shift and go to state 31
+    FLOAT           shift and go to state 35
+    STRING          shift and go to state 32
+    BOOL            shift and go to state 36
+
+    literal                        shift and go to state 28
+    expression                     shift and go to state 39
+    location                       shift and go to state 30
+
+state 5
+
+    (10) statement -> print_statement .
+
+    CONST           reduce using rule 10 (statement -> print_statement .)
+    VAR             reduce using rule 10 (statement -> print_statement .)
+    PRINT           reduce using rule 10 (statement -> print_statement .)
+    IF              reduce using rule 10 (statement -> print_statement .)
+    WHILE           reduce using rule 10 (statement -> print_statement .)
+    RETURN          reduce using rule 10 (statement -> print_statement .)
+    ID              reduce using rule 10 (statement -> print_statement .)
+    FUNC            reduce using rule 10 (statement -> print_statement .)
+    RCURL           reduce using rule 10 (statement -> print_statement .)
+    $end            reduce using rule 10 (statement -> print_statement .)
+
+
+state 6
+
+    (31) const_declaration -> CONST . ID ASSIGN expression SEMI
+
+    ID              shift and go to state 40
+
+
+state 7
+
+    (16) statement -> func_statement .
+
+    CONST           reduce using rule 16 (statement -> func_statement .)
+    VAR             reduce using rule 16 (statement -> func_statement .)
+    PRINT           reduce using rule 16 (statement -> func_statement .)
+    IF              reduce using rule 16 (statement -> func_statement .)
+    WHILE           reduce using rule 16 (statement -> func_statement .)
+    RETURN          reduce using rule 16 (statement -> func_statement .)
+    ID              reduce using rule 16 (statement -> func_statement .)
+    FUNC            reduce using rule 16 (statement -> func_statement .)
+    RCURL           reduce using rule 16 (statement -> func_statement .)
+    $end            reduce using rule 16 (statement -> func_statement .)
+
+
+state 8
+
+    (9) statement -> assign_statement .
+
+    CONST           reduce using rule 9 (statement -> assign_statement .)
+    VAR             reduce using rule 9 (statement -> assign_statement .)
+    PRINT           reduce using rule 9 (statement -> assign_statement .)
+    IF              reduce using rule 9 (statement -> assign_statement .)
+    WHILE           reduce using rule 9 (statement -> assign_statement .)
+    RETURN          reduce using rule 9 (statement -> assign_statement .)
+    ID              reduce using rule 9 (statement -> assign_statement .)
+    FUNC            reduce using rule 9 (statement -> assign_statement .)
+    RCURL           reduce using rule 9 (statement -> assign_statement .)
+    $end            reduce using rule 9 (statement -> assign_statement .)
+
+
+state 9
+
+    (12) statement -> if_else_statement .
+
+    CONST           reduce using rule 12 (statement -> if_else_statement .)
+    VAR             reduce using rule 12 (statement -> if_else_statement .)
+    PRINT           reduce using rule 12 (statement -> if_else_statement .)
+    IF              reduce using rule 12 (statement -> if_else_statement .)
+    WHILE           reduce using rule 12 (statement -> if_else_statement .)
+    RETURN          reduce using rule 12 (statement -> if_else_statement .)
+    ID              reduce using rule 12 (statement -> if_else_statement .)
+    FUNC            reduce using rule 12 (statement -> if_else_statement .)
+    RCURL           reduce using rule 12 (statement -> if_else_statement .)
+    $end            reduce using rule 12 (statement -> if_else_statement .)
+
+
+state 10
+
+    (14) statement -> return_statement .
+
+    CONST           reduce using rule 14 (statement -> return_statement .)
+    VAR             reduce using rule 14 (statement -> return_statement .)
+    PRINT           reduce using rule 14 (statement -> return_statement .)
+    IF              reduce using rule 14 (statement -> return_statement .)
+    WHILE           reduce using rule 14 (statement -> return_statement .)
+    RETURN          reduce using rule 14 (statement -> return_statement .)
+    ID              reduce using rule 14 (statement -> return_statement .)
+    FUNC            reduce using rule 14 (statement -> return_statement .)
+    RCURL           reduce using rule 14 (statement -> return_statement .)
+    $end            reduce using rule 14 (statement -> return_statement .)
+
+
+state 11
+
+    (8) statement -> var_declaration .
+
+    CONST           reduce using rule 8 (statement -> var_declaration .)
+    VAR             reduce using rule 8 (statement -> var_declaration .)
+    PRINT           reduce using rule 8 (statement -> var_declaration .)
+    IF              reduce using rule 8 (statement -> var_declaration .)
+    WHILE           reduce using rule 8 (statement -> var_declaration .)
+    RETURN          reduce using rule 8 (statement -> var_declaration .)
+    ID              reduce using rule 8 (statement -> var_declaration .)
+    FUNC            reduce using rule 8 (statement -> var_declaration .)
+    RCURL           reduce using rule 8 (statement -> var_declaration .)
+    $end            reduce using rule 8 (statement -> var_declaration .)
+
+
+state 12
+
+    (13) statement -> while_statement .
+
+    CONST           reduce using rule 13 (statement -> while_statement .)
+    VAR             reduce using rule 13 (statement -> while_statement .)
+    PRINT           reduce using rule 13 (statement -> while_statement .)
+    IF              reduce using rule 13 (statement -> while_statement .)
+    WHILE           reduce using rule 13 (statement -> while_statement .)
+    RETURN          reduce using rule 13 (statement -> while_statement .)
+    ID              reduce using rule 13 (statement -> while_statement .)
+    FUNC            reduce using rule 13 (statement -> while_statement .)
+    RCURL           reduce using rule 13 (statement -> while_statement .)
+    $end            reduce using rule 13 (statement -> while_statement .)
+
+
+state 13
+
+    (0) S' -> program .
+
+
+
+state 14
+
+    (34) assign_statement -> location . ASSIGN expression SEMI
+
+    ASSIGN          shift and go to state 41
+
+
+state 15
+
+    (6) statements -> statement .
+
+    CONST           reduce using rule 6 (statements -> statement .)
+    VAR             reduce using rule 6 (statements -> statement .)
+    PRINT           reduce using rule 6 (statements -> statement .)
+    IF              reduce using rule 6 (statements -> statement .)
+    WHILE           reduce using rule 6 (statements -> statement .)
+    RETURN          reduce using rule 6 (statements -> statement .)
+    ID              reduce using rule 6 (statements -> statement .)
+    FUNC            reduce using rule 6 (statements -> statement .)
+    RCURL           reduce using rule 6 (statements -> statement .)
+    $end            reduce using rule 6 (statements -> statement .)
+
+
+state 16
+
+    (11) statement -> if_statement .
+
+    CONST           reduce using rule 11 (statement -> if_statement .)
+    VAR             reduce using rule 11 (statement -> if_statement .)
+    PRINT           reduce using rule 11 (statement -> if_statement .)
+    IF              reduce using rule 11 (statement -> if_statement .)
+    WHILE           reduce using rule 11 (statement -> if_statement .)
+    RETURN          reduce using rule 11 (statement -> if_statement .)
+    ID              reduce using rule 11 (statement -> if_statement .)
+    FUNC            reduce using rule 11 (statement -> if_statement .)
+    RCURL           reduce using rule 11 (statement -> if_statement .)
+    $end            reduce using rule 11 (statement -> if_statement .)
+
+
+state 17
+
+    (1) program -> empty .
+    (4) basicblock -> empty .
+
+  ! reduce/reduce conflict for $end resolved using rule 1 (program -> empty .)
+    $end            reduce using rule 1 (program -> empty .)
+
+  ! $end            [ reduce using rule 4 (basicblock -> empty .) ]
+
+
+state 18
+
+    (7) statement -> const_declaration .
+
+    CONST           reduce using rule 7 (statement -> const_declaration .)
+    VAR             reduce using rule 7 (statement -> const_declaration .)
+    PRINT           reduce using rule 7 (statement -> const_declaration .)
+    IF              reduce using rule 7 (statement -> const_declaration .)
+    WHILE           reduce using rule 7 (statement -> const_declaration .)
+    RETURN          reduce using rule 7 (statement -> const_declaration .)
+    ID              reduce using rule 7 (statement -> const_declaration .)
+    FUNC            reduce using rule 7 (statement -> const_declaration .)
+    RCURL           reduce using rule 7 (statement -> const_declaration .)
+    $end            reduce using rule 7 (statement -> const_declaration .)
+
+
+state 19
+
+    (32) var_declaration -> VAR . ID typename SEMI
+    (33) var_declaration -> VAR . ID typename ASSIGN expression SEMI
+
+    ID              shift and go to state 42
+
+
+state 20
+
+    (20) func_call -> ID . LPAREN arguments RPAREN SEMI
+    (58) location -> ID .
+
+    LPAREN          shift and go to state 43
+    ASSIGN          reduce using rule 58 (location -> ID .)
+
+
+state 21
+
+    (17) if_statement -> IF . expression LCURL basicblock RCURL
+    (18) if_else_statement -> IF . expression LCURL basicblock RCURL ELSE LCURL basicblock RCURL
+    (36) expression -> . PLUS expression
+    (37) expression -> . MINUS expression
+    (38) expression -> . NOT expression
+    (39) expression -> . expression PLUS expression
+    (40) expression -> . expression MINUS expression
+    (41) expression -> . expression TIMES expression
+    (42) expression -> . expression DIVIDE expression
+    (43) expression -> . expression GT expression
+    (44) expression -> . expression GTE expression
+    (45) expression -> . expression LT expression
+    (46) expression -> . expression LTE expression
+    (47) expression -> . expression EQ expression
+    (48) expression -> . expression NEQ expression
+    (49) expression -> . expression LAND expression
+    (50) expression -> . expression LOR expression
+    (51) expression -> . LPAREN expression RPAREN
+    (52) expression -> . location
+    (53) expression -> . literal
+    (58) location -> . ID
+    (54) literal -> . INTEGER
+    (55) literal -> . FLOAT
+    (56) literal -> . STRING
+    (57) literal -> . BOOL
+
+    PLUS            shift and go to state 29
+    MINUS           shift and go to state 27
+    NOT             shift and go to state 37
+    LPAREN          shift and go to state 33
+    ID              shift and go to state 34
+    INTEGER         shift and go to state 31
+    FLOAT           shift and go to state 35
+    STRING          shift and go to state 32
+    BOOL            shift and go to state 36
+
+    literal                        shift and go to state 28
+    expression                     shift and go to state 44
+    location                       shift and go to state 30
+
+state 22
+
+    (15) statement -> func_call .
+
+    CONST           reduce using rule 15 (statement -> func_call .)
+    VAR             reduce using rule 15 (statement -> func_call .)
+    PRINT           reduce using rule 15 (statement -> func_call .)
+    IF              reduce using rule 15 (statement -> func_call .)
+    WHILE           reduce using rule 15 (statement -> func_call .)
+    RETURN          reduce using rule 15 (statement -> func_call .)
+    ID              reduce using rule 15 (statement -> func_call .)
+    FUNC            reduce using rule 15 (statement -> func_call .)
+    RCURL           reduce using rule 15 (statement -> func_call .)
+    $end            reduce using rule 15 (statement -> func_call .)
+
+
+state 23
+
+    (30) return_statement -> RETURN . expression SEMI
+    (36) expression -> . PLUS expression
+    (37) expression -> . MINUS expression
+    (38) expression -> . NOT expression
+    (39) expression -> . expression PLUS expression
+    (40) expression -> . expression MINUS expression
+    (41) expression -> . expression TIMES expression
+    (42) expression -> . expression DIVIDE expression
+    (43) expression -> . expression GT expression
+    (44) expression -> . expression GTE expression
+    (45) expression -> . expression LT expression
+    (46) expression -> . expression LTE expression
+    (47) expression -> . expression EQ expression
+    (48) expression -> . expression NEQ expression
+    (49) expression -> . expression LAND expression
+    (50) expression -> . expression LOR expression
+    (51) expression -> . LPAREN expression RPAREN
+    (52) expression -> . location
+    (53) expression -> . literal
+    (58) location -> . ID
+    (54) literal -> . INTEGER
+    (55) literal -> . FLOAT
+    (56) literal -> . STRING
+    (57) literal -> . BOOL
+
+    PLUS            shift and go to state 29
+    MINUS           shift and go to state 27
+    NOT             shift and go to state 37
+    LPAREN          shift and go to state 33
+    ID              shift and go to state 34
+    INTEGER         shift and go to state 31
+    FLOAT           shift and go to state 35
+    STRING          shift and go to state 32
+    BOOL            shift and go to state 36
+
+    literal                        shift and go to state 28
+    expression                     shift and go to state 45
+    location                       shift and go to state 30
+
+state 24
+
+    (2) program -> basicblock .
+
+    $end            reduce using rule 2 (program -> basicblock .)
+
+
+state 25
+
+    (5) statements -> statements statement .
+
+    CONST           reduce using rule 5 (statements -> statements statement .)
+    VAR             reduce using rule 5 (statements -> statements statement .)
+    PRINT           reduce using rule 5 (statements -> statements statement .)
+    IF              reduce using rule 5 (statements -> statements statement .)
+    WHILE           reduce using rule 5 (statements -> statements statement .)
+    RETURN          reduce using rule 5 (statements -> statements statement .)
+    ID              reduce using rule 5 (statements -> statements statement .)
+    FUNC            reduce using rule 5 (statements -> statements statement .)
+    RCURL           reduce using rule 5 (statements -> statements statement .)
+    $end            reduce using rule 5 (statements -> statements statement .)
+
+
+state 26
+
+    (29) func_statement -> FUNC ID . typename LPAREN parameters RPAREN LCURL basicblock RCURL
+    (59) typename -> . ID
+
+    ID              shift and go to state 47
+
+    typename                       shift and go to state 46
+
+state 27
+
+    (37) expression -> MINUS . expression
+    (36) expression -> . PLUS expression
+    (37) expression -> . MINUS expression
+    (38) expression -> . NOT expression
+    (39) expression -> . expression PLUS expression
+    (40) expression -> . expression MINUS expression
+    (41) expression -> . expression TIMES expression
+    (42) expression -> . expression DIVIDE expression
+    (43) expression -> . expression GT expression
+    (44) expression -> . expression GTE expression
+    (45) expression -> . expression LT expression
+    (46) expression -> . expression LTE expression
+    (47) expression -> . expression EQ expression
+    (48) expression -> . expression NEQ expression
+    (49) expression -> . expression LAND expression
+    (50) expression -> . expression LOR expression
+    (51) expression -> . LPAREN expression RPAREN
+    (52) expression -> . location
+    (53) expression -> . literal
+    (58) location -> . ID
+    (54) literal -> . INTEGER
+    (55) literal -> . FLOAT
+    (56) literal -> . STRING
+    (57) literal -> . BOOL
+
+    PLUS            shift and go to state 29
+    MINUS           shift and go to state 27
+    NOT             shift and go to state 37
+    LPAREN          shift and go to state 33
+    ID              shift and go to state 34
+    INTEGER         shift and go to state 31
+    FLOAT           shift and go to state 35
+    STRING          shift and go to state 32
+    BOOL            shift and go to state 36
+
+    literal                        shift and go to state 28
+    expression                     shift and go to state 48
+    location                       shift and go to state 30
+
+state 28
+
+    (53) expression -> literal .
+
+    PLUS            reduce using rule 53 (expression -> literal .)
+    MINUS           reduce using rule 53 (expression -> literal .)
+    TIMES           reduce using rule 53 (expression -> literal .)
+    DIVIDE          reduce using rule 53 (expression -> literal .)
+    GT              reduce using rule 53 (expression -> literal .)
+    GTE             reduce using rule 53 (expression -> literal .)
+    LT              reduce using rule 53 (expression -> literal .)
+    LTE             reduce using rule 53 (expression -> literal .)
+    EQ              reduce using rule 53 (expression -> literal .)
+    NEQ             reduce using rule 53 (expression -> literal .)
+    LAND            reduce using rule 53 (expression -> literal .)
+    LOR             reduce using rule 53 (expression -> literal .)
+    SEMI            reduce using rule 53 (expression -> literal .)
+    LCURL           reduce using rule 53 (expression -> literal .)
+    RPAREN          reduce using rule 53 (expression -> literal .)
+    COMMA           reduce using rule 53 (expression -> literal .)
+
+
+state 29
+
+    (36) expression -> PLUS . expression
+    (36) expression -> . PLUS expression
+    (37) expression -> . MINUS expression
+    (38) expression -> . NOT expression
+    (39) expression -> . expression PLUS expression
+    (40) expression -> . expression MINUS expression
+    (41) expression -> . expression TIMES expression
+    (42) expression -> . expression DIVIDE expression
+    (43) expression -> . expression GT expression
+    (44) expression -> . expression GTE expression
+    (45) expression -> . expression LT expression
+    (46) expression -> . expression LTE expression
+    (47) expression -> . expression EQ expression
+    (48) expression -> . expression NEQ expression
+    (49) expression -> . expression LAND expression
+    (50) expression -> . expression LOR expression
+    (51) expression -> . LPAREN expression RPAREN
+    (52) expression -> . location
+    (53) expression -> . literal
+    (58) location -> . ID
+    (54) literal -> . INTEGER
+    (55) literal -> . FLOAT
+    (56) literal -> . STRING
+    (57) literal -> . BOOL
+
+    PLUS            shift and go to state 29
+    MINUS           shift and go to state 27
+    NOT             shift and go to state 37
+    LPAREN          shift and go to state 33
+    ID              shift and go to state 34
+    INTEGER         shift and go to state 31
+    FLOAT           shift and go to state 35
+    STRING          shift and go to state 32
+    BOOL            shift and go to state 36
+
+    literal                        shift and go to state 28
+    expression                     shift and go to state 49
+    location                       shift and go to state 30
+
+state 30
+
+    (52) expression -> location .
+
+    PLUS            reduce using rule 52 (expression -> location .)
+    MINUS           reduce using rule 52 (expression -> location .)
+    TIMES           reduce using rule 52 (expression -> location .)
+    DIVIDE          reduce using rule 52 (expression -> location .)
+    GT              reduce using rule 52 (expression -> location .)
+    GTE             reduce using rule 52 (expression -> location .)
+    LT              reduce using rule 52 (expression -> location .)
+    LTE             reduce using rule 52 (expression -> location .)
+    EQ              reduce using rule 52 (expression -> location .)
+    NEQ             reduce using rule 52 (expression -> location .)
+    LAND            reduce using rule 52 (expression -> location .)
+    LOR             reduce using rule 52 (expression -> location .)
+    SEMI            reduce using rule 52 (expression -> location .)
+    LCURL           reduce using rule 52 (expression -> location .)
+    RPAREN          reduce using rule 52 (expression -> location .)
+    COMMA           reduce using rule 52 (expression -> location .)
+
+
+state 31
+
+    (54) literal -> INTEGER .
+
+    PLUS            reduce using rule 54 (literal -> INTEGER .)
+    MINUS           reduce using rule 54 (literal -> INTEGER .)
+    TIMES           reduce using rule 54 (literal -> INTEGER .)
+    DIVIDE          reduce using rule 54 (literal -> INTEGER .)
+    GT              reduce using rule 54 (literal -> INTEGER .)
+    GTE             reduce using rule 54 (literal -> INTEGER .)
+    LT              reduce using rule 54 (literal -> INTEGER .)
+    LTE             reduce using rule 54 (literal -> INTEGER .)
+    EQ              reduce using rule 54 (literal -> INTEGER .)
+    NEQ             reduce using rule 54 (literal -> INTEGER .)
+    LAND            reduce using rule 54 (literal -> INTEGER .)
+    LOR             reduce using rule 54 (literal -> INTEGER .)
+    SEMI            reduce using rule 54 (literal -> INTEGER .)
+    LCURL           reduce using rule 54 (literal -> INTEGER .)
+    RPAREN          reduce using rule 54 (literal -> INTEGER .)
+    COMMA           reduce using rule 54 (literal -> INTEGER .)
+
+
+state 32
+
+    (56) literal -> STRING .
+
+    PLUS            reduce using rule 56 (literal -> STRING .)
+    MINUS           reduce using rule 56 (literal -> STRING .)
+    TIMES           reduce using rule 56 (literal -> STRING .)
+    DIVIDE          reduce using rule 56 (literal -> STRING .)
+    GT              reduce using rule 56 (literal -> STRING .)
+    GTE             reduce using rule 56 (literal -> STRING .)
+    LT              reduce using rule 56 (literal -> STRING .)
+    LTE             reduce using rule 56 (literal -> STRING .)
+    EQ              reduce using rule 56 (literal -> STRING .)
+    NEQ             reduce using rule 56 (literal -> STRING .)
+    LAND            reduce using rule 56 (literal -> STRING .)
+    LOR             reduce using rule 56 (literal -> STRING .)
+    SEMI            reduce using rule 56 (literal -> STRING .)
+    LCURL           reduce using rule 56 (literal -> STRING .)
+    RPAREN          reduce using rule 56 (literal -> STRING .)
+    COMMA           reduce using rule 56 (literal -> STRING .)
+
+
+state 33
+
+    (51) expression -> LPAREN . expression RPAREN
+    (36) expression -> . PLUS expression
+    (37) expression -> . MINUS expression
+    (38) expression -> . NOT expression
+    (39) expression -> . expression PLUS expression
+    (40) expression -> . expression MINUS expression
+    (41) expression -> . expression TIMES expression
+    (42) expression -> . expression DIVIDE expression
+    (43) expression -> . expression GT expression
+    (44) expression -> . expression GTE expression
+    (45) expression -> . expression LT expression
+    (46) expression -> . expression LTE expression
+    (47) expression -> . expression EQ expression
+    (48) expression -> . expression NEQ expression
+    (49) expression -> . expression LAND expression
+    (50) expression -> . expression LOR expression
+    (51) expression -> . LPAREN expression RPAREN
+    (52) expression -> . location
+    (53) expression -> . literal
+    (58) location -> . ID
+    (54) literal -> . INTEGER
+    (55) literal -> . FLOAT
+    (56) literal -> . STRING
+    (57) literal -> . BOOL
+
+    PLUS            shift and go to state 29
+    MINUS           shift and go to state 27
+    NOT             shift and go to state 37
+    LPAREN          shift and go to state 33
+    ID              shift and go to state 34
+    INTEGER         shift and go to state 31
+    FLOAT           shift and go to state 35
+    STRING          shift and go to state 32
+    BOOL            shift and go to state 36
+
+    literal                        shift and go to state 28
+    expression                     shift and go to state 50
+    location                       shift and go to state 30
+
+state 34
+
+    (58) location -> ID .
+
+    PLUS            reduce using rule 58 (location -> ID .)
+    MINUS           reduce using rule 58 (location -> ID .)
+    TIMES           reduce using rule 58 (location -> ID .)
+    DIVIDE          reduce using rule 58 (location -> ID .)
+    GT              reduce using rule 58 (location -> ID .)
+    GTE             reduce using rule 58 (location -> ID .)
+    LT              reduce using rule 58 (location -> ID .)
+    LTE             reduce using rule 58 (location -> ID .)
+    EQ              reduce using rule 58 (location -> ID .)
+    NEQ             reduce using rule 58 (location -> ID .)
+    LAND            reduce using rule 58 (location -> ID .)
+    LOR             reduce using rule 58 (location -> ID .)
+    SEMI            reduce using rule 58 (location -> ID .)
+    LCURL           reduce using rule 58 (location -> ID .)
+    RPAREN          reduce using rule 58 (location -> ID .)
+    COMMA           reduce using rule 58 (location -> ID .)
+
+
+state 35
+
+    (55) literal -> FLOAT .
+
+    PLUS            reduce using rule 55 (literal -> FLOAT .)
+    MINUS           reduce using rule 55 (literal -> FLOAT .)
+    TIMES           reduce using rule 55 (literal -> FLOAT .)
+    DIVIDE          reduce using rule 55 (literal -> FLOAT .)
+    GT              reduce using rule 55 (literal -> FLOAT .)
+    GTE             reduce using rule 55 (literal -> FLOAT .)
+    LT              reduce using rule 55 (literal -> FLOAT .)
+    LTE             reduce using rule 55 (literal -> FLOAT .)
+    EQ              reduce using rule 55 (literal -> FLOAT .)
+    NEQ             reduce using rule 55 (literal -> FLOAT .)
+    LAND            reduce using rule 55 (literal -> FLOAT .)
+    LOR             reduce using rule 55 (literal -> FLOAT .)
+    SEMI            reduce using rule 55 (literal -> FLOAT .)
+    LCURL           reduce using rule 55 (literal -> FLOAT .)
+    RPAREN          reduce using rule 55 (literal -> FLOAT .)
+    COMMA           reduce using rule 55 (literal -> FLOAT .)
+
+
+state 36
+
+    (57) literal -> BOOL .
+
+    PLUS            reduce using rule 57 (literal -> BOOL .)
+    MINUS           reduce using rule 57 (literal -> BOOL .)
+    TIMES           reduce using rule 57 (literal -> BOOL .)
+    DIVIDE          reduce using rule 57 (literal -> BOOL .)
+    GT              reduce using rule 57 (literal -> BOOL .)
+    GTE             reduce using rule 57 (literal -> BOOL .)
+    LT              reduce using rule 57 (literal -> BOOL .)
+    LTE             reduce using rule 57 (literal -> BOOL .)
+    EQ              reduce using rule 57 (literal -> BOOL .)
+    NEQ             reduce using rule 57 (literal -> BOOL .)
+    LAND            reduce using rule 57 (literal -> BOOL .)
+    LOR             reduce using rule 57 (literal -> BOOL .)
+    SEMI            reduce using rule 57 (literal -> BOOL .)
+    LCURL           reduce using rule 57 (literal -> BOOL .)
+    RPAREN          reduce using rule 57 (literal -> BOOL .)
+    COMMA           reduce using rule 57 (literal -> BOOL .)
+
+
+state 37
+
+    (38) expression -> NOT . expression
+    (36) expression -> . PLUS expression
+    (37) expression -> . MINUS expression
+    (38) expression -> . NOT expression
+    (39) expression -> . expression PLUS expression
+    (40) expression -> . expression MINUS expression
+    (41) expression -> . expression TIMES expression
+    (42) expression -> . expression DIVIDE expression
+    (43) expression -> . expression GT expression
+    (44) expression -> . expression GTE expression
+    (45) expression -> . expression LT expression
+    (46) expression -> . expression LTE expression
+    (47) expression -> . expression EQ expression
+    (48) expression -> . expression NEQ expression
+    (49) expression -> . expression LAND expression
+    (50) expression -> . expression LOR expression
+    (51) expression -> . LPAREN expression RPAREN
+    (52) expression -> . location
+    (53) expression -> . literal
+    (58) location -> . ID
+    (54) literal -> . INTEGER
+    (55) literal -> . FLOAT
+    (56) literal -> . STRING
+    (57) literal -> . BOOL
+
+    PLUS            shift and go to state 29
+    MINUS           shift and go to state 27
+    NOT             shift and go to state 37
+    LPAREN          shift and go to state 33
+    ID              shift and go to state 34
+    INTEGER         shift and go to state 31
+    FLOAT           shift and go to state 35
+    STRING          shift and go to state 32
+    BOOL            shift and go to state 36
+
+    literal                        shift and go to state 28
+    expression                     shift and go to state 51
+    location                       shift and go to state 30
+
+state 38
+
+    (35) print_statement -> PRINT expression . SEMI
+    (39) expression -> expression . PLUS expression
+    (40) expression -> expression . MINUS expression
+    (41) expression -> expression . TIMES expression
+    (42) expression -> expression . DIVIDE expression
+    (43) expression -> expression . GT expression
+    (44) expression -> expression . GTE expression
+    (45) expression -> expression . LT expression
+    (46) expression -> expression . LTE expression
+    (47) expression -> expression . EQ expression
+    (48) expression -> expression . NEQ expression
+    (49) expression -> expression . LAND expression
+    (50) expression -> expression . LOR expression
+
+    SEMI            shift and go to state 54
+    PLUS            shift and go to state 60
+    MINUS           shift and go to state 63
+    TIMES           shift and go to state 56
+    DIVIDE          shift and go to state 53
+    GT              shift and go to state 52
+    GTE             shift and go to state 64
+    LT              shift and go to state 58
+    LTE             shift and go to state 61
+    EQ              shift and go to state 55
+    NEQ             shift and go to state 62
+    LAND            shift and go to state 59
+    LOR             shift and go to state 57
+
+
+state 39
+
+    (19) while_statement -> WHILE expression . LCURL basicblock RCURL
+    (39) expression -> expression . PLUS expression
+    (40) expression -> expression . MINUS expression
+    (41) expression -> expression . TIMES expression
+    (42) expression -> expression . DIVIDE expression
+    (43) expression -> expression . GT expression
+    (44) expression -> expression . GTE expression
+    (45) expression -> expression . LT expression
+    (46) expression -> expression . LTE expression
+    (47) expression -> expression . EQ expression
+    (48) expression -> expression . NEQ expression
+    (49) expression -> expression . LAND expression
+    (50) expression -> expression . LOR expression
+
+    LCURL           shift and go to state 65
+    PLUS            shift and go to state 60
+    MINUS           shift and go to state 63
+    TIMES           shift and go to state 56
+    DIVIDE          shift and go to state 53
+    GT              shift and go to state 52
+    GTE             shift and go to state 64
+    LT              shift and go to state 58
+    LTE             shift and go to state 61
+    EQ              shift and go to state 55
+    NEQ             shift and go to state 62
+    LAND            shift and go to state 59
+    LOR             shift and go to state 57
+
+
+state 40
+
+    (31) const_declaration -> CONST ID . ASSIGN expression SEMI
+
+    ASSIGN          shift and go to state 66
+
+
+state 41
+
+    (34) assign_statement -> location ASSIGN . expression SEMI
+    (36) expression -> . PLUS expression
+    (37) expression -> . MINUS expression
+    (38) expression -> . NOT expression
+    (39) expression -> . expression PLUS expression
+    (40) expression -> . expression MINUS expression
+    (41) expression -> . expression TIMES expression
+    (42) expression -> . expression DIVIDE expression
+    (43) expression -> . expression GT expression
+    (44) expression -> . expression GTE expression
+    (45) expression -> . expression LT expression
+    (46) expression -> . expression LTE expression
+    (47) expression -> . expression EQ expression
+    (48) expression -> . expression NEQ expression
+    (49) expression -> . expression LAND expression
+    (50) expression -> . expression LOR expression
+    (51) expression -> . LPAREN expression RPAREN
+    (52) expression -> . location
+    (53) expression -> . literal
+    (58) location -> . ID
+    (54) literal -> . INTEGER
+    (55) literal -> . FLOAT
+    (56) literal -> . STRING
+    (57) literal -> . BOOL
+
+    PLUS            shift and go to state 29
+    MINUS           shift and go to state 27
+    NOT             shift and go to state 37
+    LPAREN          shift and go to state 33
+    ID              shift and go to state 34
+    INTEGER         shift and go to state 31
+    FLOAT           shift and go to state 35
+    STRING          shift and go to state 32
+    BOOL            shift and go to state 36
+
+    literal                        shift and go to state 28
+    expression                     shift and go to state 67
+    location                       shift and go to state 30
+
+state 42
+
+    (32) var_declaration -> VAR ID . typename SEMI
+    (33) var_declaration -> VAR ID . typename ASSIGN expression SEMI
+    (59) typename -> . ID
+
+    ID              shift and go to state 47
+
+    typename                       shift and go to state 68
+
+state 43
+
+    (20) func_call -> ID LPAREN . arguments RPAREN SEMI
+    (21) arguments -> . argument
+    (23) arguments -> . arguments COMMA argument
+    (24) arguments -> . empty
+    (22) argument -> . expression
+    (60) empty -> .
+    (36) expression -> . PLUS expression
+    (37) expression -> . MINUS expression
+    (38) expression -> . NOT expression
+    (39) expression -> . expression PLUS expression
+    (40) expression -> . expression MINUS expression
+    (41) expression -> . expression TIMES expression
+    (42) expression -> . expression DIVIDE expression
+    (43) expression -> . expression GT expression
+    (44) expression -> . expression GTE expression
+    (45) expression -> . expression LT expression
+    (46) expression -> . expression LTE expression
+    (47) expression -> . expression EQ expression
+    (48) expression -> . expression NEQ expression
+    (49) expression -> . expression LAND expression
+    (50) expression -> . expression LOR expression
+    (51) expression -> . LPAREN expression RPAREN
+    (52) expression -> . location
+    (53) expression -> . literal
+    (58) location -> . ID
+    (54) literal -> . INTEGER
+    (55) literal -> . FLOAT
+    (56) literal -> . STRING
+    (57) literal -> . BOOL
+
+    RPAREN          reduce using rule 60 (empty -> .)
+    COMMA           reduce using rule 60 (empty -> .)
+    PLUS            shift and go to state 29
+    MINUS           shift and go to state 27
+    NOT             shift and go to state 37
+    LPAREN          shift and go to state 33
+    ID              shift and go to state 34
+    INTEGER         shift and go to state 31
+    FLOAT           shift and go to state 35
+    STRING          shift and go to state 32
+    BOOL            shift and go to state 36
+
+    argument                       shift and go to state 69
+    literal                        shift and go to state 28
+    location                       shift and go to state 30
+    expression                     shift and go to state 72
+    empty                          shift and go to state 71
+    arguments                      shift and go to state 70
+
+state 44
+
+    (17) if_statement -> IF expression . LCURL basicblock RCURL
+    (18) if_else_statement -> IF expression . LCURL basicblock RCURL ELSE LCURL basicblock RCURL
+    (39) expression -> expression . PLUS expression
+    (40) expression -> expression . MINUS expression
+    (41) expression -> expression . TIMES expression
+    (42) expression -> expression . DIVIDE expression
+    (43) expression -> expression . GT expression
+    (44) expression -> expression . GTE expression
+    (45) expression -> expression . LT expression
+    (46) expression -> expression . LTE expression
+    (47) expression -> expression . EQ expression
+    (48) expression -> expression . NEQ expression
+    (49) expression -> expression . LAND expression
+    (50) expression -> expression . LOR expression
+
+    LCURL           shift and go to state 73
+    PLUS            shift and go to state 60
+    MINUS           shift and go to state 63
+    TIMES           shift and go to state 56
+    DIVIDE          shift and go to state 53
+    GT              shift and go to state 52
+    GTE             shift and go to state 64
+    LT              shift and go to state 58
+    LTE             shift and go to state 61
+    EQ              shift and go to state 55
+    NEQ             shift and go to state 62
+    LAND            shift and go to state 59
+    LOR             shift and go to state 57
+
+
+state 45
+
+    (30) return_statement -> RETURN expression . SEMI
+    (39) expression -> expression . PLUS expression
+    (40) expression -> expression . MINUS expression
+    (41) expression -> expression . TIMES expression
+    (42) expression -> expression . DIVIDE expression
+    (43) expression -> expression . GT expression
+    (44) expression -> expression . GTE expression
+    (45) expression -> expression . LT expression
+    (46) expression -> expression . LTE expression
+    (47) expression -> expression . EQ expression
+    (48) expression -> expression . NEQ expression
+    (49) expression -> expression . LAND expression
+    (50) expression -> expression . LOR expression
+
+    SEMI            shift and go to state 74
+    PLUS            shift and go to state 60
+    MINUS           shift and go to state 63
+    TIMES           shift and go to state 56
+    DIVIDE          shift and go to state 53
+    GT              shift and go to state 52
+    GTE             shift and go to state 64
+    LT              shift and go to state 58
+    LTE             shift and go to state 61
+    EQ              shift and go to state 55
+    NEQ             shift and go to state 62
+    LAND            shift and go to state 59
+    LOR             shift and go to state 57
+
+
+state 46
+
+    (29) func_statement -> FUNC ID typename . LPAREN parameters RPAREN LCURL basicblock RCURL
+
+    LPAREN          shift and go to state 75
+
+
+state 47
+
+    (59) typename -> ID .
+
+    LPAREN          reduce using rule 59 (typename -> ID .)
+    SEMI            reduce using rule 59 (typename -> ID .)
+    ASSIGN          reduce using rule 59 (typename -> ID .)
+    RPAREN          reduce using rule 59 (typename -> ID .)
+    COMMA           reduce using rule 59 (typename -> ID .)
+
+
+state 48
+
+    (37) expression -> MINUS expression .
+    (39) expression -> expression . PLUS expression
+    (40) expression -> expression . MINUS expression
+    (41) expression -> expression . TIMES expression
+    (42) expression -> expression . DIVIDE expression
+    (43) expression -> expression . GT expression
+    (44) expression -> expression . GTE expression
+    (45) expression -> expression . LT expression
+    (46) expression -> expression . LTE expression
+    (47) expression -> expression . EQ expression
+    (48) expression -> expression . NEQ expression
+    (49) expression -> expression . LAND expression
+    (50) expression -> expression . LOR expression
+
+    PLUS            reduce using rule 37 (expression -> MINUS expression .)
+    MINUS           reduce using rule 37 (expression -> MINUS expression .)
+    TIMES           reduce using rule 37 (expression -> MINUS expression .)
+    DIVIDE          reduce using rule 37 (expression -> MINUS expression .)
+    GT              reduce using rule 37 (expression -> MINUS expression .)
+    GTE             reduce using rule 37 (expression -> MINUS expression .)
+    LT              reduce using rule 37 (expression -> MINUS expression .)
+    LTE             reduce using rule 37 (expression -> MINUS expression .)
+    EQ              reduce using rule 37 (expression -> MINUS expression .)
+    NEQ             reduce using rule 37 (expression -> MINUS expression .)
+    LAND            reduce using rule 37 (expression -> MINUS expression .)
+    LOR             reduce using rule 37 (expression -> MINUS expression .)
+    SEMI            reduce using rule 37 (expression -> MINUS expression .)
+    LCURL           reduce using rule 37 (expression -> MINUS expression .)
+    RPAREN          reduce using rule 37 (expression -> MINUS expression .)
+    COMMA           reduce using rule 37 (expression -> MINUS expression .)
+
+  ! PLUS            [ shift and go to state 60 ]
+  ! MINUS           [ shift and go to state 63 ]
+  ! TIMES           [ shift and go to state 56 ]
+  ! DIVIDE          [ shift and go to state 53 ]
+  ! GT              [ shift and go to state 52 ]
+  ! GTE             [ shift and go to state 64 ]
+  ! LT              [ shift and go to state 58 ]
+  ! LTE             [ shift and go to state 61 ]
+  ! EQ              [ shift and go to state 55 ]
+  ! NEQ             [ shift and go to state 62 ]
+  ! LAND            [ shift and go to state 59 ]
+  ! LOR             [ shift and go to state 57 ]
+
+
+state 49
+
+    (36) expression -> PLUS expression .
+    (39) expression -> expression . PLUS expression
+    (40) expression -> expression . MINUS expression
+    (41) expression -> expression . TIMES expression
+    (42) expression -> expression . DIVIDE expression
+    (43) expression -> expression . GT expression
+    (44) expression -> expression . GTE expression
+    (45) expression -> expression . LT expression
+    (46) expression -> expression . LTE expression
+    (47) expression -> expression . EQ expression
+    (48) expression -> expression . NEQ expression
+    (49) expression -> expression . LAND expression
+    (50) expression -> expression . LOR expression
+
+    PLUS            reduce using rule 36 (expression -> PLUS expression .)
+    MINUS           reduce using rule 36 (expression -> PLUS expression .)
+    TIMES           reduce using rule 36 (expression -> PLUS expression .)
+    DIVIDE          reduce using rule 36 (expression -> PLUS expression .)
+    GT              reduce using rule 36 (expression -> PLUS expression .)
+    GTE             reduce using rule 36 (expression -> PLUS expression .)
+    LT              reduce using rule 36 (expression -> PLUS expression .)
+    LTE             reduce using rule 36 (expression -> PLUS expression .)
+    EQ              reduce using rule 36 (expression -> PLUS expression .)
+    NEQ             reduce using rule 36 (expression -> PLUS expression .)
+    LAND            reduce using rule 36 (expression -> PLUS expression .)
+    LOR             reduce using rule 36 (expression -> PLUS expression .)
+    SEMI            reduce using rule 36 (expression -> PLUS expression .)
+    LCURL           reduce using rule 36 (expression -> PLUS expression .)
+    RPAREN          reduce using rule 36 (expression -> PLUS expression .)
+    COMMA           reduce using rule 36 (expression -> PLUS expression .)
+
+  ! PLUS            [ shift and go to state 60 ]
+  ! MINUS           [ shift and go to state 63 ]
+  ! TIMES           [ shift and go to state 56 ]
+  ! DIVIDE          [ shift and go to state 53 ]
+  ! GT              [ shift and go to state 52 ]
+  ! GTE             [ shift and go to state 64 ]
+  ! LT              [ shift and go to state 58 ]
+  ! LTE             [ shift and go to state 61 ]
+  ! EQ              [ shift and go to state 55 ]
+  ! NEQ             [ shift and go to state 62 ]
+  ! LAND            [ shift and go to state 59 ]
+  ! LOR             [ shift and go to state 57 ]
+
+
+state 50
+
+    (51) expression -> LPAREN expression . RPAREN
+    (39) expression -> expression . PLUS expression
+    (40) expression -> expression . MINUS expression
+    (41) expression -> expression . TIMES expression
+    (42) expression -> expression . DIVIDE expression
+    (43) expression -> expression . GT expression
+    (44) expression -> expression . GTE expression
+    (45) expression -> expression . LT expression
+    (46) expression -> expression . LTE expression
+    (47) expression -> expression . EQ expression
+    (48) expression -> expression . NEQ expression
+    (49) expression -> expression . LAND expression
+    (50) expression -> expression . LOR expression
+
+    RPAREN          shift and go to state 76
+    PLUS            shift and go to state 60
+    MINUS           shift and go to state 63
+    TIMES           shift and go to state 56
+    DIVIDE          shift and go to state 53
+    GT              shift and go to state 52
+    GTE             shift and go to state 64
+    LT              shift and go to state 58
+    LTE             shift and go to state 61
+    EQ              shift and go to state 55
+    NEQ             shift and go to state 62
+    LAND            shift and go to state 59
+    LOR             shift and go to state 57
+
+
+state 51
+
+    (38) expression -> NOT expression .
+    (39) expression -> expression . PLUS expression
+    (40) expression -> expression . MINUS expression
+    (41) expression -> expression . TIMES expression
+    (42) expression -> expression . DIVIDE expression
+    (43) expression -> expression . GT expression
+    (44) expression -> expression . GTE expression
+    (45) expression -> expression . LT expression
+    (46) expression -> expression . LTE expression
+    (47) expression -> expression . EQ expression
+    (48) expression -> expression . NEQ expression
+    (49) expression -> expression . LAND expression
+    (50) expression -> expression . LOR expression
+
+    PLUS            reduce using rule 38 (expression -> NOT expression .)
+    MINUS           reduce using rule 38 (expression -> NOT expression .)
+    TIMES           reduce using rule 38 (expression -> NOT expression .)
+    DIVIDE          reduce using rule 38 (expression -> NOT expression .)
+    GT              reduce using rule 38 (expression -> NOT expression .)
+    GTE             reduce using rule 38 (expression -> NOT expression .)
+    LT              reduce using rule 38 (expression -> NOT expression .)
+    LTE             reduce using rule 38 (expression -> NOT expression .)
+    EQ              reduce using rule 38 (expression -> NOT expression .)
+    NEQ             reduce using rule 38 (expression -> NOT expression .)
+    LAND            reduce using rule 38 (expression -> NOT expression .)
+    LOR             reduce using rule 38 (expression -> NOT expression .)
+    SEMI            reduce using rule 38 (expression -> NOT expression .)
+    LCURL           reduce using rule 38 (expression -> NOT expression .)
+    RPAREN          reduce using rule 38 (expression -> NOT expression .)
+    COMMA           reduce using rule 38 (expression -> NOT expression .)
+
+  ! PLUS            [ shift and go to state 60 ]
+  ! MINUS           [ shift and go to state 63 ]
+  ! TIMES           [ shift and go to state 56 ]
+  ! DIVIDE          [ shift and go to state 53 ]
+  ! GT              [ shift and go to state 52 ]
+  ! GTE             [ shift and go to state 64 ]
+  ! LT              [ shift and go to state 58 ]
+  ! LTE             [ shift and go to state 61 ]
+  ! EQ              [ shift and go to state 55 ]
+  ! NEQ             [ shift and go to state 62 ]
+  ! LAND            [ shift and go to state 59 ]
+  ! LOR             [ shift and go to state 57 ]
+
+
+state 52
+
+    (43) expression -> expression GT . expression
+    (36) expression -> . PLUS expression
+    (37) expression -> . MINUS expression
+    (38) expression -> . NOT expression
+    (39) expression -> . expression PLUS expression
+    (40) expression -> . expression MINUS expression
+    (41) expression -> . expression TIMES expression
+    (42) expression -> . expression DIVIDE expression
+    (43) expression -> . expression GT expression
+    (44) expression -> . expression GTE expression
+    (45) expression -> . expression LT expression
+    (46) expression -> . expression LTE expression
+    (47) expression -> . expression EQ expression
+    (48) expression -> . expression NEQ expression
+    (49) expression -> . expression LAND expression
+    (50) expression -> . expression LOR expression
+    (51) expression -> . LPAREN expression RPAREN
+    (52) expression -> . location
+    (53) expression -> . literal
+    (58) location -> . ID
+    (54) literal -> . INTEGER
+    (55) literal -> . FLOAT
+    (56) literal -> . STRING
+    (57) literal -> . BOOL
+
+    PLUS            shift and go to state 29
+    MINUS           shift and go to state 27
+    NOT             shift and go to state 37
+    LPAREN          shift and go to state 33
+    ID              shift and go to state 34
+    INTEGER         shift and go to state 31
+    FLOAT           shift and go to state 35
+    STRING          shift and go to state 32
+    BOOL            shift and go to state 36
+
+    literal                        shift and go to state 28
+    expression                     shift and go to state 77
+    location                       shift and go to state 30
+
+state 53
+
+    (42) expression -> expression DIVIDE . expression
+    (36) expression -> . PLUS expression
+    (37) expression -> . MINUS expression
+    (38) expression -> . NOT expression
+    (39) expression -> . expression PLUS expression
+    (40) expression -> . expression MINUS expression
+    (41) expression -> . expression TIMES expression
+    (42) expression -> . expression DIVIDE expression
+    (43) expression -> . expression GT expression
+    (44) expression -> . expression GTE expression
+    (45) expression -> . expression LT expression
+    (46) expression -> . expression LTE expression
+    (47) expression -> . expression EQ expression
+    (48) expression -> . expression NEQ expression
+    (49) expression -> . expression LAND expression
+    (50) expression -> . expression LOR expression
+    (51) expression -> . LPAREN expression RPAREN
+    (52) expression -> . location
+    (53) expression -> . literal
+    (58) location -> . ID
+    (54) literal -> . INTEGER
+    (55) literal -> . FLOAT
+    (56) literal -> . STRING
+    (57) literal -> . BOOL
+
+    PLUS            shift and go to state 29
+    MINUS           shift and go to state 27
+    NOT             shift and go to state 37
+    LPAREN          shift and go to state 33
+    ID              shift and go to state 34
+    INTEGER         shift and go to state 31
+    FLOAT           shift and go to state 35
+    STRING          shift and go to state 32
+    BOOL            shift and go to state 36
+
+    literal                        shift and go to state 28
+    expression                     shift and go to state 78
+    location                       shift and go to state 30
+
+state 54
+
+    (35) print_statement -> PRINT expression SEMI .
+
+    CONST           reduce using rule 35 (print_statement -> PRINT expression SEMI .)
+    VAR             reduce using rule 35 (print_statement -> PRINT expression SEMI .)
+    PRINT           reduce using rule 35 (print_statement -> PRINT expression SEMI .)
+    IF              reduce using rule 35 (print_statement -> PRINT expression SEMI .)
+    WHILE           reduce using rule 35 (print_statement -> PRINT expression SEMI .)
+    RETURN          reduce using rule 35 (print_statement -> PRINT expression SEMI .)
+    ID              reduce using rule 35 (print_statement -> PRINT expression SEMI .)
+    FUNC            reduce using rule 35 (print_statement -> PRINT expression SEMI .)
+    RCURL           reduce using rule 35 (print_statement -> PRINT expression SEMI .)
+    $end            reduce using rule 35 (print_statement -> PRINT expression SEMI .)
+
+
+state 55
+
+    (47) expression -> expression EQ . expression
+    (36) expression -> . PLUS expression
+    (37) expression -> . MINUS expression
+    (38) expression -> . NOT expression
+    (39) expression -> . expression PLUS expression
+    (40) expression -> . expression MINUS expression
+    (41) expression -> . expression TIMES expression
+    (42) expression -> . expression DIVIDE expression
+    (43) expression -> . expression GT expression
+    (44) expression -> . expression GTE expression
+    (45) expression -> . expression LT expression
+    (46) expression -> . expression LTE expression
+    (47) expression -> . expression EQ expression
+    (48) expression -> . expression NEQ expression
+    (49) expression -> . expression LAND expression
+    (50) expression -> . expression LOR expression
+    (51) expression -> . LPAREN expression RPAREN
+    (52) expression -> . location
+    (53) expression -> . literal
+    (58) location -> . ID
+    (54) literal -> . INTEGER
+    (55) literal -> . FLOAT
+    (56) literal -> . STRING
+    (57) literal -> . BOOL
+
+    PLUS            shift and go to state 29
+    MINUS           shift and go to state 27
+    NOT             shift and go to state 37
+    LPAREN          shift and go to state 33
+    ID              shift and go to state 34
+    INTEGER         shift and go to state 31
+    FLOAT           shift and go to state 35
+    STRING          shift and go to state 32
+    BOOL            shift and go to state 36
+
+    literal                        shift and go to state 28
+    expression                     shift and go to state 79
+    location                       shift and go to state 30
+
+state 56
+
+    (41) expression -> expression TIMES . expression
+    (36) expression -> . PLUS expression
+    (37) expression -> . MINUS expression
+    (38) expression -> . NOT expression
+    (39) expression -> . expression PLUS expression
+    (40) expression -> . expression MINUS expression
+    (41) expression -> . expression TIMES expression
+    (42) expression -> . expression DIVIDE expression
+    (43) expression -> . expression GT expression
+    (44) expression -> . expression GTE expression
+    (45) expression -> . expression LT expression
+    (46) expression -> . expression LTE expression
+    (47) expression -> . expression EQ expression
+    (48) expression -> . expression NEQ expression
+    (49) expression -> . expression LAND expression
+    (50) expression -> . expression LOR expression
+    (51) expression -> . LPAREN expression RPAREN
+    (52) expression -> . location
+    (53) expression -> . literal
+    (58) location -> . ID
+    (54) literal -> . INTEGER
+    (55) literal -> . FLOAT
+    (56) literal -> . STRING
+    (57) literal -> . BOOL
+
+    PLUS            shift and go to state 29
+    MINUS           shift and go to state 27
+    NOT             shift and go to state 37
+    LPAREN          shift and go to state 33
+    ID              shift and go to state 34
+    INTEGER         shift and go to state 31
+    FLOAT           shift and go to state 35
+    STRING          shift and go to state 32
+    BOOL            shift and go to state 36
+
+    literal                        shift and go to state 28
+    expression                     shift and go to state 80
+    location                       shift and go to state 30
+
+state 57
+
+    (50) expression -> expression LOR . expression
+    (36) expression -> . PLUS expression
+    (37) expression -> . MINUS expression
+    (38) expression -> . NOT expression
+    (39) expression -> . expression PLUS expression
+    (40) expression -> . expression MINUS expression
+    (41) expression -> . expression TIMES expression
+    (42) expression -> . expression DIVIDE expression
+    (43) expression -> . expression GT expression
+    (44) expression -> . expression GTE expression
+    (45) expression -> . expression LT expression
+    (46) expression -> . expression LTE expression
+    (47) expression -> . expression EQ expression
+    (48) expression -> . expression NEQ expression
+    (49) expression -> . expression LAND expression
+    (50) expression -> . expression LOR expression
+    (51) expression -> . LPAREN expression RPAREN
+    (52) expression -> . location
+    (53) expression -> . literal
+    (58) location -> . ID
+    (54) literal -> . INTEGER
+    (55) literal -> . FLOAT
+    (56) literal -> . STRING
+    (57) literal -> . BOOL
+
+    PLUS            shift and go to state 29
+    MINUS           shift and go to state 27
+    NOT             shift and go to state 37
+    LPAREN          shift and go to state 33
+    ID              shift and go to state 34
+    INTEGER         shift and go to state 31
+    FLOAT           shift and go to state 35
+    STRING          shift and go to state 32
+    BOOL            shift and go to state 36
+
+    literal                        shift and go to state 28
+    expression                     shift and go to state 81
+    location                       shift and go to state 30
+
+state 58
+
+    (45) expression -> expression LT . expression
+    (36) expression -> . PLUS expression
+    (37) expression -> . MINUS expression
+    (38) expression -> . NOT expression
+    (39) expression -> . expression PLUS expression
+    (40) expression -> . expression MINUS expression
+    (41) expression -> . expression TIMES expression
+    (42) expression -> . expression DIVIDE expression
+    (43) expression -> . expression GT expression
+    (44) expression -> . expression GTE expression
+    (45) expression -> . expression LT expression
+    (46) expression -> . expression LTE expression
+    (47) expression -> . expression EQ expression
+    (48) expression -> . expression NEQ expression
+    (49) expression -> . expression LAND expression
+    (50) expression -> . expression LOR expression
+    (51) expression -> . LPAREN expression RPAREN
+    (52) expression -> . location
+    (53) expression -> . literal
+    (58) location -> . ID
+    (54) literal -> . INTEGER
+    (55) literal -> . FLOAT
+    (56) literal -> . STRING
+    (57) literal -> . BOOL
+
+    PLUS            shift and go to state 29
+    MINUS           shift and go to state 27
+    NOT             shift and go to state 37
+    LPAREN          shift and go to state 33
+    ID              shift and go to state 34
+    INTEGER         shift and go to state 31
+    FLOAT           shift and go to state 35
+    STRING          shift and go to state 32
+    BOOL            shift and go to state 36
+
+    literal                        shift and go to state 28
+    expression                     shift and go to state 82
+    location                       shift and go to state 30
+
+state 59
+
+    (49) expression -> expression LAND . expression
+    (36) expression -> . PLUS expression
+    (37) expression -> . MINUS expression
+    (38) expression -> . NOT expression
+    (39) expression -> . expression PLUS expression
+    (40) expression -> . expression MINUS expression
+    (41) expression -> . expression TIMES expression
+    (42) expression -> . expression DIVIDE expression
+    (43) expression -> . expression GT expression
+    (44) expression -> . expression GTE expression
+    (45) expression -> . expression LT expression
+    (46) expression -> . expression LTE expression
+    (47) expression -> . expression EQ expression
+    (48) expression -> . expression NEQ expression
+    (49) expression -> . expression LAND expression
+    (50) expression -> . expression LOR expression
+    (51) expression -> . LPAREN expression RPAREN
+    (52) expression -> . location
+    (53) expression -> . literal
+    (58) location -> . ID
+    (54) literal -> . INTEGER
+    (55) literal -> . FLOAT
+    (56) literal -> . STRING
+    (57) literal -> . BOOL
+
+    PLUS            shift and go to state 29
+    MINUS           shift and go to state 27
+    NOT             shift and go to state 37
+    LPAREN          shift and go to state 33
+    ID              shift and go to state 34
+    INTEGER         shift and go to state 31
+    FLOAT           shift and go to state 35
+    STRING          shift and go to state 32
+    BOOL            shift and go to state 36
+
+    literal                        shift and go to state 28
+    expression                     shift and go to state 83
+    location                       shift and go to state 30
+
+state 60
+
+    (39) expression -> expression PLUS . expression
+    (36) expression -> . PLUS expression
+    (37) expression -> . MINUS expression
+    (38) expression -> . NOT expression
+    (39) expression -> . expression PLUS expression
+    (40) expression -> . expression MINUS expression
+    (41) expression -> . expression TIMES expression
+    (42) expression -> . expression DIVIDE expression
+    (43) expression -> . expression GT expression
+    (44) expression -> . expression GTE expression
+    (45) expression -> . expression LT expression
+    (46) expression -> . expression LTE expression
+    (47) expression -> . expression EQ expression
+    (48) expression -> . expression NEQ expression
+    (49) expression -> . expression LAND expression
+    (50) expression -> . expression LOR expression
+    (51) expression -> . LPAREN expression RPAREN
+    (52) expression -> . location
+    (53) expression -> . literal
+    (58) location -> . ID
+    (54) literal -> . INTEGER
+    (55) literal -> . FLOAT
+    (56) literal -> . STRING
+    (57) literal -> . BOOL
+
+    PLUS            shift and go to state 29
+    MINUS           shift and go to state 27
+    NOT             shift and go to state 37
+    LPAREN          shift and go to state 33
+    ID              shift and go to state 34
+    INTEGER         shift and go to state 31
+    FLOAT           shift and go to state 35
+    STRING          shift and go to state 32
+    BOOL            shift and go to state 36
+
+    literal                        shift and go to state 28
+    expression                     shift and go to state 84
+    location                       shift and go to state 30
+
+state 61
+
+    (46) expression -> expression LTE . expression
+    (36) expression -> . PLUS expression
+    (37) expression -> . MINUS expression
+    (38) expression -> . NOT expression
+    (39) expression -> . expression PLUS expression
+    (40) expression -> . expression MINUS expression
+    (41) expression -> . expression TIMES expression
+    (42) expression -> . expression DIVIDE expression
+    (43) expression -> . expression GT expression
+    (44) expression -> . expression GTE expression
+    (45) expression -> . expression LT expression
+    (46) expression -> . expression LTE expression
+    (47) expression -> . expression EQ expression
+    (48) expression -> . expression NEQ expression
+    (49) expression -> . expression LAND expression
+    (50) expression -> . expression LOR expression
+    (51) expression -> . LPAREN expression RPAREN
+    (52) expression -> . location
+    (53) expression -> . literal
+    (58) location -> . ID
+    (54) literal -> . INTEGER
+    (55) literal -> . FLOAT
+    (56) literal -> . STRING
+    (57) literal -> . BOOL
+
+    PLUS            shift and go to state 29
+    MINUS           shift and go to state 27
+    NOT             shift and go to state 37
+    LPAREN          shift and go to state 33
+    ID              shift and go to state 34
+    INTEGER         shift and go to state 31
+    FLOAT           shift and go to state 35
+    STRING          shift and go to state 32
+    BOOL            shift and go to state 36
+
+    literal                        shift and go to state 28
+    expression                     shift and go to state 85
+    location                       shift and go to state 30
+
+state 62
+
+    (48) expression -> expression NEQ . expression
+    (36) expression -> . PLUS expression
+    (37) expression -> . MINUS expression
+    (38) expression -> . NOT expression
+    (39) expression -> . expression PLUS expression
+    (40) expression -> . expression MINUS expression
+    (41) expression -> . expression TIMES expression
+    (42) expression -> . expression DIVIDE expression
+    (43) expression -> . expression GT expression
+    (44) expression -> . expression GTE expression
+    (45) expression -> . expression LT expression
+    (46) expression -> . expression LTE expression
+    (47) expression -> . expression EQ expression
+    (48) expression -> . expression NEQ expression
+    (49) expression -> . expression LAND expression
+    (50) expression -> . expression LOR expression
+    (51) expression -> . LPAREN expression RPAREN
+    (52) expression -> . location
+    (53) expression -> . literal
+    (58) location -> . ID
+    (54) literal -> . INTEGER
+    (55) literal -> . FLOAT
+    (56) literal -> . STRING
+    (57) literal -> . BOOL
+
+    PLUS            shift and go to state 29
+    MINUS           shift and go to state 27
+    NOT             shift and go to state 37
+    LPAREN          shift and go to state 33
+    ID              shift and go to state 34
+    INTEGER         shift and go to state 31
+    FLOAT           shift and go to state 35
+    STRING          shift and go to state 32
+    BOOL            shift and go to state 36
+
+    literal                        shift and go to state 28
+    expression                     shift and go to state 86
+    location                       shift and go to state 30
+
+state 63
+
+    (40) expression -> expression MINUS . expression
+    (36) expression -> . PLUS expression
+    (37) expression -> . MINUS expression
+    (38) expression -> . NOT expression
+    (39) expression -> . expression PLUS expression
+    (40) expression -> . expression MINUS expression
+    (41) expression -> . expression TIMES expression
+    (42) expression -> . expression DIVIDE expression
+    (43) expression -> . expression GT expression
+    (44) expression -> . expression GTE expression
+    (45) expression -> . expression LT expression
+    (46) expression -> . expression LTE expression
+    (47) expression -> . expression EQ expression
+    (48) expression -> . expression NEQ expression
+    (49) expression -> . expression LAND expression
+    (50) expression -> . expression LOR expression
+    (51) expression -> . LPAREN expression RPAREN
+    (52) expression -> . location
+    (53) expression -> . literal
+    (58) location -> . ID
+    (54) literal -> . INTEGER
+    (55) literal -> . FLOAT
+    (56) literal -> . STRING
+    (57) literal -> . BOOL
+
+    PLUS            shift and go to state 29
+    MINUS           shift and go to state 27
+    NOT             shift and go to state 37
+    LPAREN          shift and go to state 33
+    ID              shift and go to state 34
+    INTEGER         shift and go to state 31
+    FLOAT           shift and go to state 35
+    STRING          shift and go to state 32
+    BOOL            shift and go to state 36
+
+    literal                        shift and go to state 28
+    expression                     shift and go to state 87
+    location                       shift and go to state 30
+
+state 64
+
+    (44) expression -> expression GTE . expression
+    (36) expression -> . PLUS expression
+    (37) expression -> . MINUS expression
+    (38) expression -> . NOT expression
+    (39) expression -> . expression PLUS expression
+    (40) expression -> . expression MINUS expression
+    (41) expression -> . expression TIMES expression
+    (42) expression -> . expression DIVIDE expression
+    (43) expression -> . expression GT expression
+    (44) expression -> . expression GTE expression
+    (45) expression -> . expression LT expression
+    (46) expression -> . expression LTE expression
+    (47) expression -> . expression EQ expression
+    (48) expression -> . expression NEQ expression
+    (49) expression -> . expression LAND expression
+    (50) expression -> . expression LOR expression
+    (51) expression -> . LPAREN expression RPAREN
+    (52) expression -> . location
+    (53) expression -> . literal
+    (58) location -> . ID
+    (54) literal -> . INTEGER
+    (55) literal -> . FLOAT
+    (56) literal -> . STRING
+    (57) literal -> . BOOL
+
+    PLUS            shift and go to state 29
+    MINUS           shift and go to state 27
+    NOT             shift and go to state 37
+    LPAREN          shift and go to state 33
+    ID              shift and go to state 34
+    INTEGER         shift and go to state 31
+    FLOAT           shift and go to state 35
+    STRING          shift and go to state 32
+    BOOL            shift and go to state 36
+
+    literal                        shift and go to state 28
+    expression                     shift and go to state 88
+    location                       shift and go to state 30
+
+state 65
+
+    (19) while_statement -> WHILE expression LCURL . basicblock RCURL
+    (3) basicblock -> . statements
+    (4) basicblock -> . empty
+    (5) statements -> . statements statement
+    (6) statements -> . statement
+    (60) empty -> .
+    (7) statement -> . const_declaration
+    (8) statement -> . var_declaration
+    (9) statement -> . assign_statement
+    (10) statement -> . print_statement
+    (11) statement -> . if_statement
+    (12) statement -> . if_else_statement
+    (13) statement -> . while_statement
+    (14) statement -> . return_statement
+    (15) statement -> . func_call
+    (16) statement -> . func_statement
+    (31) const_declaration -> . CONST ID ASSIGN expression SEMI
+    (32) var_declaration -> . VAR ID typename SEMI
+    (33) var_declaration -> . VAR ID typename ASSIGN expression SEMI
+    (34) assign_statement -> . location ASSIGN expression SEMI
+    (35) print_statement -> . PRINT expression SEMI
+    (17) if_statement -> . IF expression LCURL basicblock RCURL
+    (18) if_else_statement -> . IF expression LCURL basicblock RCURL ELSE LCURL basicblock RCURL
+    (19) while_statement -> . WHILE expression LCURL basicblock RCURL
+    (30) return_statement -> . RETURN expression SEMI
+    (20) func_call -> . ID LPAREN arguments RPAREN SEMI
+    (29) func_statement -> . FUNC ID typename LPAREN parameters RPAREN LCURL basicblock RCURL
+    (58) location -> . ID
+
+    RCURL           reduce using rule 60 (empty -> .)
+    CONST           shift and go to state 6
+    VAR             shift and go to state 19
+    PRINT           shift and go to state 3
+    IF              shift and go to state 21
+    WHILE           shift and go to state 4
+    RETURN          shift and go to state 23
+    ID              shift and go to state 20
+    FUNC            shift and go to state 2
+
+    func_call                      shift and go to state 22
+    if_statement                   shift and go to state 16
+    statements                     shift and go to state 1
+    var_declaration                shift and go to state 11
+    if_else_statement              shift and go to state 9
+    return_statement               shift and go to state 10
+    const_declaration              shift and go to state 18
+    while_statement                shift and go to state 12
+    func_statement                 shift and go to state 7
+    statement                      shift and go to state 15
+    print_statement                shift and go to state 5
+    basicblock                     shift and go to state 90
+    assign_statement               shift and go to state 8
+    empty                          shift and go to state 89
+    location                       shift and go to state 14
+
+state 66
+
+    (31) const_declaration -> CONST ID ASSIGN . expression SEMI
+    (36) expression -> . PLUS expression
+    (37) expression -> . MINUS expression
+    (38) expression -> . NOT expression
+    (39) expression -> . expression PLUS expression
+    (40) expression -> . expression MINUS expression
+    (41) expression -> . expression TIMES expression
+    (42) expression -> . expression DIVIDE expression
+    (43) expression -> . expression GT expression
+    (44) expression -> . expression GTE expression
+    (45) expression -> . expression LT expression
+    (46) expression -> . expression LTE expression
+    (47) expression -> . expression EQ expression
+    (48) expression -> . expression NEQ expression
+    (49) expression -> . expression LAND expression
+    (50) expression -> . expression LOR expression
+    (51) expression -> . LPAREN expression RPAREN
+    (52) expression -> . location
+    (53) expression -> . literal
+    (58) location -> . ID
+    (54) literal -> . INTEGER
+    (55) literal -> . FLOAT
+    (56) literal -> . STRING
+    (57) literal -> . BOOL
+
+    PLUS            shift and go to state 29
+    MINUS           shift and go to state 27
+    NOT             shift and go to state 37
+    LPAREN          shift and go to state 33
+    ID              shift and go to state 34
+    INTEGER         shift and go to state 31
+    FLOAT           shift and go to state 35
+    STRING          shift and go to state 32
+    BOOL            shift and go to state 36
+
+    literal                        shift and go to state 28
+    expression                     shift and go to state 91
+    location                       shift and go to state 30
+
+state 67
+
+    (34) assign_statement -> location ASSIGN expression . SEMI
+    (39) expression -> expression . PLUS expression
+    (40) expression -> expression . MINUS expression
+    (41) expression -> expression . TIMES expression
+    (42) expression -> expression . DIVIDE expression
+    (43) expression -> expression . GT expression
+    (44) expression -> expression . GTE expression
+    (45) expression -> expression . LT expression
+    (46) expression -> expression . LTE expression
+    (47) expression -> expression . EQ expression
+    (48) expression -> expression . NEQ expression
+    (49) expression -> expression . LAND expression
+    (50) expression -> expression . LOR expression
+
+    SEMI            shift and go to state 92
+    PLUS            shift and go to state 60
+    MINUS           shift and go to state 63
+    TIMES           shift and go to state 56
+    DIVIDE          shift and go to state 53
+    GT              shift and go to state 52
+    GTE             shift and go to state 64
+    LT              shift and go to state 58
+    LTE             shift and go to state 61
+    EQ              shift and go to state 55
+    NEQ             shift and go to state 62
+    LAND            shift and go to state 59
+    LOR             shift and go to state 57
+
+
+state 68
+
+    (32) var_declaration -> VAR ID typename . SEMI
+    (33) var_declaration -> VAR ID typename . ASSIGN expression SEMI
+
+    SEMI            shift and go to state 93
+    ASSIGN          shift and go to state 94
+
+
+state 69
+
+    (21) arguments -> argument .
+
+    RPAREN          reduce using rule 21 (arguments -> argument .)
+    COMMA           reduce using rule 21 (arguments -> argument .)
+
+
+state 70
+
+    (20) func_call -> ID LPAREN arguments . RPAREN SEMI
+    (23) arguments -> arguments . COMMA argument
+
+    RPAREN          shift and go to state 95
+    COMMA           shift and go to state 96
+
+
+state 71
+
+    (24) arguments -> empty .
+
+    RPAREN          reduce using rule 24 (arguments -> empty .)
+    COMMA           reduce using rule 24 (arguments -> empty .)
+
+
+state 72
+
+    (22) argument -> expression .
+    (39) expression -> expression . PLUS expression
+    (40) expression -> expression . MINUS expression
+    (41) expression -> expression . TIMES expression
+    (42) expression -> expression . DIVIDE expression
+    (43) expression -> expression . GT expression
+    (44) expression -> expression . GTE expression
+    (45) expression -> expression . LT expression
+    (46) expression -> expression . LTE expression
+    (47) expression -> expression . EQ expression
+    (48) expression -> expression . NEQ expression
+    (49) expression -> expression . LAND expression
+    (50) expression -> expression . LOR expression
+
+    RPAREN          reduce using rule 22 (argument -> expression .)
+    COMMA           reduce using rule 22 (argument -> expression .)
+    PLUS            shift and go to state 60
+    MINUS           shift and go to state 63
+    TIMES           shift and go to state 56
+    DIVIDE          shift and go to state 53
+    GT              shift and go to state 52
+    GTE             shift and go to state 64
+    LT              shift and go to state 58
+    LTE             shift and go to state 61
+    EQ              shift and go to state 55
+    NEQ             shift and go to state 62
+    LAND            shift and go to state 59
+    LOR             shift and go to state 57
+
+
+state 73
+
+    (17) if_statement -> IF expression LCURL . basicblock RCURL
+    (18) if_else_statement -> IF expression LCURL . basicblock RCURL ELSE LCURL basicblock RCURL
+    (3) basicblock -> . statements
+    (4) basicblock -> . empty
+    (5) statements -> . statements statement
+    (6) statements -> . statement
+    (60) empty -> .
+    (7) statement -> . const_declaration
+    (8) statement -> . var_declaration
+    (9) statement -> . assign_statement
+    (10) statement -> . print_statement
+    (11) statement -> . if_statement
+    (12) statement -> . if_else_statement
+    (13) statement -> . while_statement
+    (14) statement -> . return_statement
+    (15) statement -> . func_call
+    (16) statement -> . func_statement
+    (31) const_declaration -> . CONST ID ASSIGN expression SEMI
+    (32) var_declaration -> . VAR ID typename SEMI
+    (33) var_declaration -> . VAR ID typename ASSIGN expression SEMI
+    (34) assign_statement -> . location ASSIGN expression SEMI
+    (35) print_statement -> . PRINT expression SEMI
+    (17) if_statement -> . IF expression LCURL basicblock RCURL
+    (18) if_else_statement -> . IF expression LCURL basicblock RCURL ELSE LCURL basicblock RCURL
+    (19) while_statement -> . WHILE expression LCURL basicblock RCURL
+    (30) return_statement -> . RETURN expression SEMI
+    (20) func_call -> . ID LPAREN arguments RPAREN SEMI
+    (29) func_statement -> . FUNC ID typename LPAREN parameters RPAREN LCURL basicblock RCURL
+    (58) location -> . ID
+
+    RCURL           reduce using rule 60 (empty -> .)
+    CONST           shift and go to state 6
+    VAR             shift and go to state 19
+    PRINT           shift and go to state 3
+    IF              shift and go to state 21
+    WHILE           shift and go to state 4
+    RETURN          shift and go to state 23
+    ID              shift and go to state 20
+    FUNC            shift and go to state 2
+
+    func_call                      shift and go to state 22
+    if_statement                   shift and go to state 16
+    statements                     shift and go to state 1
+    var_declaration                shift and go to state 11
+    if_else_statement              shift and go to state 9
+    return_statement               shift and go to state 10
+    const_declaration              shift and go to state 18
+    while_statement                shift and go to state 12
+    func_statement                 shift and go to state 7
+    statement                      shift and go to state 15
+    print_statement                shift and go to state 5
+    basicblock                     shift and go to state 97
+    assign_statement               shift and go to state 8
+    empty                          shift and go to state 89
+    location                       shift and go to state 14
+
+state 74
+
+    (30) return_statement -> RETURN expression SEMI .
+
+    CONST           reduce using rule 30 (return_statement -> RETURN expression SEMI .)
+    VAR             reduce using rule 30 (return_statement -> RETURN expression SEMI .)
+    PRINT           reduce using rule 30 (return_statement -> RETURN expression SEMI .)
+    IF              reduce using rule 30 (return_statement -> RETURN expression SEMI .)
+    WHILE           reduce using rule 30 (return_statement -> RETURN expression SEMI .)
+    RETURN          reduce using rule 30 (return_statement -> RETURN expression SEMI .)
+    ID              reduce using rule 30 (return_statement -> RETURN expression SEMI .)
+    FUNC            reduce using rule 30 (return_statement -> RETURN expression SEMI .)
+    RCURL           reduce using rule 30 (return_statement -> RETURN expression SEMI .)
+    $end            reduce using rule 30 (return_statement -> RETURN expression SEMI .)
+
+
+state 75
+
+    (29) func_statement -> FUNC ID typename LPAREN . parameters RPAREN LCURL basicblock RCURL
+    (26) parameters -> . parameter
+    (27) parameters -> . parameters COMMA parameter
+    (28) parameters -> . empty
+    (25) parameter -> . ID typename
+    (60) empty -> .
+
+    ID              shift and go to state 100
+    RPAREN          reduce using rule 60 (empty -> .)
+    COMMA           reduce using rule 60 (empty -> .)
+
+    parameter                      shift and go to state 99
+    empty                          shift and go to state 101
+    parameters                     shift and go to state 98
+
+state 76
+
+    (51) expression -> LPAREN expression RPAREN .
+
+    PLUS            reduce using rule 51 (expression -> LPAREN expression RPAREN .)
+    MINUS           reduce using rule 51 (expression -> LPAREN expression RPAREN .)
+    TIMES           reduce using rule 51 (expression -> LPAREN expression RPAREN .)
+    DIVIDE          reduce using rule 51 (expression -> LPAREN expression RPAREN .)
+    GT              reduce using rule 51 (expression -> LPAREN expression RPAREN .)
+    GTE             reduce using rule 51 (expression -> LPAREN expression RPAREN .)
+    LT              reduce using rule 51 (expression -> LPAREN expression RPAREN .)
+    LTE             reduce using rule 51 (expression -> LPAREN expression RPAREN .)
+    EQ              reduce using rule 51 (expression -> LPAREN expression RPAREN .)
+    NEQ             reduce using rule 51 (expression -> LPAREN expression RPAREN .)
+    LAND            reduce using rule 51 (expression -> LPAREN expression RPAREN .)
+    LOR             reduce using rule 51 (expression -> LPAREN expression RPAREN .)
+    SEMI            reduce using rule 51 (expression -> LPAREN expression RPAREN .)
+    LCURL           reduce using rule 51 (expression -> LPAREN expression RPAREN .)
+    RPAREN          reduce using rule 51 (expression -> LPAREN expression RPAREN .)
+    COMMA           reduce using rule 51 (expression -> LPAREN expression RPAREN .)
+
+
+state 77
+
+    (43) expression -> expression GT expression .
+    (39) expression -> expression . PLUS expression
+    (40) expression -> expression . MINUS expression
+    (41) expression -> expression . TIMES expression
+    (42) expression -> expression . DIVIDE expression
+    (43) expression -> expression . GT expression
+    (44) expression -> expression . GTE expression
+    (45) expression -> expression . LT expression
+    (46) expression -> expression . LTE expression
+    (47) expression -> expression . EQ expression
+    (48) expression -> expression . NEQ expression
+    (49) expression -> expression . LAND expression
+    (50) expression -> expression . LOR expression
+
+    GT              reduce using rule 43 (expression -> expression GT expression .)
+    GTE             reduce using rule 43 (expression -> expression GT expression .)
+    LT              reduce using rule 43 (expression -> expression GT expression .)
+    LTE             reduce using rule 43 (expression -> expression GT expression .)
+    EQ              reduce using rule 43 (expression -> expression GT expression .)
+    NEQ             reduce using rule 43 (expression -> expression GT expression .)
+    LAND            reduce using rule 43 (expression -> expression GT expression .)
+    LOR             reduce using rule 43 (expression -> expression GT expression .)
+    SEMI            reduce using rule 43 (expression -> expression GT expression .)
+    LCURL           reduce using rule 43 (expression -> expression GT expression .)
+    RPAREN          reduce using rule 43 (expression -> expression GT expression .)
+    COMMA           reduce using rule 43 (expression -> expression GT expression .)
+    PLUS            shift and go to state 60
+    MINUS           shift and go to state 63
+    TIMES           shift and go to state 56
+    DIVIDE          shift and go to state 53
+
+  ! PLUS            [ reduce using rule 43 (expression -> expression GT expression .) ]
+  ! MINUS           [ reduce using rule 43 (expression -> expression GT expression .) ]
+  ! TIMES           [ reduce using rule 43 (expression -> expression GT expression .) ]
+  ! DIVIDE          [ reduce using rule 43 (expression -> expression GT expression .) ]
+  ! GT              [ shift and go to state 52 ]
+  ! GTE             [ shift and go to state 64 ]
+  ! LT              [ shift and go to state 58 ]
+  ! LTE             [ shift and go to state 61 ]
+  ! EQ              [ shift and go to state 55 ]
+  ! NEQ             [ shift and go to state 62 ]
+  ! LAND            [ shift and go to state 59 ]
+  ! LOR             [ shift and go to state 57 ]
+
+
+state 78
+
+    (42) expression -> expression DIVIDE expression .
+    (39) expression -> expression . PLUS expression
+    (40) expression -> expression . MINUS expression
+    (41) expression -> expression . TIMES expression
+    (42) expression -> expression . DIVIDE expression
+    (43) expression -> expression . GT expression
+    (44) expression -> expression . GTE expression
+    (45) expression -> expression . LT expression
+    (46) expression -> expression . LTE expression
+    (47) expression -> expression . EQ expression
+    (48) expression -> expression . NEQ expression
+    (49) expression -> expression . LAND expression
+    (50) expression -> expression . LOR expression
+
+    PLUS            reduce using rule 42 (expression -> expression DIVIDE expression .)
+    MINUS           reduce using rule 42 (expression -> expression DIVIDE expression .)
+    TIMES           reduce using rule 42 (expression -> expression DIVIDE expression .)
+    DIVIDE          reduce using rule 42 (expression -> expression DIVIDE expression .)
+    GT              reduce using rule 42 (expression -> expression DIVIDE expression .)
+    GTE             reduce using rule 42 (expression -> expression DIVIDE expression .)
+    LT              reduce using rule 42 (expression -> expression DIVIDE expression .)
+    LTE             reduce using rule 42 (expression -> expression DIVIDE expression .)
+    EQ              reduce using rule 42 (expression -> expression DIVIDE expression .)
+    NEQ             reduce using rule 42 (expression -> expression DIVIDE expression .)
+    LAND            reduce using rule 42 (expression -> expression DIVIDE expression .)
+    LOR             reduce using rule 42 (expression -> expression DIVIDE expression .)
+    SEMI            reduce using rule 42 (expression -> expression DIVIDE expression .)
+    LCURL           reduce using rule 42 (expression -> expression DIVIDE expression .)
+    RPAREN          reduce using rule 42 (expression -> expression DIVIDE expression .)
+    COMMA           reduce using rule 42 (expression -> expression DIVIDE expression .)
+
+  ! PLUS            [ shift and go to state 60 ]
+  ! MINUS           [ shift and go to state 63 ]
+  ! TIMES           [ shift and go to state 56 ]
+  ! DIVIDE          [ shift and go to state 53 ]
+  ! GT              [ shift and go to state 52 ]
+  ! GTE             [ shift and go to state 64 ]
+  ! LT              [ shift and go to state 58 ]
+  ! LTE             [ shift and go to state 61 ]
+  ! EQ              [ shift and go to state 55 ]
+  ! NEQ             [ shift and go to state 62 ]
+  ! LAND            [ shift and go to state 59 ]
+  ! LOR             [ shift and go to state 57 ]
+
+
+state 79
+
+    (47) expression -> expression EQ expression .
+    (39) expression -> expression . PLUS expression
+    (40) expression -> expression . MINUS expression
+    (41) expression -> expression . TIMES expression
+    (42) expression -> expression . DIVIDE expression
+    (43) expression -> expression . GT expression
+    (44) expression -> expression . GTE expression
+    (45) expression -> expression . LT expression
+    (46) expression -> expression . LTE expression
+    (47) expression -> expression . EQ expression
+    (48) expression -> expression . NEQ expression
+    (49) expression -> expression . LAND expression
+    (50) expression -> expression . LOR expression
+
+    GT              reduce using rule 47 (expression -> expression EQ expression .)
+    GTE             reduce using rule 47 (expression -> expression EQ expression .)
+    LT              reduce using rule 47 (expression -> expression EQ expression .)
+    LTE             reduce using rule 47 (expression -> expression EQ expression .)
+    EQ              reduce using rule 47 (expression -> expression EQ expression .)
+    NEQ             reduce using rule 47 (expression -> expression EQ expression .)
+    LAND            reduce using rule 47 (expression -> expression EQ expression .)
+    LOR             reduce using rule 47 (expression -> expression EQ expression .)
+    SEMI            reduce using rule 47 (expression -> expression EQ expression .)
+    LCURL           reduce using rule 47 (expression -> expression EQ expression .)
+    RPAREN          reduce using rule 47 (expression -> expression EQ expression .)
+    COMMA           reduce using rule 47 (expression -> expression EQ expression .)
+    PLUS            shift and go to state 60
+    MINUS           shift and go to state 63
+    TIMES           shift and go to state 56
+    DIVIDE          shift and go to state 53
+
+  ! PLUS            [ reduce using rule 47 (expression -> expression EQ expression .) ]
+  ! MINUS           [ reduce using rule 47 (expression -> expression EQ expression .) ]
+  ! TIMES           [ reduce using rule 47 (expression -> expression EQ expression .) ]
+  ! DIVIDE          [ reduce using rule 47 (expression -> expression EQ expression .) ]
+  ! GT              [ shift and go to state 52 ]
+  ! GTE             [ shift and go to state 64 ]
+  ! LT              [ shift and go to state 58 ]
+  ! LTE             [ shift and go to state 61 ]
+  ! EQ              [ shift and go to state 55 ]
+  ! NEQ             [ shift and go to state 62 ]
+  ! LAND            [ shift and go to state 59 ]
+  ! LOR             [ shift and go to state 57 ]
+
+
+state 80
+
+    (41) expression -> expression TIMES expression .
+    (39) expression -> expression . PLUS expression
+    (40) expression -> expression . MINUS expression
+    (41) expression -> expression . TIMES expression
+    (42) expression -> expression . DIVIDE expression
+    (43) expression -> expression . GT expression
+    (44) expression -> expression . GTE expression
+    (45) expression -> expression . LT expression
+    (46) expression -> expression . LTE expression
+    (47) expression -> expression . EQ expression
+    (48) expression -> expression . NEQ expression
+    (49) expression -> expression . LAND expression
+    (50) expression -> expression . LOR expression
+
+    PLUS            reduce using rule 41 (expression -> expression TIMES expression .)
+    MINUS           reduce using rule 41 (expression -> expression TIMES expression .)
+    TIMES           reduce using rule 41 (expression -> expression TIMES expression .)
+    DIVIDE          reduce using rule 41 (expression -> expression TIMES expression .)
+    GT              reduce using rule 41 (expression -> expression TIMES expression .)
+    GTE             reduce using rule 41 (expression -> expression TIMES expression .)
+    LT              reduce using rule 41 (expression -> expression TIMES expression .)
+    LTE             reduce using rule 41 (expression -> expression TIMES expression .)
+    EQ              reduce using rule 41 (expression -> expression TIMES expression .)
+    NEQ             reduce using rule 41 (expression -> expression TIMES expression .)
+    LAND            reduce using rule 41 (expression -> expression TIMES expression .)
+    LOR             reduce using rule 41 (expression -> expression TIMES expression .)
+    SEMI            reduce using rule 41 (expression -> expression TIMES expression .)
+    LCURL           reduce using rule 41 (expression -> expression TIMES expression .)
+    RPAREN          reduce using rule 41 (expression -> expression TIMES expression .)
+    COMMA           reduce using rule 41 (expression -> expression TIMES expression .)
+
+  ! PLUS            [ shift and go to state 60 ]
+  ! MINUS           [ shift and go to state 63 ]
+  ! TIMES           [ shift and go to state 56 ]
+  ! DIVIDE          [ shift and go to state 53 ]
+  ! GT              [ shift and go to state 52 ]
+  ! GTE             [ shift and go to state 64 ]
+  ! LT              [ shift and go to state 58 ]
+  ! LTE             [ shift and go to state 61 ]
+  ! EQ              [ shift and go to state 55 ]
+  ! NEQ             [ shift and go to state 62 ]
+  ! LAND            [ shift and go to state 59 ]
+  ! LOR             [ shift and go to state 57 ]
+
+
+state 81
+
+    (50) expression -> expression LOR expression .
+    (39) expression -> expression . PLUS expression
+    (40) expression -> expression . MINUS expression
+    (41) expression -> expression . TIMES expression
+    (42) expression -> expression . DIVIDE expression
+    (43) expression -> expression . GT expression
+    (44) expression -> expression . GTE expression
+    (45) expression -> expression . LT expression
+    (46) expression -> expression . LTE expression
+    (47) expression -> expression . EQ expression
+    (48) expression -> expression . NEQ expression
+    (49) expression -> expression . LAND expression
+    (50) expression -> expression . LOR expression
+
+    LOR             reduce using rule 50 (expression -> expression LOR expression .)
+    SEMI            reduce using rule 50 (expression -> expression LOR expression .)
+    LCURL           reduce using rule 50 (expression -> expression LOR expression .)
+    RPAREN          reduce using rule 50 (expression -> expression LOR expression .)
+    COMMA           reduce using rule 50 (expression -> expression LOR expression .)
+    PLUS            shift and go to state 60
+    MINUS           shift and go to state 63
+    TIMES           shift and go to state 56
+    DIVIDE          shift and go to state 53
+    GT              shift and go to state 52
+    GTE             shift and go to state 64
+    LT              shift and go to state 58
+    LTE             shift and go to state 61
+    EQ              shift and go to state 55
+    NEQ             shift and go to state 62
+    LAND            shift and go to state 59
+
+  ! PLUS            [ reduce using rule 50 (expression -> expression LOR expression .) ]
+  ! MINUS           [ reduce using rule 50 (expression -> expression LOR expression .) ]
+  ! TIMES           [ reduce using rule 50 (expression -> expression LOR expression .) ]
+  ! DIVIDE          [ reduce using rule 50 (expression -> expression LOR expression .) ]
+  ! GT              [ reduce using rule 50 (expression -> expression LOR expression .) ]
+  ! GTE             [ reduce using rule 50 (expression -> expression LOR expression .) ]
+  ! LT              [ reduce using rule 50 (expression -> expression LOR expression .) ]
+  ! LTE             [ reduce using rule 50 (expression -> expression LOR expression .) ]
+  ! EQ              [ reduce using rule 50 (expression -> expression LOR expression .) ]
+  ! NEQ             [ reduce using rule 50 (expression -> expression LOR expression .) ]
+  ! LAND            [ reduce using rule 50 (expression -> expression LOR expression .) ]
+  ! LOR             [ shift and go to state 57 ]
+
+
+state 82
+
+    (45) expression -> expression LT expression .
+    (39) expression -> expression . PLUS expression
+    (40) expression -> expression . MINUS expression
+    (41) expression -> expression . TIMES expression
+    (42) expression -> expression . DIVIDE expression
+    (43) expression -> expression . GT expression
+    (44) expression -> expression . GTE expression
+    (45) expression -> expression . LT expression
+    (46) expression -> expression . LTE expression
+    (47) expression -> expression . EQ expression
+    (48) expression -> expression . NEQ expression
+    (49) expression -> expression . LAND expression
+    (50) expression -> expression . LOR expression
+
+    GT              reduce using rule 45 (expression -> expression LT expression .)
+    GTE             reduce using rule 45 (expression -> expression LT expression .)
+    LT              reduce using rule 45 (expression -> expression LT expression .)
+    LTE             reduce using rule 45 (expression -> expression LT expression .)
+    EQ              reduce using rule 45 (expression -> expression LT expression .)
+    NEQ             reduce using rule 45 (expression -> expression LT expression .)
+    LAND            reduce using rule 45 (expression -> expression LT expression .)
+    LOR             reduce using rule 45 (expression -> expression LT expression .)
+    SEMI            reduce using rule 45 (expression -> expression LT expression .)
+    LCURL           reduce using rule 45 (expression -> expression LT expression .)
+    RPAREN          reduce using rule 45 (expression -> expression LT expression .)
+    COMMA           reduce using rule 45 (expression -> expression LT expression .)
+    PLUS            shift and go to state 60
+    MINUS           shift and go to state 63
+    TIMES           shift and go to state 56
+    DIVIDE          shift and go to state 53
+
+  ! PLUS            [ reduce using rule 45 (expression -> expression LT expression .) ]
+  ! MINUS           [ reduce using rule 45 (expression -> expression LT expression .) ]
+  ! TIMES           [ reduce using rule 45 (expression -> expression LT expression .) ]
+  ! DIVIDE          [ reduce using rule 45 (expression -> expression LT expression .) ]
+  ! GT              [ shift and go to state 52 ]
+  ! GTE             [ shift and go to state 64 ]
+  ! LT              [ shift and go to state 58 ]
+  ! LTE             [ shift and go to state 61 ]
+  ! EQ              [ shift and go to state 55 ]
+  ! NEQ             [ shift and go to state 62 ]
+  ! LAND            [ shift and go to state 59 ]
+  ! LOR             [ shift and go to state 57 ]
+
+
+state 83
+
+    (49) expression -> expression LAND expression .
+    (39) expression -> expression . PLUS expression
+    (40) expression -> expression . MINUS expression
+    (41) expression -> expression . TIMES expression
+    (42) expression -> expression . DIVIDE expression
+    (43) expression -> expression . GT expression
+    (44) expression -> expression . GTE expression
+    (45) expression -> expression . LT expression
+    (46) expression -> expression . LTE expression
+    (47) expression -> expression . EQ expression
+    (48) expression -> expression . NEQ expression
+    (49) expression -> expression . LAND expression
+    (50) expression -> expression . LOR expression
+
+    LAND            reduce using rule 49 (expression -> expression LAND expression .)
+    LOR             reduce using rule 49 (expression -> expression LAND expression .)
+    SEMI            reduce using rule 49 (expression -> expression LAND expression .)
+    LCURL           reduce using rule 49 (expression -> expression LAND expression .)
+    RPAREN          reduce using rule 49 (expression -> expression LAND expression .)
+    COMMA           reduce using rule 49 (expression -> expression LAND expression .)
+    PLUS            shift and go to state 60
+    MINUS           shift and go to state 63
+    TIMES           shift and go to state 56
+    DIVIDE          shift and go to state 53
+    GT              shift and go to state 52
+    GTE             shift and go to state 64
+    LT              shift and go to state 58
+    LTE             shift and go to state 61
+    EQ              shift and go to state 55
+    NEQ             shift and go to state 62
+
+  ! PLUS            [ reduce using rule 49 (expression -> expression LAND expression .) ]
+  ! MINUS           [ reduce using rule 49 (expression -> expression LAND expression .) ]
+  ! TIMES           [ reduce using rule 49 (expression -> expression LAND expression .) ]
+  ! DIVIDE          [ reduce using rule 49 (expression -> expression LAND expression .) ]
+  ! GT              [ reduce using rule 49 (expression -> expression LAND expression .) ]
+  ! GTE             [ reduce using rule 49 (expression -> expression LAND expression .) ]
+  ! LT              [ reduce using rule 49 (expression -> expression LAND expression .) ]
+  ! LTE             [ reduce using rule 49 (expression -> expression LAND expression .) ]
+  ! EQ              [ reduce using rule 49 (expression -> expression LAND expression .) ]
+  ! NEQ             [ reduce using rule 49 (expression -> expression LAND expression .) ]
+  ! LAND            [ shift and go to state 59 ]
+  ! LOR             [ shift and go to state 57 ]
+
+
+state 84
+
+    (39) expression -> expression PLUS expression .
+    (39) expression -> expression . PLUS expression
+    (40) expression -> expression . MINUS expression
+    (41) expression -> expression . TIMES expression
+    (42) expression -> expression . DIVIDE expression
+    (43) expression -> expression . GT expression
+    (44) expression -> expression . GTE expression
+    (45) expression -> expression . LT expression
+    (46) expression -> expression . LTE expression
+    (47) expression -> expression . EQ expression
+    (48) expression -> expression . NEQ expression
+    (49) expression -> expression . LAND expression
+    (50) expression -> expression . LOR expression
+
+    PLUS            reduce using rule 39 (expression -> expression PLUS expression .)
+    MINUS           reduce using rule 39 (expression -> expression PLUS expression .)
+    GT              reduce using rule 39 (expression -> expression PLUS expression .)
+    GTE             reduce using rule 39 (expression -> expression PLUS expression .)
+    LT              reduce using rule 39 (expression -> expression PLUS expression .)
+    LTE             reduce using rule 39 (expression -> expression PLUS expression .)
+    EQ              reduce using rule 39 (expression -> expression PLUS expression .)
+    NEQ             reduce using rule 39 (expression -> expression PLUS expression .)
+    LAND            reduce using rule 39 (expression -> expression PLUS expression .)
+    LOR             reduce using rule 39 (expression -> expression PLUS expression .)
+    SEMI            reduce using rule 39 (expression -> expression PLUS expression .)
+    LCURL           reduce using rule 39 (expression -> expression PLUS expression .)
+    RPAREN          reduce using rule 39 (expression -> expression PLUS expression .)
+    COMMA           reduce using rule 39 (expression -> expression PLUS expression .)
+    TIMES           shift and go to state 56
+    DIVIDE          shift and go to state 53
+
+  ! TIMES           [ reduce using rule 39 (expression -> expression PLUS expression .) ]
+  ! DIVIDE          [ reduce using rule 39 (expression -> expression PLUS expression .) ]
+  ! PLUS            [ shift and go to state 60 ]
+  ! MINUS           [ shift and go to state 63 ]
+  ! GT              [ shift and go to state 52 ]
+  ! GTE             [ shift and go to state 64 ]
+  ! LT              [ shift and go to state 58 ]
+  ! LTE             [ shift and go to state 61 ]
+  ! EQ              [ shift and go to state 55 ]
+  ! NEQ             [ shift and go to state 62 ]
+  ! LAND            [ shift and go to state 59 ]
+  ! LOR             [ shift and go to state 57 ]
+
+
+state 85
+
+    (46) expression -> expression LTE expression .
+    (39) expression -> expression . PLUS expression
+    (40) expression -> expression . MINUS expression
+    (41) expression -> expression . TIMES expression
+    (42) expression -> expression . DIVIDE expression
+    (43) expression -> expression . GT expression
+    (44) expression -> expression . GTE expression
+    (45) expression -> expression . LT expression
+    (46) expression -> expression . LTE expression
+    (47) expression -> expression . EQ expression
+    (48) expression -> expression . NEQ expression
+    (49) expression -> expression . LAND expression
+    (50) expression -> expression . LOR expression
+
+    GT              reduce using rule 46 (expression -> expression LTE expression .)
+    GTE             reduce using rule 46 (expression -> expression LTE expression .)
+    LT              reduce using rule 46 (expression -> expression LTE expression .)
+    LTE             reduce using rule 46 (expression -> expression LTE expression .)
+    EQ              reduce using rule 46 (expression -> expression LTE expression .)
+    NEQ             reduce using rule 46 (expression -> expression LTE expression .)
+    LAND            reduce using rule 46 (expression -> expression LTE expression .)
+    LOR             reduce using rule 46 (expression -> expression LTE expression .)
+    SEMI            reduce using rule 46 (expression -> expression LTE expression .)
+    LCURL           reduce using rule 46 (expression -> expression LTE expression .)
+    RPAREN          reduce using rule 46 (expression -> expression LTE expression .)
+    COMMA           reduce using rule 46 (expression -> expression LTE expression .)
+    PLUS            shift and go to state 60
+    MINUS           shift and go to state 63
+    TIMES           shift and go to state 56
+    DIVIDE          shift and go to state 53
+
+  ! PLUS            [ reduce using rule 46 (expression -> expression LTE expression .) ]
+  ! MINUS           [ reduce using rule 46 (expression -> expression LTE expression .) ]
+  ! TIMES           [ reduce using rule 46 (expression -> expression LTE expression .) ]
+  ! DIVIDE          [ reduce using rule 46 (expression -> expression LTE expression .) ]
+  ! GT              [ shift and go to state 52 ]
+  ! GTE             [ shift and go to state 64 ]
+  ! LT              [ shift and go to state 58 ]
+  ! LTE             [ shift and go to state 61 ]
+  ! EQ              [ shift and go to state 55 ]
+  ! NEQ             [ shift and go to state 62 ]
+  ! LAND            [ shift and go to state 59 ]
+  ! LOR             [ shift and go to state 57 ]
+
+
+state 86
+
+    (48) expression -> expression NEQ expression .
+    (39) expression -> expression . PLUS expression
+    (40) expression -> expression . MINUS expression
+    (41) expression -> expression . TIMES expression
+    (42) expression -> expression . DIVIDE expression
+    (43) expression -> expression . GT expression
+    (44) expression -> expression . GTE expression
+    (45) expression -> expression . LT expression
+    (46) expression -> expression . LTE expression
+    (47) expression -> expression . EQ expression
+    (48) expression -> expression . NEQ expression
+    (49) expression -> expression . LAND expression
+    (50) expression -> expression . LOR expression
+
+    GT              reduce using rule 48 (expression -> expression NEQ expression .)
+    GTE             reduce using rule 48 (expression -> expression NEQ expression .)
+    LT              reduce using rule 48 (expression -> expression NEQ expression .)
+    LTE             reduce using rule 48 (expression -> expression NEQ expression .)
+    EQ              reduce using rule 48 (expression -> expression NEQ expression .)
+    NEQ             reduce using rule 48 (expression -> expression NEQ expression .)
+    LAND            reduce using rule 48 (expression -> expression NEQ expression .)
+    LOR             reduce using rule 48 (expression -> expression NEQ expression .)
+    SEMI            reduce using rule 48 (expression -> expression NEQ expression .)
+    LCURL           reduce using rule 48 (expression -> expression NEQ expression .)
+    RPAREN          reduce using rule 48 (expression -> expression NEQ expression .)
+    COMMA           reduce using rule 48 (expression -> expression NEQ expression .)
+    PLUS            shift and go to state 60
+    MINUS           shift and go to state 63
+    TIMES           shift and go to state 56
+    DIVIDE          shift and go to state 53
+
+  ! PLUS            [ reduce using rule 48 (expression -> expression NEQ expression .) ]
+  ! MINUS           [ reduce using rule 48 (expression -> expression NEQ expression .) ]
+  ! TIMES           [ reduce using rule 48 (expression -> expression NEQ expression .) ]
+  ! DIVIDE          [ reduce using rule 48 (expression -> expression NEQ expression .) ]
+  ! GT              [ shift and go to state 52 ]
+  ! GTE             [ shift and go to state 64 ]
+  ! LT              [ shift and go to state 58 ]
+  ! LTE             [ shift and go to state 61 ]
+  ! EQ              [ shift and go to state 55 ]
+  ! NEQ             [ shift and go to state 62 ]
+  ! LAND            [ shift and go to state 59 ]
+  ! LOR             [ shift and go to state 57 ]
+
+
+state 87
+
+    (40) expression -> expression MINUS expression .
+    (39) expression -> expression . PLUS expression
+    (40) expression -> expression . MINUS expression
+    (41) expression -> expression . TIMES expression
+    (42) expression -> expression . DIVIDE expression
+    (43) expression -> expression . GT expression
+    (44) expression -> expression . GTE expression
+    (45) expression -> expression . LT expression
+    (46) expression -> expression . LTE expression
+    (47) expression -> expression . EQ expression
+    (48) expression -> expression . NEQ expression
+    (49) expression -> expression . LAND expression
+    (50) expression -> expression . LOR expression
+
+    PLUS            reduce using rule 40 (expression -> expression MINUS expression .)
+    MINUS           reduce using rule 40 (expression -> expression MINUS expression .)
+    GT              reduce using rule 40 (expression -> expression MINUS expression .)
+    GTE             reduce using rule 40 (expression -> expression MINUS expression .)
+    LT              reduce using rule 40 (expression -> expression MINUS expression .)
+    LTE             reduce using rule 40 (expression -> expression MINUS expression .)
+    EQ              reduce using rule 40 (expression -> expression MINUS expression .)
+    NEQ             reduce using rule 40 (expression -> expression MINUS expression .)
+    LAND            reduce using rule 40 (expression -> expression MINUS expression .)
+    LOR             reduce using rule 40 (expression -> expression MINUS expression .)
+    SEMI            reduce using rule 40 (expression -> expression MINUS expression .)
+    LCURL           reduce using rule 40 (expression -> expression MINUS expression .)
+    RPAREN          reduce using rule 40 (expression -> expression MINUS expression .)
+    COMMA           reduce using rule 40 (expression -> expression MINUS expression .)
+    TIMES           shift and go to state 56
+    DIVIDE          shift and go to state 53
+
+  ! TIMES           [ reduce using rule 40 (expression -> expression MINUS expression .) ]
+  ! DIVIDE          [ reduce using rule 40 (expression -> expression MINUS expression .) ]
+  ! PLUS            [ shift and go to state 60 ]
+  ! MINUS           [ shift and go to state 63 ]
+  ! GT              [ shift and go to state 52 ]
+  ! GTE             [ shift and go to state 64 ]
+  ! LT              [ shift and go to state 58 ]
+  ! LTE             [ shift and go to state 61 ]
+  ! EQ              [ shift and go to state 55 ]
+  ! NEQ             [ shift and go to state 62 ]
+  ! LAND            [ shift and go to state 59 ]
+  ! LOR             [ shift and go to state 57 ]
+
+
+state 88
+
+    (44) expression -> expression GTE expression .
+    (39) expression -> expression . PLUS expression
+    (40) expression -> expression . MINUS expression
+    (41) expression -> expression . TIMES expression
+    (42) expression -> expression . DIVIDE expression
+    (43) expression -> expression . GT expression
+    (44) expression -> expression . GTE expression
+    (45) expression -> expression . LT expression
+    (46) expression -> expression . LTE expression
+    (47) expression -> expression . EQ expression
+    (48) expression -> expression . NEQ expression
+    (49) expression -> expression . LAND expression
+    (50) expression -> expression . LOR expression
+
+    GT              reduce using rule 44 (expression -> expression GTE expression .)
+    GTE             reduce using rule 44 (expression -> expression GTE expression .)
+    LT              reduce using rule 44 (expression -> expression GTE expression .)
+    LTE             reduce using rule 44 (expression -> expression GTE expression .)
+    EQ              reduce using rule 44 (expression -> expression GTE expression .)
+    NEQ             reduce using rule 44 (expression -> expression GTE expression .)
+    LAND            reduce using rule 44 (expression -> expression GTE expression .)
+    LOR             reduce using rule 44 (expression -> expression GTE expression .)
+    SEMI            reduce using rule 44 (expression -> expression GTE expression .)
+    LCURL           reduce using rule 44 (expression -> expression GTE expression .)
+    RPAREN          reduce using rule 44 (expression -> expression GTE expression .)
+    COMMA           reduce using rule 44 (expression -> expression GTE expression .)
+    PLUS            shift and go to state 60
+    MINUS           shift and go to state 63
+    TIMES           shift and go to state 56
+    DIVIDE          shift and go to state 53
+
+  ! PLUS            [ reduce using rule 44 (expression -> expression GTE expression .) ]
+  ! MINUS           [ reduce using rule 44 (expression -> expression GTE expression .) ]
+  ! TIMES           [ reduce using rule 44 (expression -> expression GTE expression .) ]
+  ! DIVIDE          [ reduce using rule 44 (expression -> expression GTE expression .) ]
+  ! GT              [ shift and go to state 52 ]
+  ! GTE             [ shift and go to state 64 ]
+  ! LT              [ shift and go to state 58 ]
+  ! LTE             [ shift and go to state 61 ]
+  ! EQ              [ shift and go to state 55 ]
+  ! NEQ             [ shift and go to state 62 ]
+  ! LAND            [ shift and go to state 59 ]
+  ! LOR             [ shift and go to state 57 ]
+
+
+state 89
+
+    (4) basicblock -> empty .
+
+    RCURL           reduce using rule 4 (basicblock -> empty .)
+
+
+state 90
+
+    (19) while_statement -> WHILE expression LCURL basicblock . RCURL
+
+    RCURL           shift and go to state 102
+
+
+state 91
+
+    (31) const_declaration -> CONST ID ASSIGN expression . SEMI
+    (39) expression -> expression . PLUS expression
+    (40) expression -> expression . MINUS expression
+    (41) expression -> expression . TIMES expression
+    (42) expression -> expression . DIVIDE expression
+    (43) expression -> expression . GT expression
+    (44) expression -> expression . GTE expression
+    (45) expression -> expression . LT expression
+    (46) expression -> expression . LTE expression
+    (47) expression -> expression . EQ expression
+    (48) expression -> expression . NEQ expression
+    (49) expression -> expression . LAND expression
+    (50) expression -> expression . LOR expression
+
+    SEMI            shift and go to state 103
+    PLUS            shift and go to state 60
+    MINUS           shift and go to state 63
+    TIMES           shift and go to state 56
+    DIVIDE          shift and go to state 53
+    GT              shift and go to state 52
+    GTE             shift and go to state 64
+    LT              shift and go to state 58
+    LTE             shift and go to state 61
+    EQ              shift and go to state 55
+    NEQ             shift and go to state 62
+    LAND            shift and go to state 59
+    LOR             shift and go to state 57
+
+
+state 92
+
+    (34) assign_statement -> location ASSIGN expression SEMI .
+
+    CONST           reduce using rule 34 (assign_statement -> location ASSIGN expression SEMI .)
+    VAR             reduce using rule 34 (assign_statement -> location ASSIGN expression SEMI .)
+    PRINT           reduce using rule 34 (assign_statement -> location ASSIGN expression SEMI .)
+    IF              reduce using rule 34 (assign_statement -> location ASSIGN expression SEMI .)
+    WHILE           reduce using rule 34 (assign_statement -> location ASSIGN expression SEMI .)
+    RETURN          reduce using rule 34 (assign_statement -> location ASSIGN expression SEMI .)
+    ID              reduce using rule 34 (assign_statement -> location ASSIGN expression SEMI .)
+    FUNC            reduce using rule 34 (assign_statement -> location ASSIGN expression SEMI .)
+    RCURL           reduce using rule 34 (assign_statement -> location ASSIGN expression SEMI .)
+    $end            reduce using rule 34 (assign_statement -> location ASSIGN expression SEMI .)
+
+
+state 93
+
+    (32) var_declaration -> VAR ID typename SEMI .
+
+    CONST           reduce using rule 32 (var_declaration -> VAR ID typename SEMI .)
+    VAR             reduce using rule 32 (var_declaration -> VAR ID typename SEMI .)
+    PRINT           reduce using rule 32 (var_declaration -> VAR ID typename SEMI .)
+    IF              reduce using rule 32 (var_declaration -> VAR ID typename SEMI .)
+    WHILE           reduce using rule 32 (var_declaration -> VAR ID typename SEMI .)
+    RETURN          reduce using rule 32 (var_declaration -> VAR ID typename SEMI .)
+    ID              reduce using rule 32 (var_declaration -> VAR ID typename SEMI .)
+    FUNC            reduce using rule 32 (var_declaration -> VAR ID typename SEMI .)
+    $end            reduce using rule 32 (var_declaration -> VAR ID typename SEMI .)
+    RCURL           reduce using rule 32 (var_declaration -> VAR ID typename SEMI .)
+
+
+state 94
+
+    (33) var_declaration -> VAR ID typename ASSIGN . expression SEMI
+    (36) expression -> . PLUS expression
+    (37) expression -> . MINUS expression
+    (38) expression -> . NOT expression
+    (39) expression -> . expression PLUS expression
+    (40) expression -> . expression MINUS expression
+    (41) expression -> . expression TIMES expression
+    (42) expression -> . expression DIVIDE expression
+    (43) expression -> . expression GT expression
+    (44) expression -> . expression GTE expression
+    (45) expression -> . expression LT expression
+    (46) expression -> . expression LTE expression
+    (47) expression -> . expression EQ expression
+    (48) expression -> . expression NEQ expression
+    (49) expression -> . expression LAND expression
+    (50) expression -> . expression LOR expression
+    (51) expression -> . LPAREN expression RPAREN
+    (52) expression -> . location
+    (53) expression -> . literal
+    (58) location -> . ID
+    (54) literal -> . INTEGER
+    (55) literal -> . FLOAT
+    (56) literal -> . STRING
+    (57) literal -> . BOOL
+
+    PLUS            shift and go to state 29
+    MINUS           shift and go to state 27
+    NOT             shift and go to state 37
+    LPAREN          shift and go to state 33
+    ID              shift and go to state 34
+    INTEGER         shift and go to state 31
+    FLOAT           shift and go to state 35
+    STRING          shift and go to state 32
+    BOOL            shift and go to state 36
+
+    literal                        shift and go to state 28
+    expression                     shift and go to state 104
+    location                       shift and go to state 30
+
+state 95
+
+    (20) func_call -> ID LPAREN arguments RPAREN . SEMI
+
+    SEMI            shift and go to state 105
+
+
+state 96
+
+    (23) arguments -> arguments COMMA . argument
+    (22) argument -> . expression
+    (36) expression -> . PLUS expression
+    (37) expression -> . MINUS expression
+    (38) expression -> . NOT expression
+    (39) expression -> . expression PLUS expression
+    (40) expression -> . expression MINUS expression
+    (41) expression -> . expression TIMES expression
+    (42) expression -> . expression DIVIDE expression
+    (43) expression -> . expression GT expression
+    (44) expression -> . expression GTE expression
+    (45) expression -> . expression LT expression
+    (46) expression -> . expression LTE expression
+    (47) expression -> . expression EQ expression
+    (48) expression -> . expression NEQ expression
+    (49) expression -> . expression LAND expression
+    (50) expression -> . expression LOR expression
+    (51) expression -> . LPAREN expression RPAREN
+    (52) expression -> . location
+    (53) expression -> . literal
+    (58) location -> . ID
+    (54) literal -> . INTEGER
+    (55) literal -> . FLOAT
+    (56) literal -> . STRING
+    (57) literal -> . BOOL
+
+    PLUS            shift and go to state 29
+    MINUS           shift and go to state 27
+    NOT             shift and go to state 37
+    LPAREN          shift and go to state 33
+    ID              shift and go to state 34
+    INTEGER         shift and go to state 31
+    FLOAT           shift and go to state 35
+    STRING          shift and go to state 32
+    BOOL            shift and go to state 36
+
+    literal                        shift and go to state 28
+    location                       shift and go to state 30
+    expression                     shift and go to state 72
+    argument                       shift and go to state 106
+
+state 97
+
+    (17) if_statement -> IF expression LCURL basicblock . RCURL
+    (18) if_else_statement -> IF expression LCURL basicblock . RCURL ELSE LCURL basicblock RCURL
+
+    RCURL           shift and go to state 107
+
+
+state 98
+
+    (29) func_statement -> FUNC ID typename LPAREN parameters . RPAREN LCURL basicblock RCURL
+    (27) parameters -> parameters . COMMA parameter
+
+    RPAREN          shift and go to state 108
+    COMMA           shift and go to state 109
+
+
+state 99
+
+    (26) parameters -> parameter .
+
+    RPAREN          reduce using rule 26 (parameters -> parameter .)
+    COMMA           reduce using rule 26 (parameters -> parameter .)
+
+
+state 100
+
+    (25) parameter -> ID . typename
+    (59) typename -> . ID
+
+    ID              shift and go to state 47
+
+    typename                       shift and go to state 110
+
+state 101
+
+    (28) parameters -> empty .
+
+    RPAREN          reduce using rule 28 (parameters -> empty .)
+    COMMA           reduce using rule 28 (parameters -> empty .)
+
+
+state 102
+
+    (19) while_statement -> WHILE expression LCURL basicblock RCURL .
+
+    CONST           reduce using rule 19 (while_statement -> WHILE expression LCURL basicblock RCURL .)
+    VAR             reduce using rule 19 (while_statement -> WHILE expression LCURL basicblock RCURL .)
+    PRINT           reduce using rule 19 (while_statement -> WHILE expression LCURL basicblock RCURL .)
+    IF              reduce using rule 19 (while_statement -> WHILE expression LCURL basicblock RCURL .)
+    WHILE           reduce using rule 19 (while_statement -> WHILE expression LCURL basicblock RCURL .)
+    RETURN          reduce using rule 19 (while_statement -> WHILE expression LCURL basicblock RCURL .)
+    ID              reduce using rule 19 (while_statement -> WHILE expression LCURL basicblock RCURL .)
+    FUNC            reduce using rule 19 (while_statement -> WHILE expression LCURL basicblock RCURL .)
+    RCURL           reduce using rule 19 (while_statement -> WHILE expression LCURL basicblock RCURL .)
+    $end            reduce using rule 19 (while_statement -> WHILE expression LCURL basicblock RCURL .)
+
+
+state 103
+
+    (31) const_declaration -> CONST ID ASSIGN expression SEMI .
+
+    CONST           reduce using rule 31 (const_declaration -> CONST ID ASSIGN expression SEMI .)
+    VAR             reduce using rule 31 (const_declaration -> CONST ID ASSIGN expression SEMI .)
+    PRINT           reduce using rule 31 (const_declaration -> CONST ID ASSIGN expression SEMI .)
+    IF              reduce using rule 31 (const_declaration -> CONST ID ASSIGN expression SEMI .)
+    WHILE           reduce using rule 31 (const_declaration -> CONST ID ASSIGN expression SEMI .)
+    RETURN          reduce using rule 31 (const_declaration -> CONST ID ASSIGN expression SEMI .)
+    ID              reduce using rule 31 (const_declaration -> CONST ID ASSIGN expression SEMI .)
+    FUNC            reduce using rule 31 (const_declaration -> CONST ID ASSIGN expression SEMI .)
+    RCURL           reduce using rule 31 (const_declaration -> CONST ID ASSIGN expression SEMI .)
+    $end            reduce using rule 31 (const_declaration -> CONST ID ASSIGN expression SEMI .)
+
+
+state 104
+
+    (33) var_declaration -> VAR ID typename ASSIGN expression . SEMI
+    (39) expression -> expression . PLUS expression
+    (40) expression -> expression . MINUS expression
+    (41) expression -> expression . TIMES expression
+    (42) expression -> expression . DIVIDE expression
+    (43) expression -> expression . GT expression
+    (44) expression -> expression . GTE expression
+    (45) expression -> expression . LT expression
+    (46) expression -> expression . LTE expression
+    (47) expression -> expression . EQ expression
+    (48) expression -> expression . NEQ expression
+    (49) expression -> expression . LAND expression
+    (50) expression -> expression . LOR expression
+
+    SEMI            shift and go to state 111
+    PLUS            shift and go to state 60
+    MINUS           shift and go to state 63
+    TIMES           shift and go to state 56
+    DIVIDE          shift and go to state 53
+    GT              shift and go to state 52
+    GTE             shift and go to state 64
+    LT              shift and go to state 58
+    LTE             shift and go to state 61
+    EQ              shift and go to state 55
+    NEQ             shift and go to state 62
+    LAND            shift and go to state 59
+    LOR             shift and go to state 57
+
+
+state 105
+
+    (20) func_call -> ID LPAREN arguments RPAREN SEMI .
+
+    CONST           reduce using rule 20 (func_call -> ID LPAREN arguments RPAREN SEMI .)
+    VAR             reduce using rule 20 (func_call -> ID LPAREN arguments RPAREN SEMI .)
+    PRINT           reduce using rule 20 (func_call -> ID LPAREN arguments RPAREN SEMI .)
+    IF              reduce using rule 20 (func_call -> ID LPAREN arguments RPAREN SEMI .)
+    WHILE           reduce using rule 20 (func_call -> ID LPAREN arguments RPAREN SEMI .)
+    RETURN          reduce using rule 20 (func_call -> ID LPAREN arguments RPAREN SEMI .)
+    ID              reduce using rule 20 (func_call -> ID LPAREN arguments RPAREN SEMI .)
+    FUNC            reduce using rule 20 (func_call -> ID LPAREN arguments RPAREN SEMI .)
+    RCURL           reduce using rule 20 (func_call -> ID LPAREN arguments RPAREN SEMI .)
+    $end            reduce using rule 20 (func_call -> ID LPAREN arguments RPAREN SEMI .)
+
+
+state 106
+
+    (23) arguments -> arguments COMMA argument .
+
+    RPAREN          reduce using rule 23 (arguments -> arguments COMMA argument .)
+    COMMA           reduce using rule 23 (arguments -> arguments COMMA argument .)
+
+
+state 107
+
+    (17) if_statement -> IF expression LCURL basicblock RCURL .
+    (18) if_else_statement -> IF expression LCURL basicblock RCURL . ELSE LCURL basicblock RCURL
+
+    CONST           reduce using rule 17 (if_statement -> IF expression LCURL basicblock RCURL .)
+    VAR             reduce using rule 17 (if_statement -> IF expression LCURL basicblock RCURL .)
+    PRINT           reduce using rule 17 (if_statement -> IF expression LCURL basicblock RCURL .)
+    IF              reduce using rule 17 (if_statement -> IF expression LCURL basicblock RCURL .)
+    WHILE           reduce using rule 17 (if_statement -> IF expression LCURL basicblock RCURL .)
+    RETURN          reduce using rule 17 (if_statement -> IF expression LCURL basicblock RCURL .)
+    ID              reduce using rule 17 (if_statement -> IF expression LCURL basicblock RCURL .)
+    FUNC            reduce using rule 17 (if_statement -> IF expression LCURL basicblock RCURL .)
+    $end            reduce using rule 17 (if_statement -> IF expression LCURL basicblock RCURL .)
+    RCURL           reduce using rule 17 (if_statement -> IF expression LCURL basicblock RCURL .)
+    ELSE            shift and go to state 112
+
+
+state 108
+
+    (29) func_statement -> FUNC ID typename LPAREN parameters RPAREN . LCURL basicblock RCURL
+
+    LCURL           shift and go to state 113
+
+
+state 109
+
+    (27) parameters -> parameters COMMA . parameter
+    (25) parameter -> . ID typename
+
+    ID              shift and go to state 100
+
+    parameter                      shift and go to state 114
+
+state 110
+
+    (25) parameter -> ID typename .
+
+    RPAREN          reduce using rule 25 (parameter -> ID typename .)
+    COMMA           reduce using rule 25 (parameter -> ID typename .)
+
+
+state 111
+
+    (33) var_declaration -> VAR ID typename ASSIGN expression SEMI .
+
+    CONST           reduce using rule 33 (var_declaration -> VAR ID typename ASSIGN expression SEMI .)
+    VAR             reduce using rule 33 (var_declaration -> VAR ID typename ASSIGN expression SEMI .)
+    PRINT           reduce using rule 33 (var_declaration -> VAR ID typename ASSIGN expression SEMI .)
+    IF              reduce using rule 33 (var_declaration -> VAR ID typename ASSIGN expression SEMI .)
+    WHILE           reduce using rule 33 (var_declaration -> VAR ID typename ASSIGN expression SEMI .)
+    RETURN          reduce using rule 33 (var_declaration -> VAR ID typename ASSIGN expression SEMI .)
+    ID              reduce using rule 33 (var_declaration -> VAR ID typename ASSIGN expression SEMI .)
+    FUNC            reduce using rule 33 (var_declaration -> VAR ID typename ASSIGN expression SEMI .)
+    $end            reduce using rule 33 (var_declaration -> VAR ID typename ASSIGN expression SEMI .)
+    RCURL           reduce using rule 33 (var_declaration -> VAR ID typename ASSIGN expression SEMI .)
+
+
+state 112
+
+    (18) if_else_statement -> IF expression LCURL basicblock RCURL ELSE . LCURL basicblock RCURL
+
+    LCURL           shift and go to state 115
+
+
+state 113
+
+    (29) func_statement -> FUNC ID typename LPAREN parameters RPAREN LCURL . basicblock RCURL
+    (3) basicblock -> . statements
+    (4) basicblock -> . empty
+    (5) statements -> . statements statement
+    (6) statements -> . statement
+    (60) empty -> .
+    (7) statement -> . const_declaration
+    (8) statement -> . var_declaration
+    (9) statement -> . assign_statement
+    (10) statement -> . print_statement
+    (11) statement -> . if_statement
+    (12) statement -> . if_else_statement
+    (13) statement -> . while_statement
+    (14) statement -> . return_statement
+    (15) statement -> . func_call
+    (16) statement -> . func_statement
+    (31) const_declaration -> . CONST ID ASSIGN expression SEMI
+    (32) var_declaration -> . VAR ID typename SEMI
+    (33) var_declaration -> . VAR ID typename ASSIGN expression SEMI
+    (34) assign_statement -> . location ASSIGN expression SEMI
+    (35) print_statement -> . PRINT expression SEMI
+    (17) if_statement -> . IF expression LCURL basicblock RCURL
+    (18) if_else_statement -> . IF expression LCURL basicblock RCURL ELSE LCURL basicblock RCURL
+    (19) while_statement -> . WHILE expression LCURL basicblock RCURL
+    (30) return_statement -> . RETURN expression SEMI
+    (20) func_call -> . ID LPAREN arguments RPAREN SEMI
+    (29) func_statement -> . FUNC ID typename LPAREN parameters RPAREN LCURL basicblock RCURL
+    (58) location -> . ID
+
+    RCURL           reduce using rule 60 (empty -> .)
+    CONST           shift and go to state 6
+    VAR             shift and go to state 19
+    PRINT           shift and go to state 3
+    IF              shift and go to state 21
+    WHILE           shift and go to state 4
+    RETURN          shift and go to state 23
+    ID              shift and go to state 20
+    FUNC            shift and go to state 2
+
+    func_call                      shift and go to state 22
+    if_statement                   shift and go to state 16
+    statements                     shift and go to state 1
+    const_declaration              shift and go to state 18
+    if_else_statement              shift and go to state 9
+    return_statement               shift and go to state 10
+    while_statement                shift and go to state 12
+    func_statement                 shift and go to state 7
+    statement                      shift and go to state 15
+    print_statement                shift and go to state 5
+    var_declaration                shift and go to state 11
+    basicblock                     shift and go to state 116
+    assign_statement               shift and go to state 8
+    empty                          shift and go to state 89
+    location                       shift and go to state 14
+
+state 114
+
+    (27) parameters -> parameters COMMA parameter .
+
+    RPAREN          reduce using rule 27 (parameters -> parameters COMMA parameter .)
+    COMMA           reduce using rule 27 (parameters -> parameters COMMA parameter .)
+
+
+state 115
+
+    (18) if_else_statement -> IF expression LCURL basicblock RCURL ELSE LCURL . basicblock RCURL
+    (3) basicblock -> . statements
+    (4) basicblock -> . empty
+    (5) statements -> . statements statement
+    (6) statements -> . statement
+    (60) empty -> .
+    (7) statement -> . const_declaration
+    (8) statement -> . var_declaration
+    (9) statement -> . assign_statement
+    (10) statement -> . print_statement
+    (11) statement -> . if_statement
+    (12) statement -> . if_else_statement
+    (13) statement -> . while_statement
+    (14) statement -> . return_statement
+    (15) statement -> . func_call
+    (16) statement -> . func_statement
+    (31) const_declaration -> . CONST ID ASSIGN expression SEMI
+    (32) var_declaration -> . VAR ID typename SEMI
+    (33) var_declaration -> . VAR ID typename ASSIGN expression SEMI
+    (34) assign_statement -> . location ASSIGN expression SEMI
+    (35) print_statement -> . PRINT expression SEMI
+    (17) if_statement -> . IF expression LCURL basicblock RCURL
+    (18) if_else_statement -> . IF expression LCURL basicblock RCURL ELSE LCURL basicblock RCURL
+    (19) while_statement -> . WHILE expression LCURL basicblock RCURL
+    (30) return_statement -> . RETURN expression SEMI
+    (20) func_call -> . ID LPAREN arguments RPAREN SEMI
+    (29) func_statement -> . FUNC ID typename LPAREN parameters RPAREN LCURL basicblock RCURL
+    (58) location -> . ID
+
+    RCURL           reduce using rule 60 (empty -> .)
+    CONST           shift and go to state 6
+    VAR             shift and go to state 19
+    PRINT           shift and go to state 3
+    IF              shift and go to state 21
+    WHILE           shift and go to state 4
+    RETURN          shift and go to state 23
+    ID              shift and go to state 20
+    FUNC            shift and go to state 2
+
+    func_call                      shift and go to state 22
+    if_statement                   shift and go to state 16
+    statements                     shift and go to state 1
+    var_declaration                shift and go to state 11
+    if_else_statement              shift and go to state 9
+    return_statement               shift and go to state 10
+    const_declaration              shift and go to state 18
+    while_statement                shift and go to state 12
+    func_statement                 shift and go to state 7
+    statement                      shift and go to state 15
+    print_statement                shift and go to state 5
+    basicblock                     shift and go to state 117
+    assign_statement               shift and go to state 8
+    empty                          shift and go to state 89
+    location                       shift and go to state 14
+
+state 116
+
+    (29) func_statement -> FUNC ID typename LPAREN parameters RPAREN LCURL basicblock . RCURL
+
+    RCURL           shift and go to state 118
+
+
+state 117
+
+    (18) if_else_statement -> IF expression LCURL basicblock RCURL ELSE LCURL basicblock . RCURL
+
+    RCURL           shift and go to state 119
+
+
+state 118
+
+    (29) func_statement -> FUNC ID typename LPAREN parameters RPAREN LCURL basicblock RCURL .
+
+    CONST           reduce using rule 29 (func_statement -> FUNC ID typename LPAREN parameters RPAREN LCURL basicblock RCURL .)
+    VAR             reduce using rule 29 (func_statement -> FUNC ID typename LPAREN parameters RPAREN LCURL basicblock RCURL .)
+    PRINT           reduce using rule 29 (func_statement -> FUNC ID typename LPAREN parameters RPAREN LCURL basicblock RCURL .)
+    IF              reduce using rule 29 (func_statement -> FUNC ID typename LPAREN parameters RPAREN LCURL basicblock RCURL .)
+    WHILE           reduce using rule 29 (func_statement -> FUNC ID typename LPAREN parameters RPAREN LCURL basicblock RCURL .)
+    RETURN          reduce using rule 29 (func_statement -> FUNC ID typename LPAREN parameters RPAREN LCURL basicblock RCURL .)
+    ID              reduce using rule 29 (func_statement -> FUNC ID typename LPAREN parameters RPAREN LCURL basicblock RCURL .)
+    FUNC            reduce using rule 29 (func_statement -> FUNC ID typename LPAREN parameters RPAREN LCURL basicblock RCURL .)
+    RCURL           reduce using rule 29 (func_statement -> FUNC ID typename LPAREN parameters RPAREN LCURL basicblock RCURL .)
+    $end            reduce using rule 29 (func_statement -> FUNC ID typename LPAREN parameters RPAREN LCURL basicblock RCURL .)
+
+
+state 119
+
+    (18) if_else_statement -> IF expression LCURL basicblock RCURL ELSE LCURL basicblock RCURL .
+
+    CONST           reduce using rule 18 (if_else_statement -> IF expression LCURL basicblock RCURL ELSE LCURL basicblock RCURL .)
+    VAR             reduce using rule 18 (if_else_statement -> IF expression LCURL basicblock RCURL ELSE LCURL basicblock RCURL .)
+    PRINT           reduce using rule 18 (if_else_statement -> IF expression LCURL basicblock RCURL ELSE LCURL basicblock RCURL .)
+    IF              reduce using rule 18 (if_else_statement -> IF expression LCURL basicblock RCURL ELSE LCURL basicblock RCURL .)
+    WHILE           reduce using rule 18 (if_else_statement -> IF expression LCURL basicblock RCURL ELSE LCURL basicblock RCURL .)
+    RETURN          reduce using rule 18 (if_else_statement -> IF expression LCURL basicblock RCURL ELSE LCURL basicblock RCURL .)
+    ID              reduce using rule 18 (if_else_statement -> IF expression LCURL basicblock RCURL ELSE LCURL basicblock RCURL .)
+    FUNC            reduce using rule 18 (if_else_statement -> IF expression LCURL basicblock RCURL ELSE LCURL basicblock RCURL .)
+    $end            reduce using rule 18 (if_else_statement -> IF expression LCURL basicblock RCURL ELSE LCURL basicblock RCURL .)
+    RCURL           reduce using rule 18 (if_else_statement -> IF expression LCURL basicblock RCURL ELSE LCURL basicblock RCURL .)
+
+WARNING: 
+WARNING: Conflicts:
+WARNING: 
+WARNING: reduce/reduce conflict in state 17 resolved using rule (program -> empty)
+WARNING: rejected rule (basicblock -> empty) in state 17
