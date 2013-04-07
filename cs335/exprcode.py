@@ -49,57 +49,96 @@ class GenerateCode(ast.NodeVisitor):
 
     def visit_VarDeclaration(self,node):
         node.code = node.name+': '
-        if node.typename.check_type.typename=='integer':
+        checktype=node.typename.check_type.typename
+        if checktype=='integer':
             node.code+=' .word 1\n'
-        elif node.typename.check_type.typename=='character':
+        elif checktype=='character':
             node.code+=' .byte 1\n'
-        elif node.typename.check_type.typename=='string':
-            node.code+=' .asciiz\n'
+        elif checktype=='string':
+            node.code+=' .asciiz ""\n'
+        elif checktype=='float':
+            node.code+=' .float 0.0\n'
 
     def visit_FuncParameter(self,node):
         node.code = node.name+': '
-        if node.typename.check_type.typename=='integer':
+        checktype=node.typename.check_type.typename
+        if checktype=='integer':
             node.code+=' .word 1\n'
-        elif node.typename.check_type.typename=='character':
+        elif checktype=='character':
             node.code+=' .byte 1\n'
-        elif node.typename.check_type.typename=='string':
-            node.code+=' .asciiz\n'
+        elif checktype=='string':
+            node.code+=' .asciiz ""\n'
+        elif checktype=='float':
+            node.code+=' .float 0.0\n'
 
     def visit_Literal(self,node):
-        inst = 'li $a0 '+str(node.value)+'\n'
+        if node.check_type.typename=='float':
+            inst = 'li.s $f0 '+str(node.value)+'\n'
+        else: 
+            inst = 'li $a0 '+str(node.value)+'\n'
         node.code=inst
 
     def visit_Unaryop(self,node):
+        checktype=node.check_type.typename
         self.visit(node.expr)
-        instruction = node.check_type.unary_opcodes[node.op] 
-        inst = instruction+'$a0 $a0\n'
+        instruction = node.check_type.unary_opcodes[node.op]
+        if checktype=='float':
+            inst = instruction+'$f0 $f0\n'
+        else:
+            inst = instruction+'$a0 $a0\n'
         node.code=inst
 
     def visit_LoadLocation(self, node):
-        inst = 'lw $a0 '+node.location.name+'\n'
+        checktype=node.check_type.typename
+        if checktype=='float':
+            inst = 'l.s $f0 '+node.location.name+'\n'
+        elif  checktype=='string':
+            inst = 'la $a0 '+node.location.name+'\n'
+        else :
+            inst = 'lw $a0 '+node.location.name+'\n'
         node.code = inst
         # Save the name of the temporary variable where the value was placed 
 
     def visit_Binop(self, node):
         self.visit(node.left)
         node.code = node.left.code
-        node.code+='sw $a0 0($sp)\naddiu $sp $sp -4\n'
+        checktype=node.check_type.typename
+        if checktype=='float':
+            node.code+='s.s $f0 0($sp)\naddiu $sp $sp -4\n'
+        else :
+            node.code+='sw $a0 0($sp)\naddiu $sp $sp -4\n'
         self.visit(node.right)
         node.code+=node.right.code
-        node.code+='lw $t1 4($sp)\n'
+        if checktype=='float':
+            node.code+='l.s $f1 4($sp)\n'
+        else :
+            node.code+='lw $t1 4($sp)\n'
         instruction = node.check_type.binary_opcodes[node.op]
-        inst = instruction+' $a0 $t1 $a0\naddiu $sp $sp 4\n'
+        if checktype=='float':
+            inst = instruction+' $f0 $f1 $f0\naddiu $sp $sp 4\n'
+        else :
+            inst = instruction+' $a0 $t1 $a0\naddiu $sp $sp 4\n'
         node.code+=inst
 
     def visit_Relop(self, node):
         self.visit(node.left)
         node.code=node.left.code
-        node.code+='sw $a0 0($sp)\naddiu $sp $sp -4\n'
+        checktype=node.check_type.typename
+        if checktype=='float':
+            node.code+='s.s $f0 0($sp)\naddiu $sp $sp -4\n'
+        else:
+            node.code+='sw $a0 0($sp)\naddiu $sp $sp -4\n'
         self.visit(node.right)
         node.code+=node.right.code
-        node.code+='lw $t1 4($sp)\n'
+        if checktype=='float':
+            node.code+='l.s $f1 4($sp)\n'
+        else:
+            node.code+='lw $t1 4($sp)\n'
         instruction = node.left.check_type.rel_opcodes[node.op]
-        inst = instruction+' $a0 $t1 $a0\naddiu $sp $sp 4\n'
+        if checktype=='float':
+            inst = instruction+' $f0 $f1 $a0\naddiu $sp $sp 4\n'
+        else:
+            inst = instruction+' $a0 $t1 $a0\naddiu $sp $sp 4\n'
         node.code+=inst
 
 
@@ -121,7 +160,10 @@ class GenerateCode(ast.NodeVisitor):
     def visit_AssignmentStatement(self, node):
         self.visit(node.expr)
         node.code=node.expr.code
-        inst = "sw $a0 "+node.location.name+'\n'
+        if node.expr.check_type.typename=='float':
+            inst = "s.s $a0 "+node.location.name+'\n'
+        elif node.expr.check_type.typename=='integer':
+            inst = "sw $a0 "+node.location.name+'\n'
         node.code+=inst
 
     def visit_ExitStatement(self, node):
