@@ -7,16 +7,16 @@ env = None
 class ActivationRecord:
     def __init__(self):
         self.rec =[]
-        #self.type = {}
+        self.type = {}
         self.size = {'Int': 4, 'Float':8}
     def store(self, Name, Type):
         self.rec += [Name]
-        #self.type[Name] = Type
+        self.type[Name] = Type
     def index(self, name):
         for i in xrange(len(self.rec)):
             if self.rec[i] == name: return i
         return -1
-    def size(self):
+    def length(self):
         return len(self.rec)
 
     def get(self, Name):
@@ -160,7 +160,7 @@ class GenerateCode(ast.NodeVisitor):
         elif  checktype=='string':
             inst = 'la $a0 '+node.location.name+'\n'
         else :
-            inst = 'lw $a0 '+str(4 * (activationStack.peek().size() - activationStack.peek().index(node.location.name)))+'($fp)\n'
+            inst = 'lw $a0 '+str(4 * (activationStack.peek().length() - activationStack.peek().index(node.location.name)))+'($fp)\n'
         node.code = inst
         # Save the name of the temporary variable where the value was placed 
 
@@ -230,7 +230,7 @@ class GenerateCode(ast.NodeVisitor):
             inst = "s.s $a0 "+node.location.name+'\n'
         elif node.expr.check_type.typename=='integer':
 
-            inst = "sw $a0 "+str(4 * (activationStack.peek().size() - activationStack.peek().index(node.location.name)))+'($fp)\n'
+            inst = "sw $a0 "+str(4 * (activationStack.peek().length() - activationStack.peek().index(node.location.name)))+'($fp)\n'
         node.code+=inst
 
     def visit_ExitStatement(self, node):
