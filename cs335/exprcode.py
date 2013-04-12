@@ -1,7 +1,42 @@
 from loo import IntType, FloatType, StringType, BoolType, CharType, ArrayType, AccessType, EnumType, RecordType, ExprType
 import ast
 import exprblock
+counter = 0
+endcounter = 0
+env = None
+class ActivationRecord:
+    def __init__(self):
+        self.rec =[]
+        self.type = {}
+        self.size = {'Int': 4, 'Float':8}
+    def store(self, Name, Type):
+        self.rec += [Name]
+        self.type[Name] = Type
+    def get(self, Name):
+        count = 0
+        for i in xrange(len(self.rec)):
+            if self.rec[i] != Name:
+                count += self.size[self.type[self.rec[i]]]
+        return count
+    
 
+class Stack:
+    def __init__(self):
+        self.env = []
+    def push(self, x):
+        self.env += [x]   
+    def pop(self):
+        if len(self.env) == 0:
+            raise RuntimeError()
+        val = self.env[-1]
+        self.env = self.env[0:-1]
+        return val
+    def peek(self):
+        return self.env[-1]
+
+
+                
+	 
 class GenerateCode(ast.NodeVisitor):
     '''
     Node visitor class that creates 3-address encoded instruction sequences.
@@ -19,7 +54,7 @@ class GenerateCode(ast.NodeVisitor):
         self.temp_count = 0
         # Visit all of the statements in the program
         self.visit(node.compilation)
-        self.code=node.compilation.code+'li $v0 10\nsyscall\n'
+        self.code=node.compilation.code+'li $v0 1\nsyscall\nli $v0 10\nsyscall\n'
         program = self.code
     # You must implement visit_Nodename methods for all of the other
     # AST nodes.  In your code, you will need to make instructions
@@ -36,16 +71,27 @@ class GenerateCode(ast.NodeVisitor):
             node.code+=progra.code
 
     def visit_FuncStatement(self,node):
-        node.code='.data\n'
-        for args in node.parameters.parameters:
-            self.visit(args)
-            node.code+=args.code
+        '''node.code='.data\n'
+        if node.parameters is not None:
+            for args in node.parameters.parameters:
+                self.visit(args)
+                node.code+=args.code
+            z=len(node.parameters.parameters)
+        else :
+            z=0
         for vardecl in node.decl_part:
             self.visit(vardecl)
-            node.code+=vardecl.code
+            node.code+=vardecl.code'''
         node.code+='.text\n'
+        if sys.argv[1][0:sys.argv[1].index(".adb")]==node.name:
+            node.code+='.globl main\nmain:\n'
+        node.code+=node.name+':\n'
+        node.code+='move $fp $sp\nsw $ra 0($sp)\naddiu $sp $sp -4\n'
         self.visit(node.statements)
         node.code+=node.statements.code
+        node.code+='li $v0 1\nsyscall\n'
+        node.code+='lw $ra 4($sp)\naddiu $sp $sp '+str(4*z+8)+'\n'
+        node.code+='lw $fp 0($sp)\njr $ra\n'
 
     def visit_VarDeclaration(self,node):
         node.code = node.name+': '
@@ -187,7 +233,7 @@ class GenerateCode(ast.NodeVisitor):
         if (node.expr != None):
             self.visit(node.expr)
             node.code+=node.expr.code
-        node.code+='lw $ra 4($sp)\naddiu $sp $sp 4\nlw $fp 0($sp)\njr $ra\n'
+        node.code+='lw $ra 4($sp)\naddiu $sp $sp 12\nlw $fp 0($sp)\nli $v0 1\nsyscall\njr $ra\n'
 
     def visit_GotoStatement(self,node):
         node.code='b '+node.name.location.name+'\n'
@@ -200,13 +246,68 @@ class GenerateCode(ast.NodeVisitor):
         for argument in node.arguments.arguments:
             self.visit(argument)
             node.code+=argument.code
-            node.code+='sw $a0 0($sp)\naddiu $sp $sp -4\n'
+            node.code+='sw $a0 0($sp)\naddiu $sp $sp -4\nli $v0 1\nsyscall\n'
         node.code+='jal '+node.name+'\n'
 
     def visit_PrintStatement(self, node):
         self.visit(node.expr)
         inst = ("print", node.expr.gen_location)
         node.code=inst
+
+    def visit_IfStatement(self, node):
+        #print("visiting %r" % node)
+        global counter
+        global endcounter
+        self.visit(node.expr)
+        node.code=node.expr.code
+        counter+=1
+        tempcounter = counter
+        node.code+='beq $a0 0 l'+str(tempcounter)+'\n'
+        self.visit(node.truebranch)
+        node.code+=node.truebranch.code
+        counter+=1
+        tempcounter2=counter
+        node.code+='j l'+str(tempcounter2)+'\n'
+        node.code+='l'+str(tempcounter)+':\n'
+        if node.falsebranch is not None:
+            self.visit(node.falsebranch)
+            node.code+=node.falsebranch.code
+        node.code+='l'+str(tempcounter2)+':\n'
+
+    def visit_CaseStatement(self,node):
+        global counter
+        global endcounter
+        self.visit(node.condition)
+        node.code=node.condition.code
+        node.code+='sw $a0 0($sp)\naddiu $sp $sp -4\n'
+        counter+=1
+        tempcounter=counter
+        if node.alternatives.alternatives is not None:
+            for alternative in node.alternatives.alternatives :
+                self.visit(alternative)
+                node.code+=alternative.code
+                node.code+='j l'+str(tempcounter)+'\n'
+        node.code+='el'+str(endcounter)+':\nl'+str(tempcounter)+':\n'
+        endcounter+=1
+        node.code+='addiu $sp $sp 4\n'
+
+    def visit_Alternative(self,node):
+        global counter
+        global endcounter
+        node.code='el'+str(endcounter)+':\n'
+        endcounter+=1
+        counter+=1
+        tempcounter=counter
+        for choice in node.choices.choices:
+            if choice=='others':
+                node.code+='j l'+str(tempcounter)+'\n'
+            else:
+                self.visit(choice)
+                node.code+=choice.code
+                node.code+='lw $t1 4($sp)\nbeq $a0 $t1 l'+str(tempcounter)+'\n'
+        node.code+='j el'+str(endcounter)+'\nl'+str(tempcounter)+':\n'
+        self.visit(node.statements)
+        node.code+=node.statements.code
 
 # STEP 3: Testing
 # 
@@ -268,7 +369,7 @@ if __name__ == '__main__':
     with subscribe_errors(lambda msg: sys.stdout.write(msg+"\n")):
         program = parser.parse(open(sys.argv[1]).read())
         # Check the program
-        check.check_program(program)
+        env = check.check_program(program)
         # If no errors occurred, generate code
         if not errors_reported():
             code = generate_code(program)
