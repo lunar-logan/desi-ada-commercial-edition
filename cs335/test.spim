@@ -1,0 +1,17 @@
+.data
+arg:  .word 1
+.text
+lw $a0 arg
+sw $a0 0($sp)
+addiu $sp $sp -4
+lw $a0 arg
+lw $t1 4($sp)
+imul $a0 $t1 $a0
+addiu $sp $sp 4
+lw $ra 4($sp)
+addiu $sp $sp 4
+lw $fp 0($sp)
+jr $ra
+li $v0 10
+syscall
+
