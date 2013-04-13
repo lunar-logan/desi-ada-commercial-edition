@@ -63,7 +63,7 @@ class GenerateCode(ast.NodeVisitor):
         self.temp_count = 0
         # Visit all of the statements in the program
         self.visit(node.compilation)
-        self.code=node.compilation.code+'li $v0 1\nsyscall\nli $v0 10\nsyscall\n'
+        self.code=node.compilation.code+'li $v0 10\nsyscall\n'
         program = self.code
     # You must implement visit_Nodename methods for all of the other
     # AST nodes.  In your code, you will need to make instructions
@@ -106,7 +106,6 @@ class GenerateCode(ast.NodeVisitor):
         node.code+='move $fp $sp\nsw $ra 0($sp)\naddiu $sp $sp -4\n'
         self.visit(node.statements)
         node.code+=node.statements.code
-        node.code+='li $v0 1\nsyscall\n'
         node.code+='lw $ra 4($sp)\naddiu $sp $sp '+str(4*z+8)+'\n'
         node.code+='lw $fp 0($sp)\njr $ra\n'
         activationStack.pop()
@@ -153,14 +152,14 @@ class GenerateCode(ast.NodeVisitor):
         node.code=inst
 
     def visit_LoadLocation(self, node):
-        checktype=node.check_type.typename
+        if hasattr(node,'check_type'): checktype=node.check_type.typename
         #inst = None
-        if checktype=='float':
-            inst = 'l.s $f0 '+node.location.name+'\n'
-        elif  checktype=='string':
-            inst = 'la $a0 '+node.location.name+'\n'
-        else :
-            inst = 'lw $a0 '+str(4 * (activationStack.peek().length() - activationStack.peek().index(node.location.name)))+'($fp)\n'
+        #if checktype=='float':
+        #    inst = 'l.s $f0 '+node.location.name+'\n'
+        #elif  checktype=='string':
+        #    inst = 'la $a0 '+node.location.name+'\n'
+        #else :
+        inst = 'lw $a0 '+str(4 * (activationStack.peek().length() - activationStack.peek().index(node.location.name)))+'($fp)\n'
         node.code = inst
         # Save the name of the temporary variable where the value was placed 
 
@@ -253,7 +252,7 @@ class GenerateCode(ast.NodeVisitor):
         if (node.expr != None):
             self.visit(node.expr)
             node.code+=node.expr.code
-        node.code+='lw $ra 4($sp)\naddiu $sp $sp 12\nlw $fp 0($sp)\nli $v0 1\nsyscall\njr $ra\n'
+        node.code+='lw $ra 4($sp)\naddiu $sp $sp 12\nlw $fp 0($sp)\njr $ra\n'
 
     def visit_GotoStatement(self,node):
         node.code='b '+node.name.location.name+'\n'
@@ -262,12 +261,26 @@ class GenerateCode(ast.NodeVisitor):
         node.code='sw $fp 0($sp)\naddiu $sp $sp -4\njal '+node.name.location.name+'\n'
 
     def visit_FuncCall(self,node):
-        node.code='sw $fp 0($sp)\naddiu $sp $sp -4\n'
-        for argument in node.arguments.arguments:
-            self.visit(argument)
-            node.code+=argument.code
-            node.code+='sw $a0 0($sp)\naddiu $sp $sp -4\nli $v0 1\nsyscall\n'
-        node.code+='jal '+node.name+'\n'
+        if node.name == 'put':
+            checktype = node.arguments.arguments[0].check_type.typename
+            self.visit(node.arguments.arguments[0])
+            node.code=node.arguments.arguments[0].code
+            if checktype=='integer':
+                node.code+='li $v0 1\n'
+            elif checktype=='character':
+                node.code+='li $v0 11\n'
+            elif checktype=='string':
+                node.code+='li $v0 4\n'
+            elif checktype=='float':
+                node.code+='li $v0 2'
+            node.code += 'syscall\n'
+        else:
+            node.code='sw $fp 0($sp)\naddiu $sp $sp -4\n'
+            for argument in node.arguments.arguments:
+                self.visit(argument)
+                node.code+=argument.code
+                node.code+='sw $a0 0($sp)\naddiu $sp $sp -4\n'
+            node.code+='jal '+node.name+'\n'
 
     def visit_PrintStatement(self, node):
         self.visit(node.expr)
@@ -398,4 +411,3 @@ if __name__ == '__main__':
             JumpGenerator().visit(code)
             #for inst in code:
             #    print(inst)
-
