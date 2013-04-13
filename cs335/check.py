@@ -454,24 +454,32 @@ class CheckProgramVisitor(NodeVisitor):
             return
         sym = self.environment.lookup(node.name)
         if not sym:
-            error(node.lineno, "Function name '{}' not found".format(node.name))
-        else :
-            node.check_type = sym.check_type
-            if not isinstance(sym, FuncStatement):
-                error(node.lineno, "Tried to call non-function '{}'".format(node.name))
-            else:
+            if node.name == 'put':
                 if node.arguments is not None:
-                    if len(sym.parameters.parameters) != len(node.arguments.arguments):
-                        error(node.lineno, "Number of arguments for call to function '{}' do not match function parameter declaration on line {}".format(node.name, sym.lineno))
-                    self.visit(node.arguments)
-                    argerrors = False
-                    for arg, parm in zip(node.arguments.arguments, sym.parameters.parameters):
-                        if arg.check_type != parm.typename.check_type:
-                            error(node.lineno, "Argument type '{}' does not match parameter type '{}' in function call to '{}'".format(arg.check_type.typename, parm.check_type.typename, node.name))
-                            argerrors = True
-                        if argerrors:
-                            return
-                        arg.parm = parm
+                    if len(node.arguments.arguments) > 1:
+                        error(node.lineno, "Put accepts only one argument")
+                    else:
+                        self.visit(node.arguments)
+            else:
+                error(node.lineno, "Function name '{}' not found".format(node.name))
+        else :
+            if hasattr(sym,'check_type'):
+                node.check_type = sym.check_type
+                if not isinstance(sym, FuncStatement):
+                    error(node.lineno, "Tried to call non-function '{}'".format(node.name))
+                else:
+                    if node.arguments is not None:
+                        if len(sym.parameters.parameters) != len(node.arguments.arguments):
+                            error(node.lineno, "Number of arguments for call to function '{}' do not match function parameter declaration on line {}".format(node.name, sym.lineno))
+                        self.visit(node.arguments)
+                        argerrors = False
+                        for arg, parm in zip(node.arguments.arguments, sym.parameters.parameters):
+                            if arg.check_type != parm.typename.check_type:
+                                error(node.lineno, "Argument type '{}' does not match parameter type '{}' in function call to '{}'".format(arg.check_type.typename, parm.check_type.typename, node.name))
+                                argerrors = True
+                            if argerrors:
+                                return
+                            arg.parm = parm
 
 
     def visit_Value_s(self, node):
@@ -616,6 +624,7 @@ class CheckProgramVisitor(NodeVisitor):
                 error(node.lineno, "cannot use {} outside of variable declarations".format(sym.typename))
                 return
             if isinstance(sym,FuncStatement):
+                node.check_type = None
                 pass
              #to add something
             else:
