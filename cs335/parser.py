@@ -960,7 +960,10 @@ def p_subprog_body(p):
     p[0]=FuncStatement(p[1][0],p[1][1],p[1][2],p[2],p[3],p[5], lineno=p.lineno(4))
 def p_procedure_call(p):
     '''procedure_call : name SEMICOLON'''
-    p[0] = ProcCall(LoadLocation(Location(p[1], lineno=p.lineno(2)), lineno=p.lineno(2)), lineno=p.lineno(2))
+    if (isinstance(p[1],tuple)):
+        p[0] = FuncCall(p[1][0],p[1][1], lineno=p.lineno(1))
+    else:
+        p[0] = ProcCall(LoadLocation(Location(p[1], lineno=p.lineno(2)), lineno=p.lineno(2)), lineno=p.lineno(2))
 def p_pkg_decl(p):
     '''pkg_decl : pkg_spec SEMICOLON
 | generic_pkg_inst SEMICOLON'''
@@ -1350,4 +1353,3 @@ if __name__ == '__main__':
     # Output the resulting parse tree structure
         for depth,node in flatten(program):
             print("%s%s" % (" "*(4*depth),node))    
-
