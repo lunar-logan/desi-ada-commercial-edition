@@ -91,7 +91,6 @@ class GenerateCode(ast.NodeVisitor):
                 #self.visit(args)
                 #node.code+=args.code
                 ar.store(args.name, args.typename.name)
-                node.code += 'addiu $sp $sp -4\n'
             z=len(node.parameters.parameters)
         else :
             z=0
@@ -99,6 +98,7 @@ class GenerateCode(ast.NodeVisitor):
             #self.visit(vardecl)
             #node.code+=vardecl.code
             ar.store(vardecl.name, vardecl.typename.name)
+            node.code += 'addiu $sp $sp -4\n'
         z+=len(node.decl_part)
         activationStack.push(ar)
         
