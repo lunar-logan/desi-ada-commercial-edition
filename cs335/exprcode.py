@@ -1,5 +1,6 @@
 from loo import IntType, FloatType, StringType, BoolType, CharType, ArrayType, AccessType, EnumType, RecordType, ExprType
 import ast
+from ast import *
 import exprblock
 counter = 0
 endcounter = 0
@@ -25,7 +26,12 @@ class ActivationRecord:
             if self.rec[i] != Name:
                 count += self.size[self.type[self.rec[i]]]
         return count
-    
+    def remove(self):
+        '''Removes the last element'''
+        last = self.rec[-1]
+        self.rec = self.rec[0:-1] 
+        self.type.pop(last)   
+
 
 class Stack:
     def __init__(self):
@@ -40,6 +46,7 @@ class Stack:
         self.env = self.env[0:-1]
         return val
     def peek(self):
+        #print "{", self.env, "}"
         return self.env[-1]
 
 
@@ -94,15 +101,13 @@ class GenerateCode(ast.NodeVisitor):
             z=len(node.parameters.parameters)
         else :
             z=0
-        for vardecl in node.decl_part:
-            #self.visit(vardecl)
-            #node.code+=vardecl.code
-            ar.store(vardecl.name, vardecl.typename.name)
-            node.code += 'addiu $sp $sp -4\n'
-        z+=len(node.decl_part)
         activationStack.push(ar)
-        
-        
+        for vardecl in node.decl_part:
+            self.visit(vardecl)
+            node.code+=vardecl.code
+            #ar.store(vardecl.name, vardecl.typename.name)
+        z+=len(node.decl_part)
+
         node.code+='move $fp $sp\nsw $ra 0($sp)\naddiu $sp $sp -4\n'
         self.visit(node.statements)
         node.code+=node.statements.code
@@ -111,7 +116,11 @@ class GenerateCode(ast.NodeVisitor):
         activationStack.pop()
 
     def visit_VarDeclaration(self,node):
-        node.code = node.name+': '
+        node.code = 'addiu $sp $sp -4\n'
+        #ar = ActivationRecord()
+        ar = activationStack.peek()
+        ar.store(node.name, node.typename.name)
+        '''node.code = node.name+': '
         checktype=node.typename.check_type.typename
         if checktype=='integer':
             node.code+=' .word 1\n'
@@ -120,7 +129,7 @@ class GenerateCode(ast.NodeVisitor):
         elif checktype=='string':
             node.code+=' .asciiz ""\n'
         elif checktype=='float':
-            node.code+=' .float 0.0\n'
+            node.code+=' .float 0.0\n'''
 
     def visit_FuncParameter(self,node):
         node.code = node.name+': '
@@ -342,6 +351,49 @@ class GenerateCode(ast.NodeVisitor):
         self.visit(node.statements)
         node.code+=node.statements.code
 
+    def visit_WhileStatement(self,node):
+        global counter
+        global endcounter
+        counter+=1
+        tempcounter=counter
+        counter+=1
+        tempcounter2=counter
+        node.code=''
+        if isinstance(node.expr,For_loop):
+            self.visit(node.expr.name)
+            node.code+=node.expr.name.code
+            node.code+='lw $t1 8($sp)\nlw $t2 4($sp)\nsw $t1 4($sp)\nsw $t2 8($sp)\naddiu $fp $fp -4\n'
+            self.visit(node.expr.discrete_range)
+            node.code+=node.expr.discrete_range.code
+            node.code+='lw $a0 8($sp)\n'
+            node.code+="sw $a0 "+str(4 * (activationStack.peek().length() - activationStack.peek().index(node.expr.name.name)))+'($fp)\n'
+        node.code+='l'+str(tempcounter)+':\n'
+        if isinstance(node.expr,For_loop):
+            node.code+='lw $a0 '+str(4 * (activationStack.peek().length() - activationStack.peek().index(node.expr.name.name)))+'($fp)\n'
+            node.code+='lw $t1 4($sp)\nbgt $a0 $t1 l'+str(tempcounter2)+'\n'
+            node.code+='add $a0 $a0 1\n'
+            node.code+="sw $a0 "+str(4 * (activationStack.peek().length() - activationStack.peek().index(node.expr.name.name)))+'($fp)\n'
+        else :
+            self.visit(node.expr)
+            node.code+=node.expr.code
+            node.code+='beq $a0 0 l'+str(tempcounter2)+'\n'
+        self.visit(node.truebranch)
+        node.code+=node.truebranch.code
+        node.code+='j l'+str(tempcounter)+'\n'
+        node.code+='l'+str(tempcounter2)+':\n'
+        if isinstance(node.expr,For_loop):
+            node.code+='addiu $sp $sp 4\naddiu $sp $sp 4\n'
+            node.code+='lw $t1 8($sp)\nlw $t2 4($sp)\nsw $t1 4($sp)\nsw $t2 8($sp)\naddiu $fp $fp 4\naddiu $sp $sp 4\n'
+            activationStack.peek().remove()
+
+    def visit_Doubledot_range(self,node):
+        self.visit(node.left)
+        node.code=node.left.code
+        node.code+='sw $a0 0($sp)\naddiu $sp $sp -4\n'
+        self.visit(node.right)
+        node.code+=node.right.code
+        node.code+='sw $a0 0($sp)\naddiu $sp $sp -4\n'
+
 # STEP 3: Testing
 # 
 # Try running this program on the input file good.e and viewing
@@ -383,6 +435,7 @@ class JumpGenerator(exprblock.BlockVisitor):
         if block.falsebranch:
             self.visit(block.falsebranch)
 
+
     def visit_WhileBlock(self,block):
         # Emit a conditional jump around the if-branch
         #inst = ('while', block.condvar)
@@ -393,7 +446,7 @@ class JumpGenerator(exprblock.BlockVisitor):
 
 if __name__ == '__main__':
     import lexer
-    import parser 
+    import _parser as parser 
     import check
     import sys
     from errors import subscribe_errors, errors_reported
