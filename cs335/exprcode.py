@@ -12,6 +12,13 @@ class ActivationRecord:
     def store(self, Name, Type):
         self.rec += [Name]
         self.type[Name] = Type
+    def index(self, name):
+        for i in xrange(len(self.rec)):
+            if self.rec[i] == name: return i
+        return -1
+    def length(self):
+        return len(self.rec)
+
     def get(self, Name):
         count = 0
         for i in xrange(len(self.rec)):
@@ -23,6 +30,7 @@ class ActivationRecord:
 class Stack:
     def __init__(self):
         self.env = []
+        #self.activationRecord = ActivationRecord()
     def push(self, x):
         self.env += [x]   
     def pop(self):
@@ -36,12 +44,13 @@ class Stack:
 
 
                 
-	 
+activationStack = Stack()
 class GenerateCode(ast.NodeVisitor):
     '''
     Node visitor class that creates 3-address encoded instruction sequences.
     '''
     program = ''
+    #activationStack = Stack()
     def new_temp(self,type):
         name = "%s_%d" % (type.typename,self.temp_count)
         self.temp_count += 1
@@ -71,27 +80,36 @@ class GenerateCode(ast.NodeVisitor):
             node.code+=progra.code
 
     def visit_FuncStatement(self,node):
-        '''node.code='.data\n'
+        node.code ='.text\n'
+        if sys.argv[1][0:sys.argv[1].index(".adb")]==node.name:
+            node.code+='.globl main\nmain:\n'
+        node.code+=node.name+':\n'
+        #node.code='.data\n'
+        ar = ActivationRecord()
         if node.parameters is not None:
             for args in node.parameters.parameters:
-                self.visit(args)
-                node.code+=args.code
+                #self.visit(args)
+                #node.code+=args.code
+                ar.store(args.name, args.typename.name)
             z=len(node.parameters.parameters)
         else :
             z=0
         for vardecl in node.decl_part:
-            self.visit(vardecl)
-            node.code+=vardecl.code'''
-        node.code+='.text\n'
-        if sys.argv[1][0:sys.argv[1].index(".adb")]==node.name:
-            node.code+='.globl main\nmain:\n'
-        node.code+=node.name+':\n'
+            #self.visit(vardecl)
+            #node.code+=vardecl.code
+            ar.store(vardecl.name, vardecl.typename.name)
+            node.code += 'addiu $sp $sp -4\n'
+        z+=len(node.decl_part)
+        activationStack.push(ar)
+        
+        
         node.code+='move $fp $sp\nsw $ra 0($sp)\naddiu $sp $sp -4\n'
         self.visit(node.statements)
         node.code+=node.statements.code
         node.code+='li $v0 1\nsyscall\n'
         node.code+='lw $ra 4($sp)\naddiu $sp $sp '+str(4*z+8)+'\n'
         node.code+='lw $fp 0($sp)\njr $ra\n'
+        activationStack.pop()
 
     def visit_VarDeclaration(self,node):
         node.code = node.name+': '
@@ -136,12 +154,13 @@ class GenerateCode(ast.NodeVisitor):
 
     def visit_LoadLocation(self, node):
         checktype=node.check_type.typename
+        #inst = None
         if checktype=='float':
             inst = 'l.s $f0 '+node.location.name+'\n'
         elif  checktype=='string':
             inst = 'la $a0 '+node.location.name+'\n'
         else :
-            inst = 'lw $a0 '+node.location.name+'\n'
+            inst = 'lw $a0 '+str(4 * (activationStack.peek().length() - activationStack.peek().index(node.location.name)))+'($fp)\n'
         node.code = inst
         # Save the name of the temporary variable where the value was placed 
 
@@ -209,7 +228,8 @@ class GenerateCode(ast.NodeVisitor):
         if node.expr.check_type.typename=='float':
             inst = "s.s $a0 "+node.location.name+'\n'
         elif node.expr.check_type.typename=='integer':
-            inst = "sw $a0 "+node.location.name+'\n'
+
+            inst = "sw $a0 "+str(4 * (activationStack.peek().length() - activationStack.peek().index(node.location.name)))+'($fp)\n'
         node.code+=inst
 
     def visit_ExitStatement(self, node):
@@ -360,7 +380,7 @@ class JumpGenerator(exprblock.BlockVisitor):
 
 if __name__ == '__main__':
     import lexer
-    import parser
+    import parser 
     import check
     import sys
     from errors import subscribe_errors, errors_reported
@@ -378,3 +398,4 @@ if __name__ == '__main__':
             JumpGenerator().visit(code)
             #for inst in code:
             #    print(inst)
+
