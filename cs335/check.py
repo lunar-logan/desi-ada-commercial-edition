@@ -465,7 +465,8 @@ class CheckProgramVisitor(NodeVisitor):
         else :
             if hasattr(sym,'check_type'):
                 node.check_type = sym.check_type
-                if not isinstance(sym, FuncStatement):
+                if node.check_type==ArrayType: pass
+                elif not isinstance(sym, FuncStatement):
                     error(node.lineno, "Tried to call non-function '{}'".format(node.name))
                 else:
                     if node.arguments is not None:
