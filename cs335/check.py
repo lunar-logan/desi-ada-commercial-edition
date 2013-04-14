@@ -465,7 +465,7 @@ class CheckProgramVisitor(NodeVisitor):
         else :
             if hasattr(sym,'check_type'):
                 node.check_type = sym.check_type
-                if node.check_type==ArrayType: pass
+                if isinstance(sym,VarDeclaration): pass
                 elif not isinstance(sym, FuncStatement):
                     error(node.lineno, "Tried to call non-function '{}'".format(node.name))
                 else:
@@ -651,7 +651,7 @@ def check_program(node):
 
 if __name__ == '__main__':
     import lexer
-    import parser
+    import _parser as parser
     import sys
     from errors import subscribe_errors
     pars = parser.make_parser()
