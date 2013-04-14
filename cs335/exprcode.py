@@ -9,7 +9,9 @@ class ActivationRecord:
     def __init__(self):
         self.rec =[]
         self.type = {}
-        self.size = {'Int': 4, 'Float':8}
+        self.size = {'integer': 4, 'float':8}
+    def addSize(self, tp, sz):
+        self.size[tp] = sz
     def store(self, Name, Type):
         self.rec += [Name]
         self.type[Name] = Type
@@ -20,11 +22,21 @@ class ActivationRecord:
     def length(self):
         return len(self.rec)
 
-    def get(self, Name):
-        count = 0
-        for i in xrange(len(self.rec)):
-            if self.rec[i] != Name:
+    def getType(self, name):
+        if name in self.type:
+            return self.type[name]
+        return None
+    def get(self, Name=None):
+        if Name == None:
+            count = 0
+            for i in xrange(len(self.rec)):
                 count += self.size[self.type[self.rec[i]]]
+            return count
+        count = 0
+        for i in xrange(len(self.rec)):            
+            if self.rec[i] == Name: break
+            count += self.size[self.type[self.rec[i]]]
+                #print self.rec[i], " --hghg",self.size[self.type[self.rec[i]]]
         return count
     def remove(self):
         '''Removes the last element'''
@@ -116,10 +128,19 @@ class GenerateCode(ast.NodeVisitor):
         activationStack.pop()
 
     def visit_VarDeclaration(self,node):
-        node.code = 'addiu $sp $sp -4\n'
+       
         #ar = ActivationRecord()
+        #print "Array Node", node
         ar = activationStack.peek()
         ar.store(node.name, node.typename.name)
+        if node.typename.name == 'array':
+            #print "Inside!", node.length
+            arrayLength = node.length.index_constraint[0][1].right.value-node.length.index_constraint[0][1].left.value+1
+            node.code = "addiu $sp $sp " + str(-4 * (node.length.index_constraint[0][1].right.value-node.length.index_constraint[0][1].left.value+1)) + '\n'
+            ar.addSize('array', 4*arrayLength)
+            #print "Array Length: ", node.length.index_constraint.right.value-node.length.index_constraint.left.value+1
+            #print "AR Size: ",activationStack.peek().get()
+        else: node.code = 'addiu $sp $sp -4\n'        
         '''node.code = node.name+': '
         checktype=node.typename.check_type.typename
         if checktype=='integer':
@@ -144,10 +165,10 @@ class GenerateCode(ast.NodeVisitor):
             node.code+=' .float 0.0\n'
 
     def visit_Literal(self,node):
-        if node.check_type.typename=='float':
-            inst = 'li.s $f0 '+str(node.value)+'\n'
-        else: 
-            inst = 'li $a0 '+str(node.value)+'\n'
+        #if node.check_type.typename=='float':
+        #    inst = 'li.s $f0 '+str(node.value)+'\n'
+        #else: 
+        inst = 'li $a0 '+str(node.value)+'\n'
         node.code=inst
 
     def visit_Unaryop(self,node):
@@ -168,7 +189,7 @@ class GenerateCode(ast.NodeVisitor):
         #elif  checktype=='string':
         #    inst = 'la $a0 '+node.location.name+'\n'
         #else :
-        inst = 'lw $a0 '+str(4 * (activationStack.peek().length() - activationStack.peek().index(node.location.name)))+'($fp)\n'
+        inst = 'lw $a0 '+str(activationStack.peek().get() - activationStack.peek().get(node.location.name))+'($fp)\n'
         node.code = inst
         # Save the name of the temporary variable where the value was placed 
 
@@ -232,14 +253,29 @@ class GenerateCode(ast.NodeVisitor):
 
     def visit_AssignmentStatement(self, node):
         self.visit(node.expr)
+        #print node.location.name
+        #print 'ActivationRecord',activationStack.peek().rec,activationStack.peek().get(),activationStack.peek().get(node.location.name)
         node.code=node.expr.code
         if node.expr.check_type.typename=='float':
             inst = "s.s $a0 "+node.location.name+'\n'
         elif node.expr.check_type.typename=='integer':
 
-            inst = "sw $a0 "+str(4 * (activationStack.peek().length() - activationStack.peek().index(node.location.name)))+'($fp)\n'
+            inst = "sw $a0 "+str(activationStack.peek().get() - activationStack.peek().get(node.location.name))+'($fp)\n'
         node.code+=inst
 
+    def visit_ArrayAssignmentStatement(self,node):
+        self.visit(node.expr)
+        node.code = node.expr.code
+        node.code+='sw $a0 0($sp)\naddiu $sp $sp -4\n'
+        for arg in node.args.arguments:
+            self.visit(arg)
+            node.code += arg.code
+        node.code += 'mul $a0 $a0 4\n'
+        node.code+='sub $a0 $a0 '+str(activationStack.peek().get() - activationStack.peek().get(node.location.name))+'\n'
+        node.code+='mul $a0 $a0 -1\n'
+        node.code+='lw $t1 0($sp)\naddiu $sp $sp 4\n'
+        node.code+='add $a0 $a0 $fp\nsw $t1 0($a0)\n'
+        
     def visit_ExitStatement(self, node):
         node.code=''
         if node.expr != None :
@@ -270,10 +306,11 @@ class GenerateCode(ast.NodeVisitor):
         node.code='sw $fp 0($sp)\naddiu $sp $sp -4\njal '+node.name.location.name+'\n'
 
     def visit_FuncCall(self,node):
+        node.code=''
         if node.name == 'put':
             checktype = node.arguments.arguments[0].check_type.typename
             self.visit(node.arguments.arguments[0])
-            node.code=node.arguments.arguments[0].code
+            node.code+=node.arguments.arguments[0].code
             if checktype=='integer':
                 node.code+='li $v0 1\n'
             elif checktype=='character':
@@ -283,8 +320,19 @@ class GenerateCode(ast.NodeVisitor):
             elif checktype=='float':
                 node.code+='li $v0 2'
             node.code += 'syscall\n'
+        elif activationStack.peek().index(node.name) < 0:
+            #print "Seems an array!!"
+            for argument in node.arguments.arguments:
+                self.visit(argument)
+                node.code+=argument.code
+            node.code += 'mul $a0 $a0 4\n'
+            print 'Size of a record',activationStack.peek().get(),activationStack.peek().get(node.name)
+            node.code+='sub $a0 $a0 '+str(activationStack.peek().get() - activationStack.peek().get(node.name))+'\n'
+            node.code+='mul $a0 $a0 -1\n'
+            node.code+='add $a0 $a0 $fp\nlw $a0 0($a0)'
         else:
-            node.code='sw $fp 0($sp)\naddiu $sp $sp -4\n'
+            #print "Fallback to else"
+            node.code+='sw $fp 0($sp)\naddiu $sp $sp -4\n'
             for argument in node.arguments.arguments:
                 self.visit(argument)
                 node.code+=argument.code
@@ -366,13 +414,13 @@ class GenerateCode(ast.NodeVisitor):
             self.visit(node.expr.discrete_range)
             node.code+=node.expr.discrete_range.code
             node.code+='lw $a0 8($sp)\n'
-            node.code+="sw $a0 "+str(4 * (activationStack.peek().length() - activationStack.peek().index(node.expr.name.name)))+'($fp)\n'
+            node.code+="sw $a0 "+str(4 * (activationStack.peek().get() - activationStack.peek().get(node.expr.name.name)))+'($fp)\n'
         node.code+='l'+str(tempcounter)+':\n'
         if isinstance(node.expr,For_loop):
-            node.code+='lw $a0 '+str(4 * (activationStack.peek().length() - activationStack.peek().index(node.expr.name.name)))+'($fp)\n'
+            node.code+='lw $a0 '+str(4 * (activationStack.peek().get() - activationStack.peek().get(node.expr.name.name)))+'($fp)\n'
             node.code+='lw $t1 4($sp)\nbgt $a0 $t1 l'+str(tempcounter2)+'\n'
             node.code+='add $a0 $a0 1\n'
-            node.code+="sw $a0 "+str(4 * (activationStack.peek().length() - activationStack.peek().index(node.expr.name.name)))+'($fp)\n'
+            node.code+="sw $a0 "+str(4 * (activationStack.peek().get() - activationStack.peek().get(node.expr.name.name)))+'($fp)\n'
         else :
             self.visit(node.expr)
             node.code+=node.expr.code
@@ -393,6 +441,8 @@ class GenerateCode(ast.NodeVisitor):
         self.visit(node.right)
         node.code+=node.right.code
         node.code+='sw $a0 0($sp)\naddiu $sp $sp -4\n'
+
+
 
 # STEP 3: Testing
 # 
