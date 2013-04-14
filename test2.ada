@@ -1,8 +1,15 @@
--- Change return type. Provides return type error
-function Square (Arg : Integer) return Integer is
---   B : float;
+-- If_Else Statement
+procedure test2 is
+      Ace,Patt,Cat,Bag : Integer;  -- same as 3 separate declarations
+      Dog : Character;
    begin
---      B := 4.5;
---      return B;
-      return Arg * Arg;
-   end Square;
+      Ace := 5;
+      Bag := 4;
+
+      if (Bag=Ace) then Bag:=4;
+      elsif (Bag>3) then Bag:=7;
+      end if;
+      
+      Put(Bag);
+      Put(newline);
+   end;
