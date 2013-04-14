@@ -123,8 +123,8 @@ class GenerateCode(ast.NodeVisitor):
         node.code+='move $fp $sp\nsw $ra 0($sp)\naddiu $sp $sp -4\n'
         self.visit(node.statements)
         node.code+=node.statements.code
-        node.code+='lw $ra 4($sp)\naddiu $sp $sp '+str(4*z+8)+'\n'
-        node.code+='lw $fp 0($sp)\njr $ra\n'
+        node.code+='lw $ra 4($sp)\naddiu $sp $sp 4\n'
+        node.code+='lw $fp 4($sp)\naddiu $sp $sp '+str(activationStack.peek().get()+4)+'\njr $ra\n'
         activationStack.pop()
 
     def visit_VarDeclaration(self,node):
@@ -273,7 +273,7 @@ class GenerateCode(ast.NodeVisitor):
         node.code += 'mul $a0 $a0 4\n'
         node.code+='sub $a0 $a0 '+str(activationStack.peek().get() - activationStack.peek().get(node.location.name))+'\n'
         node.code+='mul $a0 $a0 -1\n'
-        node.code+='lw $t1 0($sp)\naddiu $sp $sp 4\n'
+        node.code+='lw $t1 4($sp)\naddiu $sp $sp 4\n'
         node.code+='add $a0 $a0 $fp\nsw $t1 0($a0)\n'
         
     def visit_ExitStatement(self, node):
@@ -319,9 +319,10 @@ class GenerateCode(ast.NodeVisitor):
                 node.code+='li $v0 4\n'
             elif checktype=='float':
                 node.code+='li $v0 2'
+            else: node.code+='li $v0 1\n'
             node.code += 'syscall\n'
-        elif activationStack.peek().index(node.name) < 0:
-            #print "Seems an array!!"
+        #elif activationStack.peek().index(node.name) < 0:
+        elif node.check_type==ArrayType:    #print "Seems an array!!"
             for argument in node.arguments.arguments:
                 self.visit(argument)
                 node.code+=argument.code
@@ -329,7 +330,7 @@ class GenerateCode(ast.NodeVisitor):
             print 'Size of a record',activationStack.peek().get(),activationStack.peek().get(node.name)
             node.code+='sub $a0 $a0 '+str(activationStack.peek().get() - activationStack.peek().get(node.name))+'\n'
             node.code+='mul $a0 $a0 -1\n'
-            node.code+='add $a0 $a0 $fp\nlw $a0 0($a0)'
+            node.code+='add $a0 $a0 $fp\nlw $a0 0($a0)\n'
         else:
             #print "Fallback to else"
             node.code+='sw $fp 0($sp)\naddiu $sp $sp -4\n'
@@ -496,7 +497,7 @@ class JumpGenerator(exprblock.BlockVisitor):
 
 if __name__ == '__main__':
     import lexer
-    import _parser as parser 
+    import parser as parser 
     import check
     import sys
     from errors import subscribe_errors, errors_reported
